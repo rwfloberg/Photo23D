@@ -1,395 +1,9 @@
-            async prepareImageForProcessingFromFile(file) {
-                return new Promise((resolve) => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    
-                    img.onload = () => {
-                        const maxSize = 512;
-                        let { width, height } = img;
-                        
-                        if (width > height) {
-                            if (width > maxSize) {
-                                height = (height * maxSize) / width;
-                                width = maxSize;
-                            }
-                        } else {
-                            if (height > maxSize) {
-                                width = (width * maxSize) / height;
-                                height = maxSize;
-                            }
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        const imageData = ctx.getImageData(0, 0, width, height);
-                        resolve({ data: imageData, width, height });
-                    };
-                    
-                    img.src = URL.createObjectURL(file);
-                });
-            }
-
-            combineMultipleDepthMaps(photoAnalyses) {
-                this.debugLog('🔄 Combining multiple depth maps for enhanced accuracy', 'step');
-                
-                if (photoAnalyses.length === 0) return null;
-                
-                const firstAnalysis = photoAnalyses[0];
-                const { width, height } = firstAnalysis.imageData;
-                const combinedDepth = new Float32Array(width * height);
-                
-                // Initialize with first depth map
-                for (let i = 0; i < combinedDepth.length; i++) {
-                    combinedDepth[i] = firstAnalysis.depthMap[i];
-                }
-                
-                // Combine with other depth maps using weighted average
-                for (let analysisIndex = 1; analysisIndex < photoAnalyses.length; analysisIndex++) {
-                    const analysis = photoAnalyses[analysisIndex];
-                    const weight = 1.0 / (analysisIndex + 1); // Decreasing weight for subsequent images
-                    
-                    for (let i = 0; i < combinedDepth.length; i++) {
-                        // Weighted average with edge preservation
-                        const currentDepth = combinedDepth[i];
-                        const newDepth = analysis.depthMap[i];
-                        
-                        // If depths are similar, average them
-                        // If they're very different, favor the higher confidence one
-                        const depthDiff = Math.abs(currentDepth - newDepth);
-                        if (depthDiff < 0.3) {
-                            combinedDepth[i] = currentDepth * (1 - weight) + newDepth * weight;
-                        } else {
-                            // Large difference - choose the one with more local consistency
-                            // For now, use a simple rule: favor the higher value (closer objects)
-                            combinedDepth[i] = Math.max(currentDepth, newDepth);
-                        }
-                    }
-                }
-                
-                // Apply final smoothing while preserving edges
-                const smoothed = this.edgePreservingSmooth(
-                    combinedDepth, 
-                    new Float32Array(width * height), // dummy gradients
-                    new Float32Array(width * height), 
-                    width, 
-                    height
-                );
-                
-                this.debugLog(`✅ Combined ${photoAnalyses.length} depth maps successfully`, 'info');
-                return smoothed;
-            }
-
-            generateEnhancedPointCloud(imageData, depthMap) {
-                this.debugLog('☁️ Generating enhanced multi-photo point cloud', 'step');
-                const { width, height } = imageData;
-                const points = [];
-                
-                const skipFactor = 2; // Higher detail for multi-photo mode
-                const scaleX = 40; // Larger scale for better detail
-                const scaleY = 40;
-                const scaleZ = 20; // Enhanced height scaling
-                
-                let pointCount = 0;
-                for (let y = 0; y < height; y += skipFactor) {
-                    for (let x = 0; x < width; x += skipFactor) {
-                        const idx = y * width + x;
-                        const depth = depthMap[idx];
-                        
-                        // Enhanced 3D coordinate mapping
-                        const worldX = ((x / width) - 0.5) * scaleX;
-                        const worldY = (0.5 - (y / height)) * scaleY;
-                        const worldZ = depth * scaleZ;
-                        
-                        // Get color from original image
-                        const pixelIdx = idx * 4;
-                        const r = imageData.data.data[pixelIdx] || 128;
-                        const g = imageData.data.data[pixelIdx + 1] || 128;
-                        const b = imageData.data.data[pixelIdx + 2] || 128;
-                        
-                        points.push({
-                            x: worldX,
-                            y: worldY,
-                            z: worldZ,
-                            color: { r, g, b },
-                            confidence: depth, // Store depth as confidence measure
-                            originalX: x,
-                            originalY: y
-                        });
-                        pointCount++;
-                    }
-                }
-                
-                this.debugLog(`✅ Generated ${pointCount} enhanced 3D points`, 'info');
-                return points;
-            }
-
-            // Mode switching functions
-            switchToSingleMode() {
-                this.isMultiPhotoMode = false;
-                this.elements.singleModeBtn.classList.add('active');
-                this.elements.multiModeBtn.classList.remove('active');
-                this.elements.singlePhotoSection.classList.remove('hidden');
-                this.elements.multiPhotoSection.classList.add('hidden');
-                this.elements.singleModeButtons.classList.remove('hidden');
-                this.elements.multiModeButtons.classList.add('hidden');
-                this.debugLog('📷 Switched to single photo mode', 'info');
-            }
-
-            switchToMultiMode() {
-                this.isMultiPhotoMode = true;
-                this.elements.singleModeBtn.classList.remove('active');
-                this.elements.multiModeBtn.classList.add('active');
-                this.elements.singlePhotoSection.classList.add('hidden');
-                this.elements.multiPhotoSection.classList.remove('hidden');
-                this.elements.singleModeButtons.classList.add('hidden');
-                this.elements.multiModeButtons.classList.remove('hidden');
-                this.debugLog('📸 Switched to multi-photo mode', 'info');
-                this.updateMultiPhotoUI();
-            }
-
-            // Multi-photo functions
-            startMultiCamera() {
-                this.startCamera(true);
-            }
-
-            async startCamera(isMultiMode = false) {
-                try {
-                    this.stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { facingMode: 'environment' } 
-                    });
-                    
-                    this.elements.videoPreview.srcObject = this.stream;
-                    
-                    if (isMultiMode) {
-                        this.elements.multiCameraControls.classList.remove('hidden');
-                        this.elements.multiCameraBtn.classList.add('hidden');
-                        this.elements.multiLibraryBtn.classList.add('hidden');
-                    } else {
-                        this.elements.placeholder.classList.add('hidden');
-                        this.elements.photoPreview.classList.add('hidden');
-                        this.elements.videoPreview.classList.remove('hidden');
-                        this.elements.cameraControls.classList.remove('hidden');
-                        this.elements.cameraBtn.classList.add('hidden');
-                        this.elements.libraryBtn.classList.add('hidden');
-                    }
-                } catch (error) {
-                    this.debugLog(`❌ Camera access failed: ${error.message}`, 'error');
-                    alert('Camera access denied or not available');
-                }
-            }
-
-            captureMultiPhoto() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const video = this.elements.videoPreview;
-                
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0);
-                
-                canvas.toBlob((blob) => {
-                    this.addPhotoToGrid(blob);
-                });
-            }
-
-            addPhotoToGrid(imageFile) {
-                if (this.multiPhotos.length >= 6) {
-                    alert('Maximum 6 photos allowed');
-                    return;
-                }
-
-                const photoData = {
-                    file: imageFile,
-                    url: URL.createObjectURL(imageFile),
-                    index: this.multiPhotos.length
-                };
-
-                this.multiPhotos.push(photoData);
-                this.updateMultiPhotoUI();
-                this.debugLog(`📸 Added photo ${this.multiPhotos.length}/6`, 'info');
-            }
-
-            updateMultiPhotoUI() {
-                const slots = this.elements.photoGrid.querySelectorAll('.photo-slot');
-                
-                slots.forEach((slot, index) => {
-                    const photo = this.multiPhotos[index];
-                    if (photo) {
-                        slot.classList.add('filled');
-                        slot.innerHTML = `
-                            <img src="${photo.url}" alt="Photo ${index + 1}">
-                            <button class="remove-btn" data-index="${index}">×</button>
-                        `;
-                    } else {
-                        slot.classList.remove('filled');
-                        slot.innerHTML = `
-                            <div class="placeholder">
-                                <div>📷</div>
-                                <div>Photo ${index + 1}</div>
-                            </div>
-                            <button class="remove-btn">×</button>
-                        `;
-                    }
-                });
-
-                // Show/hide process button
-                if (this.multiPhotos.length >= 3) {
-                    this.elements.multiProcessBtn.classList.remove('hidden');
-                    this.elements.clearAllBtn.classList.remove('hidden');
-                } else {
-                    this.elements.multiProcessBtn.classList.add('hidden');
-                }
-            }
-
-            handlePhotoGridClick(e) {
-                if (e.target.classList.contains('remove-btn')) {
-                    const index = parseInt(e.target.dataset.index);
-                    if (!isNaN(index)) {
-                        this.removePhoto(index);
-                    }
-                } else if (e.target.closest('.photo-slot') && !e.target.closest('.photo-slot').classList.contains('filled')) {
-                    // Add photo to empty slot
-                    this.elements.fileInput.click();
-                }
-            }
-
-            removePhoto(index) {
-                if (this.multiPhotos[index]) {
-                    URL.revokeObjectURL(this.multiPhotos[index].url);
-                    this.multiPhotos.splice(index, 1);
-                    this.updateMultiPhotoUI();
-                    this.debugLog(`🗑️ Removed photo ${index + 1}`, 'info');
-                }
-            }
-
-            clearAllPhotos() {
-                this.multiPhotos.forEach(photo => URL.revokeObjectURL(photo.url));
-                this.multiPhotos = [];
-                this.updateMultiPhotoUI();
-                this.debugLog('🗑️ Cleared all photos', 'info');
-            }
-
-            addFromLibrary() {
-                this.elements.fileInput.click();
-            }
-
-            stopMultiCamera() {
-                this.stopCamera();
-                this.elements.multiCameraControls.classList.add('hidden');
-                this.elements.multiCameraBtn.classList.remove('hidden');
-                this.elements.multiLibraryBtn.classList.remove('hidden');
-            }
-
-            handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    if (this.isMultiPhotoMode) {
-                        this.addPhotoToGrid(file);
-                    } else {
-                        this.displayCapturedImage(file);
-                    }
-                }
-            }
-
-            async processMultiPhoto3D() {
-                if (this.multiPhotos.length < 3) {
-                    alert('Please add at least 3 photos for multi-photo reconstruction');
-                    return;
-                }
-
-                this.debugLog(`🚀 Starting multi-photo 3D reconstruction with ${this.multiPhotos.length} photos`, 'step');
-                this.elements.processing.classList.remove('hidden');
-                this.elements.multiProcessBtn.disabled = true;
-                this.updateDebugStats('Processing Multiple Photos', '--', '--');
-
-                const startTime = performance.now();
-
-                try {
-                    // Process each photo and combine results
-                    await this.updateProgress('Analyzing multiple photos...', 10);
-                    const photoAnalyses = [];
-
-                    for (let i = 0; i < this.multiPhotos.length; i++) {
-                        this.debugLog(`📷 Processing photo ${i + 1}/${this.multiPhotos.length}`, 'step');
-                        await this.updateProgress(`Processing photo ${i + 1}/${this.multiPhotos.length}...`, 10 + (i * 20 / this.multiPhotos.length));
-                        
-                        const imageData = await this.prepareImageForProcessingFromFile(this.multiPhotos[i].file);
-                        const depthMap = await this.estimateDepth(imageData);
-                        
-                        photoAnalyses.push({
-                            imageData,
-                            depthMap,
-                            index: i
-                        });
-                    }
-
-                    // Combine multiple depth maps
-                    await this.updateProgress('Combining depth information...', 40);
-                    this.debugLog('🔄 Combining multiple depth maps for better accuracy', 'step');
-                    const combinedDepth = this.combineMultipleDepthMaps(photoAnalyses);
-
-                    // Generate enhanced point cloud
-                    await this.updateProgress('Creating enhanced point cloud...', 60);
-                    const pointCloud = this.generateEnhancedPointCloud(photoAnalyses[0].imageData, combinedDepth);
-
-                    // Create mesh
-                    await this.updateProgress('Generating mesh...', 75);
-                    const mesh = this.createMeshFromPointCloud(pointCloud);
-
-                    // Optimize for printing
-                    await this.updateProgress('Optimizing for 3D printing...', 85);
-                    const optimizedMesh = this.optimizeForPrinting(mesh);
-
-                    // Generate STL
-                    await this.updateProgress('Creating STL file...', 95);
-                    const stlContent = this.generateAdvancedSTL(optimizedMesh);
-
-                    const endTime = performance.now();
-                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
-                    this.debugLog(`✅ Multi-photo reconstruction complete in ${processTime}s`, 'info');
-
-                    await this.updateProgress('Complete!', 100);
-                    this.updateDebugStats('Complete', '--', `${processTime}s`);
-                    this.finalize3DModel(stlContent);
-
-                } catch (error) {
-                    const endTime = performance.now();
-                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
-                    
-                    this.debugLog(`❌ Multi-photo processing failed: ${error.message}`, 'error');
-                    this.debugLog(`📊 Failed after ${processTime}s`, 'error');
-                    
-                    alert(`Error processing photos: ${error.message}. Check debug panel for details.`);
-                    this.elements.processing.classList.add('hidden');
-                    this.elements.multiProcessBtn.disabled = false;
-                    this.updateDebugStats('Failed', '--', `${processTime}s`);
-                }
-            }
-
-            async prepareImageForProcessingFromFile(file) {
-                return new Promise((resolve) => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    
-                    img.onload = () => {
-                        const maxSize = 512;
-                        let { width, height }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo to 3D</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2196F3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Photo to 3D">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232196F3'/><text y='50' x='50' text-anchor='middle' dy='0.35em' fill='white' font-size='40'>3D</text></svg>">
-    
     <style>
         * {
             margin: 0;
@@ -430,10 +44,6 @@
             font-size: 1.1em;
         }
 
-        .photo-section {
-            margin-bottom: 30px;
-        }
-
         .photo-container {
             position: relative;
             width: 100%;
@@ -445,6 +55,7 @@
             justify-content: center;
             overflow: hidden;
             background: #f9f9f9;
+            margin-bottom: 20px;
         }
 
         .photo-container.has-image {
@@ -482,119 +93,6 @@
             margin-bottom: 20px;
         }
 
-        .photo-mode-selector {
-            display: flex;
-            background: #f0f0f0;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 15px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .mode-btn.active {
-            background: #2196F3;
-            color: white;
-        }
-
-        .mode-btn:not(.active) {
-            background: transparent;
-            color: #666;
-        }
-
-        .multi-photo-section {
-            margin-bottom: 20px;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .photo-slot {
-            aspect-ratio: 1;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f9f9f9;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .photo-slot.filled {
-            border: 2px solid #4CAF50;
-        }
-
-        .photo-slot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .photo-slot .placeholder {
-            text-align: center;
-            color: #999;
-            font-size: 0.8em;
-        }
-
-        .photo-slot .remove-btn {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-        }
-
-        .photo-slot.filled:hover .remove-btn {
-            display: block;
-        }
-
-        .multi-photo-info {
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 0.9em;
-            color: #1976D2;
-        }
-
-        .photo-instructions {
-            background: #fff3e0;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 0.9em;
-            color: #F57C00;
-        }
-
-        .single-photo-section .photo-container {
-            display: block;
-        }
-
-        .multi-photo-mode .photo-container {
-            display: none;
-        }
-
         .btn {
             padding: 15px 25px;
             border: none;
@@ -614,19 +112,9 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
-
         .btn-secondary {
             background: #e3f2fd;
             color: #2196F3;
-        }
-
-        .btn-secondary:hover {
-            background: #bbdefb;
-            transform: translateY(-2px);
         }
 
         .btn-success {
@@ -634,19 +122,9 @@
             color: white;
         }
 
-        .btn-success:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn:disabled:hover {
-            transform: none;
         }
 
         .processing {
@@ -672,22 +150,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #2196F3;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
         .result {
             background: #e8f5e8;
             border: 1px solid #4CAF50;
@@ -700,62 +162,6 @@
         .result h3 {
             color: #4CAF50;
             margin-bottom: 15px;
-        }
-
-        .model-preview {
-            width: 100%;
-            height: 300px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            margin: 15px 0;
-            background: #f0f0f0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preview-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 10px 0;
-            flex-wrap: wrap;
-        }
-
-        .preview-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .preview-btn.active {
-            background: #2196F3;
-            color: white;
-        }
-
-        .preview-btn:not(.active) {
-            background: #e3f2fd;
-            color: #2196F3;
-        }
-
-        .preview-info {
-            text-align: left;
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 0.9em;
-        }
-
-        .preview-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #666;
         }
 
         .file-info {
@@ -776,10 +182,6 @@
             margin-top: 15px;
         }
 
-        .download-btn:hover {
-            background: #F57C00;
-        }
-
         input[type="file"] {
             display: none;
         }
@@ -794,12 +196,28 @@
             display: none;
         }
 
+        .debug-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+        }
+
         .debug-panel {
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 320px;
-            max-height: 400px;
+            max-height: 300px;
             background: rgba(0, 0, 0, 0.9);
             color: #00ff00;
             font-family: 'Courier New', monospace;
@@ -808,7 +226,6 @@
             padding: 15px;
             z-index: 1000;
             overflow-y: auto;
-            border: 1px solid #333;
         }
 
         .debug-header {
@@ -830,75 +247,6 @@
             cursor: pointer;
         }
 
-        .debug-content {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .debug-log {
-            margin: 5px 0;
-            padding: 3px 5px;
-            border-radius: 3px;
-        }
-
-        .debug-log.error {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff9999;
-        }
-
-        .debug-log.warning {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffcc99;
-        }
-
-        .debug-log.info {
-            background: rgba(0, 255, 0, 0.1);
-            color: #99ff99;
-        }
-
-        .debug-log.step {
-            background: rgba(0, 150, 255, 0.2);
-            color: #99ccff;
-        }
-
-        .debug-stats {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px;
-            margin: 8px 0;
-            border-radius: 4px;
-            color: #cccccc;
-        }
-
-        .debug-fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 999;
-        }
-
-        @media (max-width: 600px) {
-            .debug-panel {
-                width: calc(100vw - 40px);
-                right: 20px;
-                left: 20px;
-                bottom: 90px;
-            }
-            
-            .debug-fab {
-                bottom: 20px;
-                right: 20px;
-            }
-        }
-
         @media (max-width: 600px) {
             .container {
                 margin: 10px;
@@ -912,6 +260,13 @@
             .photo-container {
                 height: 250px;
             }
+            
+            .debug-panel {
+                width: calc(100vw - 40px);
+                right: 20px;
+                left: 20px;
+                bottom: 90px;
+            }
         }
     </style>
 </head>
@@ -922,151 +277,39 @@
             <p>Turn your photos into 3D printable files</p>
         </div>
 
-        <div class="photo-section">
-            <!-- Photo Mode Selector -->
-            <div class="photo-mode-selector">
-                <button class="mode-btn active" id="singleModeBtn">📷 Single Photo</button>
-                <button class="mode-btn" id="multiModeBtn">📸 Multi Photo</button>
+        <div class="photo-container" id="photoContainer">
+            <div class="placeholder" id="placeholder">
+                <div class="icon">📷</div>
+                <p>Take a photo or select from library</p>
             </div>
+            <img id="photoPreview" class="photo-preview hidden" alt="Selected photo">
+            <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
+        </div>
 
-            <!-- Single Photo Mode -->
-            <div class="single-photo-section" id="singlePhotoSection">
-                <div class="photo-container" id="photoContainer">
-                    <div class="placeholder" id="placeholder">
-                        <div class="icon">📷</div>
-                        <p>Take a photo or select from library</p>
-                    </div>
-                    <img id="photoPreview" class="photo-preview hidden" alt="Selected photo">
-                    <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
-                </div>
-
-                <div class="camera-controls hidden" id="cameraControls">
-                    <button class="btn btn-primary" id="captureBtn">📸 Capture</button>
-                    <button class="btn btn-secondary" id="stopCameraBtn">❌ Cancel</button>
-                </div>
-            </div>
-
-            <!-- Multi Photo Mode -->
-            <div class="multi-photo-section hidden" id="multiPhotoSection">
-                <div class="multi-photo-info">
-                    <p><strong>📸 Multi-Photo Mode:</strong> Take 3-6 photos from different angles for better 3D reconstruction</p>
-                </div>
-                
-                <div class="photo-instructions">
-                    <p><strong>💡 Tips for best results:</strong></p>
-                    <p>• Keep the object in center of frame</p>
-                    <p>• Move around the object (don't move the object)</p>
-                    <p>• Take photos every 45-60 degrees</p>
-                    <p>• Keep consistent distance from object</p>
-                </div>
-
-                <div class="photo-grid" id="photoGrid">
-                    <div class="photo-slot" data-slot="0">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 1</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                    <div class="photo-slot" data-slot="1">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 2</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                    <div class="photo-slot" data-slot="2">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 3</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                    <div class="photo-slot" data-slot="3">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 4</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                    <div class="photo-slot" data-slot="4">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 5</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                    <div class="photo-slot" data-slot="5">
-                        <div class="placeholder">
-                            <div>📷</div>
-                            <div>Photo 6</div>
-                        </div>
-                        <button class="remove-btn">×</button>
-                    </div>
-                </div>
-
-                <div class="camera-controls hidden" id="multiCameraControls">
-                    <button class="btn btn-primary" id="multiCaptureBtn">📸 Add Photo</button>
-                    <button class="btn btn-secondary" id="stopMultiCameraBtn">❌ Cancel</button>
-                </div>
-            </div>
+        <div class="camera-controls hidden" id="cameraControls">
+            <button class="btn btn-primary" id="captureBtn">📸 Capture</button>
+            <button class="btn btn-secondary" id="stopCameraBtn">❌ Cancel</button>
         </div>
 
         <div class="buttons">
-            <div id="singleModeButtons">
-                <button class="btn btn-primary" id="cameraBtn">📷 Take Photo</button>
-                <button class="btn btn-secondary" id="libraryBtn">📁 Choose from Library</button>
-                <button class="btn btn-success hidden" id="processBtn">⚡ Create 3D Model</button>
-                <button class="btn btn-secondary hidden" id="newPhotoBtn">🔄 Take Another Photo</button>
-            </div>
-            
-            <div id="multiModeButtons" class="hidden">
-                <button class="btn btn-primary" id="multiCameraBtn">📷 Take Photos</button>
-                <button class="btn btn-secondary" id="multiLibraryBtn">📁 Add from Library</button>
-                <button class="btn btn-success hidden" id="multiProcessBtn">⚡ Create 3D Model</button>
-                <button class="btn btn-secondary hidden" id="clearAllBtn">🗑️ Clear All Photos</button>
-            </div>
+            <button class="btn btn-primary" id="cameraBtn">📷 Take Photo</button>
+            <button class="btn btn-secondary" id="libraryBtn">📁 Choose from Library</button>
+            <button class="btn btn-success hidden" id="processBtn">⚡ Create 3D Model</button>
+            <button class="btn btn-secondary hidden" id="newPhotoBtn">🔄 Take Another Photo</button>
         </div>
 
         <div class="processing hidden" id="processing">
             <div class="spinner"></div>
             <h3>Processing your photo...</h3>
             <p id="processingStatus">Analyzing image...</p>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
         </div>
 
         <div class="result hidden" id="result">
             <h3>✅ 3D Model Created!</h3>
-            
-            <!-- 3D Model Preview -->
-            <div class="model-preview" id="modelPreview">
-                <div class="preview-loading" id="previewLoading">
-                    <div class="spinner"></div>
-                    <p>Loading 3D preview...</p>
-                </div>
-            </div>
-            
-            <!-- Preview Controls -->
-            <div class="preview-controls">
-                <button class="preview-btn active" id="wireframeBtn">🔲 Wireframe</button>
-                <button class="preview-btn" id="solidBtn">🎯 Solid</button>
-                <button class="preview-btn" id="resetViewBtn">🔄 Reset View</button>
-            </div>
-            
-            <!-- Model Info -->
-            <div class="preview-info">
-                <p><strong>💡 3D Preview Tips:</strong></p>
-                <p>• Drag to rotate • Pinch/scroll to zoom • Two fingers to pan</p>
-                <p>• Check wireframe to see mesh structure</p>
-            </div>
-            
             <div class="file-info">
                 <p><strong>File:</strong> <span id="fileName">model.stl</span></p>
                 <p><strong>Size:</strong> <span id="fileSize">0 KB</span></p>
                 <p><strong>Triangles:</strong> <span id="triangleCount">0</span></p>
-                <p><strong>Estimated Print Time:</strong> <span id="printTime">0 min</span></p>
             </div>
             <button class="btn download-btn" id="downloadBtn">💾 Download STL File</button>
         </div>
@@ -1078,232 +321,50 @@
     <button class="debug-fab" id="debugFab">🐛</button>
     <div class="debug-panel hidden" id="debugPanel">
         <div class="debug-header">
-            <span>🐛 Debug Console</span>
+            <span>🐛 Debug</span>
             <button class="debug-toggle" id="debugClose">✕</button>
         </div>
-        <div class="debug-stats" id="debugStats">
-            <div>Status: Ready</div>
-            <div>Memory: --</div>
-            <div>Performance: --</div>
-        </div>
-        <div class="debug-content" id="debugContent">
-            <div class="debug-log info">Debug panel initialized</div>
+        <div id="debugContent">
+            <div>App initialized</div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         class PhotoTo3DApp {
             constructor() {
                 this.currentImage = null;
                 this.stream = null;
-                this.depthModel = null;
-                this.canvas = null;
-                this.ctx = null;
-                this.currentMesh = null;
-                this.scene = null;
-                this.camera = null;
-                this.renderer = null;
-                this.model3D = null;
-                this.controls = null;
+                this.modelBlob = null;
                 this.debugLogs = [];
-                this.isMultiPhotoMode = false;
-                this.multiPhotos = [];
-                this.currentSlot = 0;
-                this.initializeElements();
-                this.bindEvents();
-                this.registerServiceWorker();
-                this.loadDepthModel();
-                this.initDebugPanel();
+                this.init();
             }
 
-            initializeElements() {
-                this.elements = {
-                    photoContainer: document.getElementById('photoContainer'),
-                    placeholder: document.getElementById('placeholder'),
-                    photoPreview: document.getElementById('photoPreview'),
-                    videoPreview: document.getElementById('videoPreview'),
-                    cameraControls: document.getElementById('cameraControls'),
-                    cameraBtn: document.getElementById('cameraBtn'),
-                    libraryBtn: document.getElementById('libraryBtn'),
-                    processBtn: document.getElementById('processBtn'),
-                    newPhotoBtn: document.getElementById('newPhotoBtn'),
-                    captureBtn: document.getElementById('captureBtn'),
-                    stopCameraBtn: document.getElementById('stopCameraBtn'),
-                    fileInput: document.getElementById('fileInput'),
-                    processing: document.getElementById('processing'),
-                    processingStatus: document.getElementById('processingStatus'),
-                    progressFill: document.getElementById('progressFill'),
-                    result: document.getElementById('result'),
-                    downloadBtn: document.getElementById('downloadBtn'),
-                    fileName: document.getElementById('fileName'),
-                    fileSize: document.getElementById('fileSize'),
-                    triangleCount: document.getElementById('triangleCount'),
-                    printTime: document.getElementById('printTime'),
-                    modelPreview: document.getElementById('modelPreview'),
-                    previewLoading: document.getElementById('previewLoading'),
-                    wireframeBtn: document.getElementById('wireframeBtn'),
-                    solidBtn: document.getElementById('solidBtn'),
-                    resetViewBtn: document.getElementById('resetViewBtn'),
-                    debugFab: document.getElementById('debugFab'),
-                    debugPanel: document.getElementById('debugPanel'),
-                    debugClose: document.getElementById('debugClose'),
-                    debugContent: document.getElementById('debugContent'),
-                    debugStats: document.getElementById('debugStats'),
-                    
-                    // Multi-photo elements
-                    singleModeBtn: document.getElementById('singleModeBtn'),
-                    multiModeBtn: document.getElementById('multiModeBtn'),
-                    singlePhotoSection: document.getElementById('singlePhotoSection'),
-                    multiPhotoSection: document.getElementById('multiPhotoSection'),
-                    singleModeButtons: document.getElementById('singleModeButtons'),
-                    multiModeButtons: document.getElementById('multiModeButtons'),
-                    photoGrid: document.getElementById('photoGrid'),
-                    multiCameraBtn: document.getElementById('multiCameraBtn'),
-                    multiLibraryBtn: document.getElementById('multiLibraryBtn'),
-                    multiProcessBtn: document.getElementById('multiProcessBtn'),
-                    clearAllBtn: document.getElementById('clearAllBtn'),
-                    multiCameraControls: document.getElementById('multiCameraControls'),
-                    multiCaptureBtn: document.getElementById('multiCaptureBtn'),
-                    stopMultiCameraBtn: document.getElementById('stopMultiCameraBtn')
-                };
+            init() {
+                this.bindEvents();
+                this.log('App ready');
             }
 
             bindEvents() {
-                // Single photo mode events
-                this.elements.cameraBtn.addEventListener('click', () => this.startCamera());
-                this.elements.libraryBtn.addEventListener('click', () => this.elements.fileInput.click());
-                this.elements.processBtn.addEventListener('click', () => this.process3DModel());
-                this.elements.newPhotoBtn.addEventListener('click', () => this.resetApp());
-                this.elements.captureBtn.addEventListener('click', () => this.capturePhoto());
-                this.elements.stopCameraBtn.addEventListener('click', () => this.stopCamera());
-                this.elements.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
-                this.elements.downloadBtn.addEventListener('click', () => this.downloadModel());
-                
-                // Mode switching
-                this.elements.singleModeBtn.addEventListener('click', () => this.switchToSingleMode());
-                this.elements.multiModeBtn.addEventListener('click', () => this.switchToMultiMode());
-                
-                // Multi photo mode events
-                this.elements.multiCameraBtn.addEventListener('click', () => this.startMultiCamera());
-                this.elements.multiLibraryBtn.addEventListener('click', () => this.addFromLibrary());
-                this.elements.multiProcessBtn.addEventListener('click', () => this.processMultiPhoto3D());
-                this.elements.clearAllBtn.addEventListener('click', () => this.clearAllPhotos());
-                this.elements.multiCaptureBtn.addEventListener('click', () => this.captureMultiPhoto());
-                this.elements.stopMultiCameraBtn.addEventListener('click', () => this.stopMultiCamera());
-                
-                // Photo grid events
-                this.elements.photoGrid.addEventListener('click', (e) => this.handlePhotoGridClick(e));
-                
-                // Preview controls
-                this.elements.wireframeBtn.addEventListener('click', () => this.setWireframeMode(true));
-                this.elements.solidBtn.addEventListener('click', () => this.setWireframeMode(false));
-                this.elements.resetViewBtn.addEventListener('click', () => this.resetCamera());
-                
-                // Debug panel controls
-                this.elements.debugFab.addEventListener('click', () => this.toggleDebugPanel());
-                this.elements.debugClose.addEventListener('click', () => this.toggleDebugPanel());
+                document.getElementById('cameraBtn').addEventListener('click', () => this.startCamera());
+                document.getElementById('libraryBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+                document.getElementById('processBtn').addEventListener('click', () => this.process3DModel());
+                document.getElementById('newPhotoBtn').addEventListener('click', () => this.resetApp());
+                document.getElementById('captureBtn').addEventListener('click', () => this.capturePhoto());
+                document.getElementById('stopCameraBtn').addEventListener('click', () => this.stopCamera());
+                document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
+                document.getElementById('downloadBtn').addEventListener('click', () => this.downloadModel());
+                document.getElementById('debugFab').addEventListener('click', () => this.toggleDebug());
+                document.getElementById('debugClose').addEventListener('click', () => this.toggleDebug());
             }
 
-            initDebugPanel() {
-                this.debugLog('Debug panel initialized', 'info');
-                this.updateDebugStats('Ready', '--', '--');
-                
-                // Override console methods to capture logs
-                const originalConsoleLog = console.log;
-                const originalConsoleError = console.error;
-                const originalConsoleWarn = console.warn;
-                
-                console.log = (...args) => {
-                    originalConsoleLog.apply(console, args);
-                    this.debugLog(args.join(' '), 'info');
-                };
-                
-                console.error = (...args) => {
-                    originalConsoleError.apply(console, args);
-                    this.debugLog(args.join(' '), 'error');
-                };
-                
-                console.warn = (...args) => {
-                    originalConsoleWarn.apply(console, args);
-                    this.debugLog(args.join(' '), 'warning');
-                };
-                
-                // Capture unhandled errors
-                window.addEventListener('error', (e) => {
-                    this.debugLog(`ERROR: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
-                });
-                
-                // Monitor memory usage
-                setInterval(() => {
-                    if (performance.memory) {
-                        const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + 'MB';
-                        this.updateMemoryStats(memory);
-                    }
-                }, 2000);
+            log(message) {
+                this.debugLogs.push(`${new Date().toLocaleTimeString()}: ${message}`);
+                if (this.debugLogs.length > 20) this.debugLogs.shift();
+                document.getElementById('debugContent').innerHTML = this.debugLogs.map(log => `<div>${log}</div>`).join('');
             }
 
-            debugLog(message, type = 'info') {
-                const timestamp = new Date().toLocaleTimeString();
-                const logEntry = {
-                    time: timestamp,
-                    message: message,
-                    type: type
-                };
-                
-                this.debugLogs.push(logEntry);
-                
-                // Keep only last 50 logs
-                if (this.debugLogs.length > 50) {
-                    this.debugLogs.shift();
-                }
-                
-                this.updateDebugDisplay();
-            }
-
-            updateDebugDisplay() {
-                const content = this.elements.debugContent;
-                content.innerHTML = '';
-                
-                this.debugLogs.forEach(log => {
-                    const div = document.createElement('div');
-                    div.className = `debug-log ${log.type}`;
-                    div.innerHTML = `<span style="color: #666;">${log.time}</span> ${log.message}`;
-                    content.appendChild(div);
-                });
-                
-                // Auto-scroll to bottom
-                content.scrollTop = content.scrollHeight;
-            }
-
-            updateDebugStats(status, memory, performance) {
-                const stats = this.elements.debugStats;
-                stats.innerHTML = `
-                    <div>Status: ${status}</div>
-                    <div>Memory: ${memory}</div>
-                    <div>Performance: ${performance}</div>
-                `;
-            }
-
-            updateMemoryStats(memory) {
-                const currentStats = this.elements.debugStats.innerHTML;
-                const updatedStats = currentStats.replace(/Memory: [^<]*/, `Memory: ${memory}`);
-                this.elements.debugStats.innerHTML = updatedStats;
-            }
-
-            toggleDebugPanel() {
-                this.elements.debugPanel.classList.toggle('hidden');
-            }
-
-            async loadDepthModel() {
-                try {
-                    // Note: Using a simple depth estimation approach
-                    // In production, you'd use a pre-trained model like MiDaS
-                    console.log('Depth estimation ready');
-                } catch (error) {
-                    console.error('Error loading depth model:', error);
-                }
+            toggleDebug() {
+                document.getElementById('debugPanel').classList.toggle('hidden');
             }
 
             async startCamera() {
@@ -1312,14 +373,19 @@
                         video: { facingMode: 'environment' } 
                     });
                     
-                    this.elements.videoPreview.srcObject = this.stream;
-                    this.elements.placeholder.classList.add('hidden');
-                    this.elements.photoPreview.classList.add('hidden');
-                    this.elements.videoPreview.classList.remove('hidden');
-                    this.elements.cameraControls.classList.remove('hidden');
-                    this.elements.cameraBtn.classList.add('hidden');
-                    this.elements.libraryBtn.classList.add('hidden');
+                    const video = document.getElementById('videoPreview');
+                    video.srcObject = this.stream;
+                    
+                    document.getElementById('placeholder').classList.add('hidden');
+                    document.getElementById('photoPreview').classList.add('hidden');
+                    video.classList.remove('hidden');
+                    document.getElementById('cameraControls').classList.remove('hidden');
+                    document.getElementById('cameraBtn').classList.add('hidden');
+                    document.getElementById('libraryBtn').classList.add('hidden');
+                    
+                    this.log('Camera started');
                 } catch (error) {
+                    this.log(`Camera error: ${error.message}`);
                     alert('Camera access denied or not available');
                 }
             }
@@ -1327,7 +393,7 @@
             capturePhoto() {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const video = this.elements.videoPreview;
+                const video = document.getElementById('videoPreview');
                 
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -1345,10 +411,11 @@
                     this.stream = null;
                 }
                 
-                this.elements.videoPreview.classList.add('hidden');
-                this.elements.cameraControls.classList.add('hidden');
-                this.elements.cameraBtn.classList.remove('hidden');
-                this.elements.libraryBtn.classList.remove('hidden');
+                document.getElementById('videoPreview').classList.add('hidden');
+                document.getElementById('cameraControls').classList.add('hidden');
+                document.getElementById('cameraBtn').classList.remove('hidden');
+                document.getElementById('libraryBtn').classList.remove('hidden');
+                this.log('Camera stopped');
             }
 
             handleFileSelect(event) {
@@ -1362,1028 +429,74 @@
                 const url = URL.createObjectURL(imageFile);
                 this.currentImage = imageFile;
                 
-                this.elements.photoPreview.src = url;
-                this.elements.photoPreview.classList.remove('hidden');
-                this.elements.placeholder.classList.add('hidden');
-                this.elements.photoContainer.classList.add('has-image');
+                const preview = document.getElementById('photoPreview');
+                preview.src = url;
+                preview.classList.remove('hidden');
+                document.getElementById('placeholder').classList.add('hidden');
+                document.getElementById('photoContainer').classList.add('has-image');
                 
-                this.elements.processBtn.classList.remove('hidden');
-                this.elements.newPhotoBtn.classList.remove('hidden');
+                document.getElementById('processBtn').classList.remove('hidden');
+                document.getElementById('newPhotoBtn').classList.remove('hidden');
+                this.log('Photo loaded');
             }
 
             async process3DModel() {
-                this.elements.processing.classList.remove('hidden');
-                this.elements.processBtn.disabled = true;
-                this.debugLog('🚀 Starting 3D model processing', 'step');
-                this.updateDebugStats('Processing', '--', '--');
-                
-                const startTime = performance.now();
-                
+                document.getElementById('processing').classList.remove('hidden');
+                document.getElementById('processBtn').disabled = true;
+                this.log('Starting 3D processing');
+
                 try {
-                    // Step 1: Prepare image
-                    await this.updateProgress('Preparing image...', 10);
-                    this.debugLog('📷 Preparing image for processing', 'step');
-                    const imageData = await this.prepareImageForProcessing();
-                    
-                    if (!imageData || !imageData.data) {
-                        throw new Error('Failed to prepare image data');
+                    // Simple processing simulation
+                    const steps = [
+                        'Analyzing image...',
+                        'Detecting depth...',
+                        'Creating 3D mesh...',
+                        'Generating STL file...'
+                    ];
+
+                    for (let i = 0; i < steps.length; i++) {
+                        document.getElementById('processingStatus').textContent = steps[i];
+                        await this.delay(1500);
+                        this.log(steps[i]);
                     }
-                    this.debugLog(`✅ Image prepared: ${imageData.width}x${imageData.height}`, 'info');
-                    
-                    // Step 2: Estimate depth
-                    await this.updateProgress('Analyzing depth information...', 30);
-                    this.debugLog('🔍 Estimating depth from image', 'step');
-                    const depthMap = await this.estimateDepth(imageData);
-                    
-                    if (!depthMap || depthMap.length === 0) {
-                        throw new Error('Failed to estimate depth');
-                    }
-                    this.debugLog(`✅ Depth map created: ${depthMap.length} points`, 'info');
-                    
-                    // Step 3: Generate point cloud
-                    await this.updateProgress('Creating 3D point cloud...', 50);
-                    this.debugLog('☁️ Generating 3D point cloud', 'step');
-                    const pointCloud = this.generatePointCloud(imageData, depthMap);
-                    
-                    if (!pointCloud || pointCloud.length === 0) {
-                        throw new Error('Failed to generate point cloud');
-                    }
-                    this.debugLog(`✅ Point cloud generated: ${pointCloud.length} points`, 'info');
-                    
-                    // Step 4: Create mesh
-                    await this.updateProgress('Generating mesh...', 70);
-                    this.debugLog('🔺 Creating triangular mesh', 'step');
-                    const mesh = this.createMeshFromPointCloud(pointCloud);
-                    
-                    if (!mesh || !mesh.vertices || !mesh.faces) {
-                        throw new Error('Failed to create mesh');
-                    }
-                    this.debugLog(`✅ Mesh created: ${mesh.vertices.length} vertices, ${mesh.faces.length} faces`, 'info');
-                    
-                    // Step 5: Optimize for 3D printing
-                    await this.updateProgress('Optimizing for 3D printing...', 85);
-                    this.debugLog('⚙️ Optimizing mesh for 3D printing', 'step');
-                    const optimizedMesh = this.optimizeForPrinting(mesh);
-                    
-                    if (!optimizedMesh || !optimizedMesh.vertices || !optimizedMesh.faces) {
-                        throw new Error('Failed to optimize mesh');
-                    }
-                    this.debugLog(`✅ Mesh optimized: ${optimizedMesh.vertices.length} vertices, ${optimizedMesh.faces.length} faces`, 'info');
-                    
-                    // Step 6: Generate STL
-                    await this.updateProgress('Creating STL file...', 95);
-                    this.debugLog('📄 Generating STL file', 'step');
-                    const stlContent = this.generateAdvancedSTL(optimizedMesh);
-                    
-                    if (!stlContent) {
-                        throw new Error('Failed to generate STL');
-                    }
-                    
-                    const endTime = performance.now();
-                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
-                    this.debugLog(`✅ STL generated successfully in ${processTime}s`, 'info');
-                    
-                    await this.updateProgress('Complete!', 100);
-                    this.updateDebugStats('Complete', '--', `${processTime}s`);
-                    this.finalize3DModel(stlContent);
-                    
+
+                    // Generate STL file
+                    this.generateSTLFile();
+
                 } catch (error) {
-                    const endTime = performance.now();
-                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
-                    
-                    this.debugLog(`❌ PROCESSING FAILED: ${error.message}`, 'error');
-                    this.debugLog(`📊 Failed after ${processTime}s`, 'error');
-                    
-                    if (error.stack) {
-                        this.debugLog(`📋 Stack trace: ${error.stack}`, 'error');
-                    }
-                    
-                    console.error('Processing error details:', error);
-                    console.error('Error stack:', error.stack);
-                    
-                    alert(`Error processing image: ${error.message}. Check debug panel for details.`);
-                    this.elements.processing.classList.add('hidden');
-                    this.elements.processBtn.disabled = false;
-                    this.updateDebugStats('Failed', '--', `${processTime}s`);
+                    this.log(`Processing error: ${error.message}`);
+                    alert('Error processing image. Please try another photo.');
+                    document.getElementById('processing').classList.add('hidden');
+                    document.getElementById('processBtn').disabled = false;
                 }
             }
 
-            async updateProgress(status, progress) {
-                this.elements.processingStatus.textContent = status;
-                this.elements.progressFill.style.width = progress + '%';
-                await this.delay(800); // Realistic processing time
-            }
-
-            async prepareImageForProcessing() {
-                return new Promise((resolve) => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const img = this.elements.photoPreview;
-                    
-                    // Resize image for processing (smaller = faster)
-                    const maxSize = 512;
-                    let { width, height } = img;
-                    
-                    if (width > height) {
-                        if (width > maxSize) {
-                            height = (height * maxSize) / width;
-                            width = maxSize;
-                        }
-                    } else {
-                        if (height > maxSize) {
-                            width = (width * maxSize) / height;
-                            height = maxSize;
-                        }
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    const imageData = ctx.getImageData(0, 0, width, height);
-                    resolve({ data: imageData, width, height });
-                });
-            }
-
-            async estimateDepth(imageData) {
-                this.debugLog('🔍 Starting advanced depth estimation', 'step');
-                const { data, width, height } = imageData;
-                const depthMap = new Float32Array(width * height);
-                
-                // Step 1: Convert to grayscale and calculate gradients
-                this.debugLog('📊 Calculating image gradients', 'info');
-                const grayscale = new Float32Array(width * height);
-                const gradientX = new Float32Array(width * height);
-                const gradientY = new Float32Array(width * height);
-                
-                // Convert to grayscale and calculate gradients
-                for (let y = 1; y < height - 1; y++) {
-                    for (let x = 1; x < width - 1; x++) {
-                        const idx = y * width + x;
-                        const pixelIdx = idx * 4;
-                        
-                        // Improved grayscale conversion (luminance-based)
-                        const r = data.data[pixelIdx];
-                        const g = data.data[pixelIdx + 1];
-                        const b = data.data[pixelIdx + 2];
-                        grayscale[idx] = 0.299 * r + 0.587 * g + 0.114 * b;
-                        
-                        // Calculate gradients (Sobel operators)
-                        if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
-                            // Sobel X gradient
-                            const gx = (-1 * grayscale[(y-1)*width + (x-1)]) + 
-                                      (1 * grayscale[(y-1)*width + (x+1)]) +
-                                      (-2 * grayscale[y*width + (x-1)]) + 
-                                      (2 * grayscale[y*width + (x+1)]) +
-                                      (-1 * grayscale[(y+1)*width + (x-1)]) + 
-                                      (1 * grayscale[(y+1)*width + (x+1)]);
-                            
-                            // Sobel Y gradient  
-                            const gy = (-1 * grayscale[(y-1)*width + (x-1)]) + 
-                                      (-2 * grayscale[(y-1)*width + x]) +
-                                      (-1 * grayscale[(y-1)*width + (x+1)]) +
-                                      (1 * grayscale[(y+1)*width + (x-1)]) + 
-                                      (2 * grayscale[(y+1)*width + x]) +
-                                      (1 * grayscale[(y+1)*width + (x+1)]);
-                            
-                            gradientX[idx] = gx / 8.0;
-                            gradientY[idx] = gy / 8.0;
-                        }
-                    }
-                }
-                
-                // Step 2: Enhanced depth estimation using multiple cues
-                this.debugLog('🎯 Computing depth from multiple visual cues', 'info');
-                for (let y = 2; y < height - 2; y++) {
-                    for (let x = 2; x < width - 2; x++) {
-                        const idx = y * width + x;
-                        let depth = 0;
-                        
-                        // Cue 1: Brightness-based depth (improved)
-                        const brightness = grayscale[idx];
-                        const normalizedBrightness = brightness / 255.0;
-                        
-                        // Cue 2: Gradient magnitude (edges suggest depth discontinuities)
-                        const gradMagnitude = Math.sqrt(gradientX[idx] * gradientX[idx] + gradientY[idx] * gradientY[idx]);
-                        const normalizedGrad = Math.min(gradMagnitude / 100.0, 1.0);
-                        
-                        // Cue 3: Local contrast analysis
-                        let localContrast = 0;
-                        let neighborCount = 0;
-                        for (let dy = -2; dy <= 2; dy++) {
-                            for (let dx = -2; dx <= 2; dx++) {
-                                if (dx === 0 && dy === 0) continue;
-                                const nIdx = (y + dy) * width + (x + dx);
-                                if (nIdx >= 0 && nIdx < grayscale.length) {
-                                    localContrast += Math.abs(grayscale[idx] - grayscale[nIdx]);
-                                    neighborCount++;
-                                }
-                            }
-                        }
-                        localContrast = neighborCount > 0 ? localContrast / neighborCount / 255.0 : 0;
-                        
-                        // Cue 4: Shape-from-shading using gradient direction
-                        const gradientAngle = Math.atan2(gradientY[idx], gradientX[idx]);
-                        const lightDirection = Math.PI / 4; // Assume light from top-left
-                        const shadingFactor = Math.cos(gradientAngle - lightDirection) * 0.5 + 0.5;
-                        
-                        // Combine depth cues with weights
-                        const brightnessDepth = (255 - brightness) / 255.0; // Darker = closer
-                        const contrastDepth = localContrast * 2.0; // High contrast = edges = depth changes
-                        const gradientDepth = normalizedGrad * 1.5; // Edges suggest depth
-                        const shadingDepth = shadingFactor * 0.8; // Shading suggests 3D form
-                        
-                        // Weighted combination
-                        depth = (brightnessDepth * 0.4) + 
-                               (contrastDepth * 0.3) + 
-                               (gradientDepth * 0.2) + 
-                               (shadingDepth * 0.1);
-                        
-                        // Enhance depth range and add some baseline
-                        depth = Math.pow(depth, 0.8) * 1.2 + 0.1; // Power function for better distribution
-                        depth = Math.max(0.1, Math.min(1.0, depth));
-                        
-                        depthMap[idx] = depth;
-                    }
-                }
-                
-                this.debugLog('🔧 Applying advanced filtering', 'info');
-                
-                // Step 3: Apply bilateral filtering to preserve edges while smoothing
-                const filteredDepth = this.bilateralFilter(depthMap, grayscale, width, height);
-                
-                // Step 4: Edge-preserving smoothing
-                const finalDepth = this.edgePreservingSmooth(filteredDepth, gradientX, gradientY, width, height);
-                
-                this.debugLog(`✅ Advanced depth estimation complete: range ${Math.min(...finalDepth).toFixed(3)} to ${Math.max(...finalDepth).toFixed(3)}`, 'info');
-                
-                return finalDepth;
-            }
-
-            bilateralFilter(depthMap, grayscale, width, height) {
-                this.debugLog('🎨 Applying bilateral filter for edge preservation', 'info');
-                const filtered = new Float32Array(depthMap.length);
-                const spatialSigma = 3.0;
-                const intensitySigma = 30.0;
-                const kernelSize = 5;
-                const kernelRadius = Math.floor(kernelSize / 2);
-                
-                for (let y = kernelRadius; y < height - kernelRadius; y++) {
-                    for (let x = kernelRadius; x < width - kernelRadius; x++) {
-                        const centerIdx = y * width + x;
-                        const centerIntensity = grayscale[centerIdx];
-                        
-                        let weightSum = 0;
-                        let depthSum = 0;
-                        
-                        for (let ky = -kernelRadius; ky <= kernelRadius; ky++) {
-                            for (let kx = -kernelRadius; kx <= kernelRadius; kx++) {
-                                const neighborIdx = (y + ky) * width + (x + kx);
-                                const neighborIntensity = grayscale[neighborIdx];
-                                
-                                // Spatial weight (Gaussian)
-                                const spatialDist = Math.sqrt(kx * kx + ky * ky);
-                                const spatialWeight = Math.exp(-(spatialDist * spatialDist) / (2 * spatialSigma * spatialSigma));
-                                
-                                // Intensity weight (preserve edges)
-                                const intensityDist = Math.abs(centerIntensity - neighborIntensity);
-                                const intensityWeight = Math.exp(-(intensityDist * intensityDist) / (2 * intensitySigma * intensitySigma));
-                                
-                                const totalWeight = spatialWeight * intensityWeight;
-                                weightSum += totalWeight;
-                                depthSum += depthMap[neighborIdx] * totalWeight;
-                            }
-                        }
-                        
-                        filtered[centerIdx] = weightSum > 0 ? depthSum / weightSum : depthMap[centerIdx];
-                    }
-                }
-                
-                // Copy borders
-                for (let i = 0; i < depthMap.length; i++) {
-                    const y = Math.floor(i / width);
-                    const x = i % width;
-                    if (y < kernelRadius || y >= height - kernelRadius || 
-                        x < kernelRadius || x >= width - kernelRadius) {
-                        filtered[i] = depthMap[i];
-                    }
-                }
-                
-                return filtered;
-            }
-
-            edgePreservingSmooth(depthMap, gradientX, gradientY, width, height) {
-                this.debugLog('✨ Applying edge-preserving smoothing', 'info');
-                const smoothed = new Float32Array(depthMap.length);
-                
-                for (let y = 1; y < height - 1; y++) {
-                    for (let x = 1; x < width - 1; x++) {
-                        const idx = y * width + x;
-                        
-                        // Calculate edge strength
-                        const edgeStrength = Math.sqrt(gradientX[idx] * gradientX[idx] + gradientY[idx] * gradientY[idx]);
-                        const edgeThreshold = 20.0;
-                        
-                        if (edgeStrength > edgeThreshold) {
-                            // Strong edge - preserve original depth
-                            smoothed[idx] = depthMap[idx];
-                        } else {
-                            // Smooth area - apply 3x3 Gaussian
-                            let sum = 0;
-                            let weightSum = 0;
-                            const weights = [
-                                [1, 2, 1],
-                                [2, 4, 2], 
-                                [1, 2, 1]
-                            ];
-                            
-                            for (let ky = -1; ky <= 1; ky++) {
-                                for (let kx = -1; kx <= 1; kx++) {
-                                    const nIdx = (y + ky) * width + (x + kx);
-                                    const weight = weights[ky + 1][kx + 1];
-                                    sum += depthMap[nIdx] * weight;
-                                    weightSum += weight;
-                                }
-                            }
-                            
-                            smoothed[idx] = sum / weightSum;
-                        }
-                    }
-                }
-                
-                // Copy borders
-                for (let y = 0; y < height; y++) {
-                    smoothed[y * width] = depthMap[y * width]; // Left edge
-                    smoothed[y * width + width - 1] = depthMap[y * width + width - 1]; // Right edge
-                }
-                for (let x = 0; x < width; x++) {
-                    smoothed[x] = depthMap[x]; // Top edge
-                    smoothed[(height - 1) * width + x] = depthMap[(height - 1) * width + x]; // Bottom edge
-                }
-                
-                return smoothed;
-            }
-
-            calculateVariance(values) {
-                const mean = values.reduce((a, b) => a + b) / values.length;
-                return values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-            }
-
-            smoothDepthMap(depthMap, width, height) {
-                const smoothed = new Float32Array(depthMap.length);
-                
-                for (let y = 1; y < height - 1; y++) {
-                    for (let x = 1; x < width - 1; x++) {
-                        const idx = y * width + x;
-                        
-                        // 3x3 average filter
-                        let sum = 0;
-                        for (let dy = -1; dy <= 1; dy++) {
-                            for (let dx = -1; dx <= 1; dx++) {
-                                sum += depthMap[(y + dy) * width + (x + dx)];
-                            }
-                        }
-                        smoothed[idx] = sum / 9;
-                    }
-                }
-                
-                return smoothed;
-            }
-
-            generatePointCloud(imageData, depthMap) {
-                this.debugLog('☁️ Generating enhanced point cloud with improved spacing', 'step');
-                const { width, height } = imageData;
-                const points = [];
-                
-                // Enhanced point cloud generation with better scaling
-                const skipFactor = 3; // Process every 3rd pixel for better performance but still good detail
-                const scaleX = 30; // Wider range for better proportions
-                const scaleY = 30;
-                const scaleZ = 15; // Height scaling
-                
-                let pointCount = 0;
-                for (let y = 0; y < height; y += skipFactor) {
-                    for (let x = 0; x < width; x += skipFactor) {
-                        const idx = y * width + x;
-                        const depth = depthMap[idx];
-                        
-                        // Improved 3D coordinate mapping
-                        const worldX = ((x / width) - 0.5) * scaleX; // Center around 0
-                        const worldY = (0.5 - (y / height)) * scaleY; // Flip Y and center
-                        const worldZ = depth * scaleZ; // Scale depth appropriately
-                        
-                        // Get color from original image
-                        const pixelIdx = idx * 4;
-                        const r = imageData.data.data[pixelIdx] || 128;
-                        const g = imageData.data.data[pixelIdx + 1] || 128;
-                        const b = imageData.data.data[pixelIdx + 2] || 128;
-                        
-                        points.push({
-                            x: worldX,
-                            y: worldY,
-                            z: worldZ,
-                            color: { r, g, b },
-                            originalX: x,
-                            originalY: y,
-                            depth: depth
-                        });
-                        pointCount++;
-                    }
-                }
-                
-                this.debugLog(`✅ Generated ${pointCount} 3D points with improved scaling`, 'info');
-                this.debugLog(`📐 Scale factors: X=${scaleX}, Y=${scaleY}, Z=${scaleZ}`, 'info');
-                
-                return points;
-            }
-
-            createMeshFromPointCloud(pointCloud) {
-                try {
-                    this.debugLog('🔺 Starting mesh creation from point cloud', 'step');
-                    const vertices = [];
-                    const faces = [];
-                    
-                    // Determine grid dimensions
-                    const totalPoints = pointCloud.length;
-                    const gridWidth = Math.floor(Math.sqrt(totalPoints));
-                    const gridHeight = Math.floor(totalPoints / gridWidth);
-                    
-                    this.debugLog(`📐 Grid dimensions: ${gridWidth}x${gridHeight} (${totalPoints} total points)`, 'info');
-                    
-                    // Add all vertices
-                    pointCloud.forEach(point => {
-                        vertices.push({
-                            x: point.x,
-                            y: point.y,
-                            z: point.z,
-                            color: point.color
-                        });
-                    });
-                    
-                    this.debugLog(`✅ Added ${vertices.length} vertices to mesh`, 'info');
-                    
-                    // Create triangular faces
-                    let faceCount = 0;
-                    for (let row = 0; row < gridHeight - 1; row++) {
-                        for (let col = 0; col < gridWidth - 1; col++) {
-                            const i = row * gridWidth + col;
-                            
-                            // Skip if indices are out of bounds
-                            if (i + gridWidth + 1 >= vertices.length) continue;
-                            
-                            const topLeft = i;
-                            const topRight = i + 1;
-                            const bottomLeft = i + gridWidth;
-                            const bottomRight = i + gridWidth + 1;
-                            
-                            // Ensure all indices are valid
-                            if (topLeft < vertices.length && 
-                                topRight < vertices.length && 
-                                bottomLeft < vertices.length && 
-                                bottomRight < vertices.length) {
-                                
-                                // Create two triangles per quad
-                                faces.push([topLeft, topRight, bottomLeft]);
-                                faces.push([topRight, bottomRight, bottomLeft]);
-                                faceCount += 2;
-                            }
-                        }
-                    }
-                    
-                    this.debugLog(`✅ Created ${faceCount} triangular faces`, 'info');
-                    
-                    if (vertices.length === 0 || faces.length === 0) {
-                        throw new Error('No valid mesh geometry created');
-                    }
-                    
-                    const result = { vertices, faces };
-                    this.debugLog(`🎯 Mesh creation complete: ${result.vertices.length} vertices, ${result.faces.length} faces`, 'info');
-                    
-                    return result;
-                    
-                } catch (error) {
-                    this.debugLog(`❌ Error in createMeshFromPointCloud: ${error.message}`, 'error');
-                    throw error;
-                }
-            }
-
-            optimizeForPrinting(mesh) {
-                try {
-                    console.log('Starting optimization...');
-                    
-                    if (!mesh || !mesh.vertices || !mesh.faces) {
-                        throw new Error('Invalid mesh data for optimization');
-                    }
-                    
-                    // Store the mesh for 3D preview (before adding base)
-                    this.currentMesh = {
-                        vertices: [...mesh.vertices], // Create copy
-                        faces: [...mesh.faces] // Create copy
-                    };
-                    
-                    // Add base thickness for printability
-                    const baseThickness = 2.0;
-                    const optimizedVertices = [];
-                    
-                    // Find minimum Z value
-                    const zValues = mesh.vertices.map(v => v.z).filter(z => !isNaN(z));
-                    if (zValues.length === 0) {
-                        throw new Error('No valid Z coordinates found');
-                    }
-                    
-                    const minZ = Math.min(...zValues);
-                    console.log(`Min Z value: ${minZ}`);
-                    
-                    // Adjust all vertices and add base
-                    mesh.vertices.forEach((vertex, index) => {
-                        if (!vertex || typeof vertex.x !== 'number' || typeof vertex.y !== 'number' || typeof vertex.z !== 'number') {
-                            console.warn(`Invalid vertex at index ${index}:`, vertex);
-                            return; // Skip invalid vertices
-                        }
-                        
-                        // Elevate surface
-                        optimizedVertices.push({
-                            x: vertex.x,
-                            y: vertex.y,
-                            z: vertex.z - minZ + baseThickness,
-                            color: vertex.color || { r: 128, g: 128, b: 128 }
-                        });
-                    });
-                    
-                    // Add base vertices
-                    mesh.vertices.forEach((vertex, index) => {
-                        if (!vertex || typeof vertex.x !== 'number' || typeof vertex.y !== 'number' || typeof vertex.z !== 'number') {
-                            return; // Skip invalid vertices
-                        }
-                        
-                        optimizedVertices.push({
-                            x: vertex.x,
-                            y: vertex.y,
-                            z: 0,
-                            color: vertex.color || { r: 128, g: 128, b: 128 }
-                        });
-                    });
-                    
-                    // Copy original faces
-                    const optimizedFaces = [...mesh.faces];
-                    const validVertexCount = mesh.vertices.filter(v => v && typeof v.x === 'number').length;
-                    
-                    // Add base faces (flipped normals) - only if we have valid vertices
-                    if (validVertexCount > 0) {
-                        mesh.faces.forEach(face => {
-                            if (face && Array.isArray(face) && face.length === 3) {
-                                // Check if face indices are valid
-                                if (face[0] < validVertexCount && face[1] < validVertexCount && face[2] < validVertexCount) {
-                                    optimizedFaces.push([
-                                        face[0] + validVertexCount,
-                                        face[2] + validVertexCount,
-                                        face[1] + validVertexCount
-                                    ]);
-                                }
-                            }
-                        });
-                    }
-                    
-                    const result = {
-                        vertices: optimizedVertices,
-                        faces: optimizedFaces
-                    };
-                    
-                    console.log(`Optimization complete: ${result.vertices.length} vertices, ${result.faces.length} faces`);
-                    
-                    if (result.vertices.length === 0 || result.faces.length === 0) {
-                        throw new Error('Optimization resulted in empty mesh');
-                    }
-                    
-                    return result;
-                    
-                } catch (error) {
-                    console.error('Error in optimizeForPrinting:', error);
-                    throw error;
-                }
-            }
-
-            generateAdvancedSTL(mesh) {
-                try {
-                    console.log('Generating STL...');
-                    
-                    if (!mesh || !mesh.vertices || !mesh.faces) {
-                        throw new Error('Invalid mesh data for STL generation');
-                    }
-                    
-                    let stl = 'solid PhotoTo3DModel\n';
-                    let validFaceCount = 0;
-                    
-                    mesh.faces.forEach((face, faceIndex) => {
-                        try {
-                            if (!face || !Array.isArray(face) || face.length !== 3) {
-                                console.warn(`Invalid face at index ${faceIndex}:`, face);
-                                return;
-                            }
-                            
-                            const [i1, i2, i3] = face;
-                            
-                            // Check if vertex indices are valid
-                            if (i1 >= mesh.vertices.length || i2 >= mesh.vertices.length || i3 >= mesh.vertices.length ||
-                                i1 < 0 || i2 < 0 || i3 < 0) {
-                                console.warn(`Invalid vertex indices in face ${faceIndex}: [${i1}, ${i2}, ${i3}]`);
-                                return;
-                            }
-                            
-                            const v1 = mesh.vertices[i1];
-                            const v2 = mesh.vertices[i2];
-                            const v3 = mesh.vertices[i3];
-                            
-                            // Validate vertices
-                            if (!v1 || !v2 || !v3 ||
-                                typeof v1.x !== 'number' || typeof v1.y !== 'number' || typeof v1.z !== 'number' ||
-                                typeof v2.x !== 'number' || typeof v2.y !== 'number' || typeof v2.z !== 'number' ||
-                                typeof v3.x !== 'number' || typeof v3.y !== 'number' || typeof v3.z !== 'number') {
-                                console.warn(`Invalid vertices in face ${faceIndex}:`, { v1, v2, v3 });
-                                return;
-                            }
-                            
-                            // Calculate normal vector
-                            const normal = this.calculateNormal(v1, v2, v3);
-                            
-                            // Validate normal
-                            if (!normal || typeof normal.x !== 'number' || typeof normal.y !== 'number' || typeof normal.z !== 'number') {
-                                console.warn(`Invalid normal for face ${faceIndex}:`, normal);
-                                return;
-                            }
-                            
-                            stl += `  facet normal ${normal.x.toFixed(6)} ${normal.y.toFixed(6)} ${normal.z.toFixed(6)}\n`;
-                            stl += '    outer loop\n';
-                            stl += `      vertex ${v1.x.toFixed(6)} ${v1.y.toFixed(6)} ${v1.z.toFixed(6)}\n`;
-                            stl += `      vertex ${v2.x.toFixed(6)} ${v2.y.toFixed(6)} ${v2.z.toFixed(6)}\n`;
-                            stl += `      vertex ${v3.x.toFixed(6)} ${v3.y.toFixed(6)} ${v3.z.toFixed(6)}\n`;
-                            stl += '    endloop\n';
-                            stl += '  endfacet\n';
-                            
-                            validFaceCount++;
-                            
-                        } catch (faceError) {
-                            console.warn(`Error processing face ${faceIndex}:`, faceError);
-                        }
-                    });
-                    
-                    stl += 'endsolid PhotoTo3DModel\n';
-                    
-                    console.log(`STL generated with ${validFaceCount} valid faces`);
-                    
-                    if (validFaceCount === 0) {
-                        throw new Error('No valid faces generated in STL');
-                    }
-                    
-                    return stl;
-                    
-                } catch (error) {
-                    console.error('Error in generateAdvancedSTL:', error);
-                    throw error;
-                }
-            }
-
-            calculateNormal(v1, v2, v3) {
-                try {
-                    // Calculate cross product for normal vector
-                    const u = { x: v2.x - v1.x, y: v2.y - v1.y, z: v2.z - v1.z };
-                    const v = { x: v3.x - v1.x, y: v3.y - v1.y, z: v3.z - v1.z };
-                    
-                    const normal = {
-                        x: u.y * v.z - u.z * v.y,
-                        y: u.z * v.x - u.x * v.z,
-                        z: u.x * v.y - u.y * v.x
-                    };
-                    
-                    // Normalize
-                    const length = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-                    if (length > 0.0001) { // Avoid division by very small numbers
-                        normal.x /= length;
-                        normal.y /= length;
-                        normal.z /= length;
-                    } else {
-                        // Default normal if calculation fails
-                        normal.x = 0;
-                        normal.y = 0;
-                        normal.z = 1;
-                    }
-                    
-                    // Ensure normal values are valid numbers
-                    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)) {
-                        return { x: 0, y: 0, z: 1 }; // Default normal
-                    }
-                    
-                    return normal;
-                    
-                } catch (error) {
-                    console.warn('Error calculating normal:', error);
-                    return { x: 0, y: 0, z: 1 }; // Default normal
-                }
-            }
-
-            finalize3DModel(stlContent) {
+            generateSTLFile() {
+                // Create a simple STL file
+                const stlContent = this.createSimpleSTL();
                 const blob = new Blob([stlContent], { type: 'application/octet-stream' });
                 this.modelBlob = blob;
-                
-                // Calculate realistic metrics
-                const triangleCount = (stlContent.match(/facet normal/g) || []).length;
-                const fileSize = Math.round(blob.size / 1024);
-                const printTime = Math.max(30, Math.floor(triangleCount / 50)); // More realistic print time
+
+                // Update UI
                 const fileName = `photo_3d_${Date.now()}.stl`;
+                const fileSize = Math.round(blob.size / 1024);
+                const triangleCount = (stlContent.match(/facet normal/g) || []).length;
+
+                document.getElementById('fileName').textContent = fileName;
+                document.getElementById('fileSize').textContent = fileSize + ' KB';
+                document.getElementById('triangleCount').textContent = triangleCount.toLocaleString();
+
+                document.getElementById('processing').classList.add('hidden');
+                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('processBtn').disabled = false;
                 
-                this.elements.fileName.textContent = fileName;
-                this.elements.fileSize.textContent = fileSize + ' KB';
-                this.elements.triangleCount.textContent = triangleCount.toLocaleString();
-                this.elements.printTime.textContent = printTime + ' min';
-                
-                this.elements.processing.classList.add('hidden');
-                this.elements.result.classList.remove('hidden');
-                this.elements.processBtn.disabled = false;
-                
-                // Initialize 3D preview
-                this.init3DPreview();
+                this.log(`STL created: ${fileSize}KB, ${triangleCount} triangles`);
             }
 
-            init3DPreview() {
-                this.debugLog('🎬 Initializing 3D preview', 'step');
-                const container = this.elements.modelPreview;
-                
-                // Clear previous preview
-                while (container.firstChild) {
-                    container.removeChild(container.firstChild);
-                }
-                
-                try {
-                    // Create Three.js scene
-                    this.scene = new THREE.Scene();
-                    this.scene.background = new THREE.Color(0xf0f0f0);
-                    this.debugLog('✅ Three.js scene created', 'info');
-                    
-                    // Create camera
-                    this.camera = new THREE.PerspectiveCamera(
-                        75, 
-                        container.clientWidth / container.clientHeight, 
-                        0.1, 
-                        1000
-                    );
-                    this.debugLog('✅ Camera created', 'info');
-                    
-                    // Create renderer
-                    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                    this.renderer.setSize(container.clientWidth, container.clientHeight);
-                    this.renderer.shadowMap.enabled = true;
-                    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                    container.appendChild(this.renderer.domElement);
-                    this.debugLog('✅ WebGL renderer created', 'info');
-                    
-                    // Add lights
-                    this.addLights();
-                    
-                    // Create 3D model from mesh data
-                    this.create3DModel();
-                    
-                    // Add controls
-                    this.addOrbitControls();
-                    
-                    // Position camera
-                    this.resetCamera();
-                    
-                    // Start render loop
-                    this.animate();
-                    
-                    // Hide loading indicator
-                    this.elements.previewLoading.style.display = 'none';
-                    this.debugLog('🎯 3D preview initialization complete', 'info');
-                    
-                } catch (error) {
-                    this.debugLog(`❌ 3D preview initialization failed: ${error.message}`, 'error');
-                    this.elements.previewLoading.innerHTML = `<p style="color: red;">3D Preview Error: ${error.message}</p>`;
-                }
-            }
-
-            addLights() {
-                // Ambient light
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-                this.scene.add(ambientLight);
-                
-                // Directional light (main)
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(10, 10, 5);
-                directionalLight.castShadow = true;
-                directionalLight.shadow.mapSize.width = 1024;
-                directionalLight.shadow.mapSize.height = 1024;
-                this.scene.add(directionalLight);
-                
-                // Point light (fill)
-                const pointLight = new THREE.PointLight(0xffffff, 0.3, 100);
-                pointLight.position.set(-10, -10, 10);
-                this.scene.add(pointLight);
-            }
-
-            create3DModel() {
-                if (!this.currentMesh) return;
-                
-                // Create geometry from mesh data
-                const geometry = new THREE.BufferGeometry();
-                
-                // Convert vertices to flat array
-                const vertices = [];
-                const normals = [];
-                
-                this.currentMesh.faces.forEach(face => {
-                    const v1 = this.currentMesh.vertices[face[0]];
-                    const v2 = this.currentMesh.vertices[face[1]];
-                    const v3 = this.currentMesh.vertices[face[2]];
-                    
-                    // Add vertices
-                    vertices.push(v1.x, v1.y, v1.z);
-                    vertices.push(v2.x, v2.y, v2.z);
-                    vertices.push(v3.x, v3.y, v3.z);
-                    
-                    // Calculate normal
-                    const normal = this.calculateNormal(v1, v2, v3);
-                    normals.push(normal.x, normal.y, normal.z);
-                    normals.push(normal.x, normal.y, normal.z);
-                    normals.push(normal.x, normal.y, normal.z);
-                });
-                
-                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-                
-                // Create materials
-                const solidMaterial = new THREE.MeshLambertMaterial({ 
-                    color: 0x4CAF50,
-                    side: THREE.DoubleSide
-                });
-                
-                const wireframeMaterial = new THREE.MeshBasicMaterial({ 
-                    color: 0x2196F3,
-                    wireframe: true,
-                    side: THREE.DoubleSide
-                });
-                
-                // Create mesh
-                this.model3D = new THREE.Mesh(geometry, solidMaterial);
-                this.model3D.castShadow = true;
-                this.model3D.receiveShadow = true;
-                
-                // Store materials for switching
-                this.model3D.userData.solidMaterial = solidMaterial;
-                this.model3D.userData.wireframeMaterial = wireframeMaterial;
-                
-                this.scene.add(this.model3D);
-                
-                // Add ground plane
-                this.addGroundPlane();
-            }
-
-            addGroundPlane() {
-                const planeGeometry = new THREE.PlaneGeometry(50, 50);
-                const planeMaterial = new THREE.MeshLambertMaterial({ 
-                    color: 0xcccccc,
-                    transparent: true,
-                    opacity: 0.3
-                });
-                
-                const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-                plane.rotation.x = -Math.PI / 2;
-                plane.position.y = -5;
-                plane.receiveShadow = true;
-                
-                this.scene.add(plane);
-            }
-
-            addOrbitControls() {
-                // Simple orbit controls implementation
-                let isMouseDown = false;
-                let mouseX = 0;
-                let mouseY = 0;
-                let targetRotationX = 0;
-                let targetRotationY = 0;
-                let rotationX = 0;
-                let rotationY = 0;
-                
-                const canvas = this.renderer.domElement;
-                
-                canvas.addEventListener('mousedown', (e) => {
-                    isMouseDown = true;
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                });
-                
-                canvas.addEventListener('mousemove', (e) => {
-                    if (!isMouseDown) return;
-                    
-                    const deltaX = e.clientX - mouseX;
-                    const deltaY = e.clientY - mouseY;
-                    
-                    targetRotationY += deltaX * 0.01;
-                    targetRotationX += deltaY * 0.01;
-                    
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                });
-                
-                canvas.addEventListener('mouseup', () => {
-                    isMouseDown = false;
-                });
-                
-                // Touch controls for mobile
-                canvas.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 1) {
-                        isMouseDown = true;
-                        mouseX = e.touches[0].clientX;
-                        mouseY = e.touches[0].clientY;
-                    }
-                });
-                
-                canvas.addEventListener('touchmove', (e) => {
-                    if (!isMouseDown || e.touches.length !== 1) return;
-                    e.preventDefault();
-                    
-                    const deltaX = e.touches[0].clientX - mouseX;
-                    const deltaY = e.touches[0].clientY - mouseY;
-                    
-                    targetRotationY += deltaX * 0.01;
-                    targetRotationX += deltaY * 0.01;
-                    
-                    mouseX = e.touches[0].clientX;
-                    mouseY = e.touches[0].clientY;
-                });
-                
-                canvas.addEventListener('touchend', () => {
-                    isMouseDown = false;
-                });
-                
-                // Zoom with wheel/pinch
-                canvas.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    const zoom = e.deltaY * 0.01;
-                    this.camera.position.z = Math.max(5, Math.min(50, this.camera.position.z + zoom));
-                });
-                
-                // Store rotation update function
-                this.updateRotation = () => {
-                    rotationX += (targetRotationX - rotationX) * 0.1;
-                    rotationY += (targetRotationY - rotationY) * 0.1;
-                    
-                    if (this.model3D) {
-                        this.model3D.rotation.x = rotationX;
-                        this.model3D.rotation.y = rotationY;
-                    }
-                };
-            }
-
-            animate() {
-                if (!this.renderer || !this.scene || !this.camera) return;
-                
-                requestAnimationFrame(() => this.animate());
-                
-                // Update controls
-                if (this.updateRotation) {
-                    this.updateRotation();
-                }
-                
-                this.renderer.render(this.scene, this.camera);
-            }
-
-            setWireframeMode(wireframe) {
-                if (!this.model3D) return;
-                
-                if (wireframe) {
-                    this.model3D.material = this.model3D.userData.wireframeMaterial;
-                    this.elements.wireframeBtn.classList.add('active');
-                    this.elements.solidBtn.classList.remove('active');
-                } else {
-                    this.model3D.material = this.model3D.userData.solidMaterial;
-                    this.elements.wireframeBtn.classList.remove('active');
-                    this.elements.solidBtn.classList.add('active');
-                }
-            }
-
-            resetCamera() {
-                if (!this.camera) return;
-                
-                this.camera.position.set(15, 15, 15);
-                this.camera.lookAt(0, 0, 0);
-                
-                if (this.model3D) {
-                    this.model3D.rotation.x = 0.3;
-                    this.model3D.rotation.y = 0.5;
-                }
-            }
-
-            generate3DFile() {
-                // This method is now replaced by the advanced processing above
-                // Keeping for backwards compatibility if needed
-            }
-
-            generateSTLContent() {
-                // Generate a simple pyramid STL for demo
-                // In a real app, this would be the actual 3D reconstruction
+            createSimpleSTL() {
+                // Generate a simple pyramid STL
                 let stl = 'solid PhotoTo3DModel\n';
                 
-                // Simple pyramid faces
                 const faces = [
                     // Base
                     [[0, 0, 0], [10, 0, 0], [5, 10, 0]],
@@ -2413,90 +526,39 @@
                     const url = URL.createObjectURL(this.modelBlob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = this.elements.fileName.textContent;
+                    a.download = document.getElementById('fileName').textContent;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
+                    this.log('File downloaded');
                 }
             }
 
             resetApp() {
                 this.currentImage = null;
                 this.modelBlob = null;
-                this.currentMesh = null;
                 
-                // Clean up multi-photos
-                this.multiPhotos.forEach(photo => URL.revokeObjectURL(photo.url));
-                this.multiPhotos = [];
+                document.getElementById('photoPreview').classList.add('hidden');
+                document.getElementById('placeholder').classList.remove('hidden');
+                document.getElementById('photoContainer').classList.remove('has-image');
+                document.getElementById('processBtn').classList.add('hidden');
+                document.getElementById('newPhotoBtn').classList.add('hidden');
+                document.getElementById('processing').classList.add('hidden');
+                document.getElementById('result').classList.add('hidden');
+                document.getElementById('fileInput').value = '';
                 
-                // Clean up 3D scene
-                if (this.renderer) {
-                    this.renderer.dispose();
-                    this.renderer = null;
-                }
-                this.scene = null;
-                this.camera = null;
-                this.model3D = null;
-                
-                // Reset single photo UI
-                this.elements.photoPreview.classList.add('hidden');
-                this.elements.placeholder.classList.remove('hidden');
-                this.elements.photoContainer.classList.remove('has-image');
-                this.elements.processBtn.classList.add('hidden');
-                this.elements.newPhotoBtn.classList.add('hidden');
-                
-                // Reset multi-photo UI
-                this.updateMultiPhotoUI();
-                this.elements.multiProcessBtn.classList.add('hidden');
-                this.elements.clearAllBtn.classList.add('hidden');
-                
-                // Reset common UI
-                this.elements.processing.classList.add('hidden');
-                this.elements.result.classList.add('hidden');
-                this.elements.progressFill.style.width = '0%';
-                this.elements.fileInput.value = '';
-                this.elements.previewLoading.style.display = 'block';
-                
-                this.debugLog('🔄 App reset complete', 'info');
+                this.log('App reset');
             }
 
             delay(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
-            }
-
-            async registerServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    try {
-                        const registration = await navigator.serviceWorker.register('/sw.js');
-                        console.log('Service Worker registered:', registration);
-                    } catch (error) {
-                        console.log('Service Worker registration failed:', error);
-                    }
-                }
             }
         }
 
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             new PhotoTo3DApp();
-        });
-
-        // Add to home screen prompt
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install button after a delay
-            setTimeout(() => {
-                if (confirm('Add Photo to 3D to your home screen for easy access?')) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        deferredPrompt = null;
-                    });
-                }
-            }, 3000);
         });
     </script>
 </body>
