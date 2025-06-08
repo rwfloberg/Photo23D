@@ -547,32 +547,57 @@
                     await this.updateProgress('Preparing image...', 10);
                     const imageData = await this.prepareImageForProcessing();
                     
+                    if (!imageData || !imageData.data) {
+                        throw new Error('Failed to prepare image data');
+                    }
+                    
                     // Step 2: Estimate depth
                     await this.updateProgress('Analyzing depth information...', 30);
                     const depthMap = await this.estimateDepth(imageData);
+                    
+                    if (!depthMap || depthMap.length === 0) {
+                        throw new Error('Failed to estimate depth');
+                    }
                     
                     // Step 3: Generate point cloud
                     await this.updateProgress('Creating 3D point cloud...', 50);
                     const pointCloud = this.generatePointCloud(imageData, depthMap);
                     
+                    if (!pointCloud || pointCloud.length === 0) {
+                        throw new Error('Failed to generate point cloud');
+                    }
+                    
                     // Step 4: Create mesh
                     await this.updateProgress('Generating mesh...', 70);
                     const mesh = this.createMeshFromPointCloud(pointCloud);
+                    
+                    if (!mesh || !mesh.vertices || !mesh.faces) {
+                        throw new Error('Failed to create mesh');
+                    }
                     
                     // Step 5: Optimize for 3D printing
                     await this.updateProgress('Optimizing for 3D printing...', 85);
                     const optimizedMesh = this.optimizeForPrinting(mesh);
                     
+                    if (!optimizedMesh || !optimizedMesh.vertices || !optimizedMesh.faces) {
+                        throw new Error('Failed to optimize mesh');
+                    }
+                    
                     // Step 6: Generate STL
                     await this.updateProgress('Creating STL file...', 95);
                     const stlContent = this.generateAdvancedSTL(optimizedMesh);
+                    
+                    if (!stlContent) {
+                        throw new Error('Failed to generate STL');
+                    }
                     
                     await this.updateProgress('Complete!', 100);
                     this.finalize3DModel(stlContent);
                     
                 } catch (error) {
-                    console.error('Processing error:', error);
-                    alert('Error processing image. Please try another photo.');
+                    console.error('Processing error details:', error);
+                    console.error('Error stack:', error.stack);
+                    alert(`Error processing image: ${error.message}. Please try another photo.`);
                     this.elements.processing.classList.add('hidden');
                     this.elements.processBtn.disabled = false;
                 }
@@ -722,132 +747,279 @@
             }
 
             createMeshFromPointCloud(pointCloud) {
-                const vertices = [];
-                const faces = [];
-                
-                // Create triangular mesh from point cloud
-                const gridWidth = Math.sqrt(pointCloud.length);
-                
-                for (let i = 0; i < pointCloud.length - gridWidth - 1; i++) {
-                    if ((i + 1) % gridWidth === 0) continue; // Skip row ends
+                try {
+                    const vertices = [];
+                    const faces = [];
                     
-                    const p1 = pointCloud[i];
-                    const p2 = pointCloud[i + 1];
-                    const p3 = pointCloud[i + gridWidth];
-                    const p4 = pointCloud[i + gridWidth + 1];
+                    // Determine grid dimensions
+                    const totalPoints = pointCloud.length;
+                    const gridWidth = Math.floor(Math.sqrt(totalPoints));
+                    const gridHeight = Math.floor(totalPoints / gridWidth);
                     
-                    // Add vertices
-                    const v1 = vertices.length;
-                    vertices.push(p1, p2, p3, p4);
+                    console.log(`Creating mesh: ${totalPoints} points, ${gridWidth}x${gridHeight} grid`);
                     
-                    // Create two triangles per quad
-                    faces.push([v1, v1 + 1, v1 + 2]);
-                    faces.push([v1 + 1, v1 + 3, v1 + 2]);
+                    // Add all vertices
+                    pointCloud.forEach(point => {
+                        vertices.push({
+                            x: point.x,
+                            y: point.y,
+                            z: point.z,
+                            color: point.color
+                        });
+                    });
+                    
+                    // Create triangular faces
+                    for (let row = 0; row < gridHeight - 1; row++) {
+                        for (let col = 0; col < gridWidth - 1; col++) {
+                            const i = row * gridWidth + col;
+                            
+                            // Skip if indices are out of bounds
+                            if (i + gridWidth + 1 >= vertices.length) continue;
+                            
+                            const topLeft = i;
+                            const topRight = i + 1;
+                            const bottomLeft = i + gridWidth;
+                            const bottomRight = i + gridWidth + 1;
+                            
+                            // Ensure all indices are valid
+                            if (topLeft < vertices.length && 
+                                topRight < vertices.length && 
+                                bottomLeft < vertices.length && 
+                                bottomRight < vertices.length) {
+                                
+                                // Create two triangles per quad
+                                faces.push([topLeft, topRight, bottomLeft]);
+                                faces.push([topRight, bottomRight, bottomLeft]);
+                            }
+                        }
+                    }
+                    
+                    console.log(`Mesh created: ${vertices.length} vertices, ${faces.length} faces`);
+                    
+                    if (vertices.length === 0 || faces.length === 0) {
+                        throw new Error('No valid mesh geometry created');
+                    }
+                    
+                    return { vertices, faces };
+                    
+                } catch (error) {
+                    console.error('Error in createMeshFromPointCloud:', error);
+                    throw error;
                 }
-                
-                return { vertices, faces };
             }
 
             optimizeForPrinting(mesh) {
-                // Store the mesh for 3D preview
-                this.currentMesh = mesh;
-                
-                // Add base thickness for printability
-                const baseThickness = 2.0;
-                const optimizedVertices = [];
-                
-                // Find minimum Z value
-                const minZ = Math.min(...mesh.vertices.map(v => v.z));
-                
-                // Adjust all vertices and add base
-                mesh.vertices.forEach(vertex => {
-                    // Elevate surface
-                    optimizedVertices.push({
-                        x: vertex.x,
-                        y: vertex.y,
-                        z: vertex.z - minZ + baseThickness,
-                        color: vertex.color
+                try {
+                    console.log('Starting optimization...');
+                    
+                    if (!mesh || !mesh.vertices || !mesh.faces) {
+                        throw new Error('Invalid mesh data for optimization');
+                    }
+                    
+                    // Store the mesh for 3D preview (before adding base)
+                    this.currentMesh = {
+                        vertices: [...mesh.vertices], // Create copy
+                        faces: [...mesh.faces] // Create copy
+                    };
+                    
+                    // Add base thickness for printability
+                    const baseThickness = 2.0;
+                    const optimizedVertices = [];
+                    
+                    // Find minimum Z value
+                    const zValues = mesh.vertices.map(v => v.z).filter(z => !isNaN(z));
+                    if (zValues.length === 0) {
+                        throw new Error('No valid Z coordinates found');
+                    }
+                    
+                    const minZ = Math.min(...zValues);
+                    console.log(`Min Z value: ${minZ}`);
+                    
+                    // Adjust all vertices and add base
+                    mesh.vertices.forEach((vertex, index) => {
+                        if (!vertex || typeof vertex.x !== 'number' || typeof vertex.y !== 'number' || typeof vertex.z !== 'number') {
+                            console.warn(`Invalid vertex at index ${index}:`, vertex);
+                            return; // Skip invalid vertices
+                        }
+                        
+                        // Elevate surface
+                        optimizedVertices.push({
+                            x: vertex.x,
+                            y: vertex.y,
+                            z: vertex.z - minZ + baseThickness,
+                            color: vertex.color || { r: 128, g: 128, b: 128 }
+                        });
                     });
-                });
-                
-                // Add base vertices
-                mesh.vertices.forEach(vertex => {
-                    optimizedVertices.push({
-                        x: vertex.x,
-                        y: vertex.y,
-                        z: 0,
-                        color: vertex.color
+                    
+                    // Add base vertices
+                    mesh.vertices.forEach((vertex, index) => {
+                        if (!vertex || typeof vertex.x !== 'number' || typeof vertex.y !== 'number' || typeof vertex.z !== 'number') {
+                            return; // Skip invalid vertices
+                        }
+                        
+                        optimizedVertices.push({
+                            x: vertex.x,
+                            y: vertex.y,
+                            z: 0,
+                            color: vertex.color || { r: 128, g: 128, b: 128 }
+                        });
                     });
-                });
-                
-                // Add side walls and base faces
-                const optimizedFaces = [...mesh.faces];
-                const vertexCount = mesh.vertices.length;
-                
-                // Add base faces (flipped normals)
-                mesh.faces.forEach(face => {
-                    optimizedFaces.push([
-                        face[0] + vertexCount,
-                        face[2] + vertexCount,
-                        face[1] + vertexCount
-                    ]);
-                });
-                
-                const optimizedMesh = {
-                    vertices: optimizedVertices,
-                    faces: optimizedFaces
-                };
-                
-                // Update stored mesh for preview
-                this.currentMesh = optimizedMesh;
-                
-                return optimizedMesh;
+                    
+                    // Copy original faces
+                    const optimizedFaces = [...mesh.faces];
+                    const validVertexCount = mesh.vertices.filter(v => v && typeof v.x === 'number').length;
+                    
+                    // Add base faces (flipped normals) - only if we have valid vertices
+                    if (validVertexCount > 0) {
+                        mesh.faces.forEach(face => {
+                            if (face && Array.isArray(face) && face.length === 3) {
+                                // Check if face indices are valid
+                                if (face[0] < validVertexCount && face[1] < validVertexCount && face[2] < validVertexCount) {
+                                    optimizedFaces.push([
+                                        face[0] + validVertexCount,
+                                        face[2] + validVertexCount,
+                                        face[1] + validVertexCount
+                                    ]);
+                                }
+                            }
+                        });
+                    }
+                    
+                    const result = {
+                        vertices: optimizedVertices,
+                        faces: optimizedFaces
+                    };
+                    
+                    console.log(`Optimization complete: ${result.vertices.length} vertices, ${result.faces.length} faces`);
+                    
+                    if (result.vertices.length === 0 || result.faces.length === 0) {
+                        throw new Error('Optimization resulted in empty mesh');
+                    }
+                    
+                    return result;
+                    
+                } catch (error) {
+                    console.error('Error in optimizeForPrinting:', error);
+                    throw error;
+                }
             }
 
             generateAdvancedSTL(mesh) {
-                let stl = 'solid PhotoTo3DModel\n';
-                
-                mesh.faces.forEach(face => {
-                    const v1 = mesh.vertices[face[0]];
-                    const v2 = mesh.vertices[face[1]];
-                    const v3 = mesh.vertices[face[2]];
+                try {
+                    console.log('Generating STL...');
                     
-                    // Calculate normal vector
-                    const normal = this.calculateNormal(v1, v2, v3);
+                    if (!mesh || !mesh.vertices || !mesh.faces) {
+                        throw new Error('Invalid mesh data for STL generation');
+                    }
                     
-                    stl += `  facet normal ${normal.x.toFixed(6)} ${normal.y.toFixed(6)} ${normal.z.toFixed(6)}\n`;
-                    stl += '    outer loop\n';
-                    stl += `      vertex ${v1.x.toFixed(6)} ${v1.y.toFixed(6)} ${v1.z.toFixed(6)}\n`;
-                    stl += `      vertex ${v2.x.toFixed(6)} ${v2.y.toFixed(6)} ${v2.z.toFixed(6)}\n`;
-                    stl += `      vertex ${v3.x.toFixed(6)} ${v3.y.toFixed(6)} ${v3.z.toFixed(6)}\n`;
-                    stl += '    endloop\n';
-                    stl += '  endfacet\n';
-                });
-                
-                stl += 'endsolid PhotoTo3DModel\n';
-                return stl;
+                    let stl = 'solid PhotoTo3DModel\n';
+                    let validFaceCount = 0;
+                    
+                    mesh.faces.forEach((face, faceIndex) => {
+                        try {
+                            if (!face || !Array.isArray(face) || face.length !== 3) {
+                                console.warn(`Invalid face at index ${faceIndex}:`, face);
+                                return;
+                            }
+                            
+                            const [i1, i2, i3] = face;
+                            
+                            // Check if vertex indices are valid
+                            if (i1 >= mesh.vertices.length || i2 >= mesh.vertices.length || i3 >= mesh.vertices.length ||
+                                i1 < 0 || i2 < 0 || i3 < 0) {
+                                console.warn(`Invalid vertex indices in face ${faceIndex}: [${i1}, ${i2}, ${i3}]`);
+                                return;
+                            }
+                            
+                            const v1 = mesh.vertices[i1];
+                            const v2 = mesh.vertices[i2];
+                            const v3 = mesh.vertices[i3];
+                            
+                            // Validate vertices
+                            if (!v1 || !v2 || !v3 ||
+                                typeof v1.x !== 'number' || typeof v1.y !== 'number' || typeof v1.z !== 'number' ||
+                                typeof v2.x !== 'number' || typeof v2.y !== 'number' || typeof v2.z !== 'number' ||
+                                typeof v3.x !== 'number' || typeof v3.y !== 'number' || typeof v3.z !== 'number') {
+                                console.warn(`Invalid vertices in face ${faceIndex}:`, { v1, v2, v3 });
+                                return;
+                            }
+                            
+                            // Calculate normal vector
+                            const normal = this.calculateNormal(v1, v2, v3);
+                            
+                            // Validate normal
+                            if (!normal || typeof normal.x !== 'number' || typeof normal.y !== 'number' || typeof normal.z !== 'number') {
+                                console.warn(`Invalid normal for face ${faceIndex}:`, normal);
+                                return;
+                            }
+                            
+                            stl += `  facet normal ${normal.x.toFixed(6)} ${normal.y.toFixed(6)} ${normal.z.toFixed(6)}\n`;
+                            stl += '    outer loop\n';
+                            stl += `      vertex ${v1.x.toFixed(6)} ${v1.y.toFixed(6)} ${v1.z.toFixed(6)}\n`;
+                            stl += `      vertex ${v2.x.toFixed(6)} ${v2.y.toFixed(6)} ${v2.z.toFixed(6)}\n`;
+                            stl += `      vertex ${v3.x.toFixed(6)} ${v3.y.toFixed(6)} ${v3.z.toFixed(6)}\n`;
+                            stl += '    endloop\n';
+                            stl += '  endfacet\n';
+                            
+                            validFaceCount++;
+                            
+                        } catch (faceError) {
+                            console.warn(`Error processing face ${faceIndex}:`, faceError);
+                        }
+                    });
+                    
+                    stl += 'endsolid PhotoTo3DModel\n';
+                    
+                    console.log(`STL generated with ${validFaceCount} valid faces`);
+                    
+                    if (validFaceCount === 0) {
+                        throw new Error('No valid faces generated in STL');
+                    }
+                    
+                    return stl;
+                    
+                } catch (error) {
+                    console.error('Error in generateAdvancedSTL:', error);
+                    throw error;
+                }
             }
 
             calculateNormal(v1, v2, v3) {
-                // Calculate cross product for normal vector
-                const u = { x: v2.x - v1.x, y: v2.y - v1.y, z: v2.z - v1.z };
-                const v = { x: v3.x - v1.x, y: v3.y - v1.y, z: v3.z - v1.z };
-                
-                const normal = {
-                    x: u.y * v.z - u.z * v.y,
-                    y: u.z * v.x - u.x * v.z,
-                    z: u.x * v.y - u.y * v.x
-                };
-                
-                // Normalize
-                const length = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-                if (length > 0) {
-                    normal.x /= length;
-                    normal.y /= length;
-                    normal.z /= length;
+                try {
+                    // Calculate cross product for normal vector
+                    const u = { x: v2.x - v1.x, y: v2.y - v1.y, z: v2.z - v1.z };
+                    const v = { x: v3.x - v1.x, y: v3.y - v1.y, z: v3.z - v1.z };
+                    
+                    const normal = {
+                        x: u.y * v.z - u.z * v.y,
+                        y: u.z * v.x - u.x * v.z,
+                        z: u.x * v.y - u.y * v.x
+                    };
+                    
+                    // Normalize
+                    const length = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+                    if (length > 0.0001) { // Avoid division by very small numbers
+                        normal.x /= length;
+                        normal.y /= length;
+                        normal.z /= length;
+                    } else {
+                        // Default normal if calculation fails
+                        normal.x = 0;
+                        normal.y = 0;
+                        normal.z = 1;
+                    }
+                    
+                    // Ensure normal values are valid numbers
+                    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)) {
+                        return { x: 0, y: 0, z: 1 }; // Default normal
+                    }
+                    
+                    return normal;
+                    
+                } catch (error) {
+                    console.warn('Error calculating normal:', error);
+                    return { x: 0, y: 0, z: 1 }; // Default normal
                 }
-                
-                return normal;
             }
 
             finalize3DModel(stlContent) {
