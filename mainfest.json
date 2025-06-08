@@ -1,0 +1,31 @@
+{
+  "name": "Photo to 3D",
+  "short_name": "Photo3D",
+  "description": "Turn your photos into 3D printable files",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#2196F3",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%232196F3'/><text y='96' x='96' text-anchor='middle' dy='0.35em' fill='white' font-size='80'>3D</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%232196F3'/><text y='256' x='256' text-anchor='middle' dy='0.35em' fill='white' font-size='200'>3D</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["photography", "utilities", "productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'><rect width='390' height='844' fill='%23f0f0f0'/><text y='100' x='195' text-anchor='middle' fill='%23333' font-size='24'>Photo to 3D App</text></svg>",
+      "sizes": "390x844",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ]
+}
