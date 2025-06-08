@@ -896,50 +896,222 @@
             }
 
             async estimateDepth(imageData) {
-                // Advanced depth estimation using image analysis
+                this.debugLog('🔍 Starting advanced depth estimation', 'step');
                 const { data, width, height } = imageData;
                 const depthMap = new Float32Array(width * height);
                 
-                // Convert to grayscale and analyze brightness patterns
-                for (let i = 0; i < data.data.length; i += 4) {
-                    const pixelIndex = i / 4;
-                    const r = data.data[i];
-                    const g = data.data[i + 1];
-                    const b = data.data[i + 2];
-                    
-                    // Convert to grayscale
-                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-                    
-                    // Basic depth estimation: darker = closer, lighter = farther
-                    // In real app, this would use ML model
-                    let depth = (255 - gray) / 255.0;
-                    
-                    // Add some noise and variation for more realistic depth
-                    const x = pixelIndex % width;
-                    const y = Math.floor(pixelIndex / width);
-                    
-                    // Edge detection for depth discontinuities
-                    if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
-                        const neighbors = [
-                            data.data[(pixelIndex - width) * 4], // top
-                            data.data[(pixelIndex + width) * 4], // bottom
-                            data.data[(pixelIndex - 1) * 4],     // left
-                            data.data[(pixelIndex + 1) * 4]      // right
-                        ];
+                // Step 1: Convert to grayscale and calculate gradients
+                this.debugLog('📊 Calculating image gradients', 'info');
+                const grayscale = new Float32Array(width * height);
+                const gradientX = new Float32Array(width * height);
+                const gradientY = new Float32Array(width * height);
+                
+                // Convert to grayscale and calculate gradients
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        const pixelIdx = idx * 4;
                         
-                        const variance = this.calculateVariance(neighbors);
-                        if (variance > 50) { // Edge detected
-                            depth += 0.2; // Edges are typically closer
+                        // Improved grayscale conversion (luminance-based)
+                        const r = data.data[pixelIdx];
+                        const g = data.data[pixelIdx + 1];
+                        const b = data.data[pixelIdx + 2];
+                        grayscale[idx] = 0.299 * r + 0.587 * g + 0.114 * b;
+                        
+                        // Calculate gradients (Sobel operators)
+                        if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
+                            // Sobel X gradient
+                            const gx = (-1 * grayscale[(y-1)*width + (x-1)]) + 
+                                      (1 * grayscale[(y-1)*width + (x+1)]) +
+                                      (-2 * grayscale[y*width + (x-1)]) + 
+                                      (2 * grayscale[y*width + (x+1)]) +
+                                      (-1 * grayscale[(y+1)*width + (x-1)]) + 
+                                      (1 * grayscale[(y+1)*width + (x+1)]);
+                            
+                            // Sobel Y gradient  
+                            const gy = (-1 * grayscale[(y-1)*width + (x-1)]) + 
+                                      (-2 * grayscale[(y-1)*width + x]) +
+                                      (-1 * grayscale[(y-1)*width + (x+1)]) +
+                                      (1 * grayscale[(y+1)*width + (x-1)]) + 
+                                      (2 * grayscale[(y+1)*width + x]) +
+                                      (1 * grayscale[(y+1)*width + (x+1)]);
+                            
+                            gradientX[idx] = gx / 8.0;
+                            gradientY[idx] = gy / 8.0;
                         }
                     }
-                    
-                    // Smooth depth transitions
-                    depth = Math.max(0.1, Math.min(1.0, depth));
-                    depthMap[pixelIndex] = depth;
                 }
                 
-                // Apply smoothing filter
-                return this.smoothDepthMap(depthMap, width, height);
+                // Step 2: Enhanced depth estimation using multiple cues
+                this.debugLog('🎯 Computing depth from multiple visual cues', 'info');
+                for (let y = 2; y < height - 2; y++) {
+                    for (let x = 2; x < width - 2; x++) {
+                        const idx = y * width + x;
+                        let depth = 0;
+                        
+                        // Cue 1: Brightness-based depth (improved)
+                        const brightness = grayscale[idx];
+                        const normalizedBrightness = brightness / 255.0;
+                        
+                        // Cue 2: Gradient magnitude (edges suggest depth discontinuities)
+                        const gradMagnitude = Math.sqrt(gradientX[idx] * gradientX[idx] + gradientY[idx] * gradientY[idx]);
+                        const normalizedGrad = Math.min(gradMagnitude / 100.0, 1.0);
+                        
+                        // Cue 3: Local contrast analysis
+                        let localContrast = 0;
+                        let neighborCount = 0;
+                        for (let dy = -2; dy <= 2; dy++) {
+                            for (let dx = -2; dx <= 2; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const nIdx = (y + dy) * width + (x + dx);
+                                if (nIdx >= 0 && nIdx < grayscale.length) {
+                                    localContrast += Math.abs(grayscale[idx] - grayscale[nIdx]);
+                                    neighborCount++;
+                                }
+                            }
+                        }
+                        localContrast = neighborCount > 0 ? localContrast / neighborCount / 255.0 : 0;
+                        
+                        // Cue 4: Shape-from-shading using gradient direction
+                        const gradientAngle = Math.atan2(gradientY[idx], gradientX[idx]);
+                        const lightDirection = Math.PI / 4; // Assume light from top-left
+                        const shadingFactor = Math.cos(gradientAngle - lightDirection) * 0.5 + 0.5;
+                        
+                        // Combine depth cues with weights
+                        const brightnessDepth = (255 - brightness) / 255.0; // Darker = closer
+                        const contrastDepth = localContrast * 2.0; // High contrast = edges = depth changes
+                        const gradientDepth = normalizedGrad * 1.5; // Edges suggest depth
+                        const shadingDepth = shadingFactor * 0.8; // Shading suggests 3D form
+                        
+                        // Weighted combination
+                        depth = (brightnessDepth * 0.4) + 
+                               (contrastDepth * 0.3) + 
+                               (gradientDepth * 0.2) + 
+                               (shadingDepth * 0.1);
+                        
+                        // Enhance depth range and add some baseline
+                        depth = Math.pow(depth, 0.8) * 1.2 + 0.1; // Power function for better distribution
+                        depth = Math.max(0.1, Math.min(1.0, depth));
+                        
+                        depthMap[idx] = depth;
+                    }
+                }
+                
+                this.debugLog('🔧 Applying advanced filtering', 'info');
+                
+                // Step 3: Apply bilateral filtering to preserve edges while smoothing
+                const filteredDepth = this.bilateralFilter(depthMap, grayscale, width, height);
+                
+                // Step 4: Edge-preserving smoothing
+                const finalDepth = this.edgePreservingSmooth(filteredDepth, gradientX, gradientY, width, height);
+                
+                this.debugLog(`✅ Advanced depth estimation complete: range ${Math.min(...finalDepth).toFixed(3)} to ${Math.max(...finalDepth).toFixed(3)}`, 'info');
+                
+                return finalDepth;
+            }
+
+            bilateralFilter(depthMap, grayscale, width, height) {
+                this.debugLog('🎨 Applying bilateral filter for edge preservation', 'info');
+                const filtered = new Float32Array(depthMap.length);
+                const spatialSigma = 3.0;
+                const intensitySigma = 30.0;
+                const kernelSize = 5;
+                const kernelRadius = Math.floor(kernelSize / 2);
+                
+                for (let y = kernelRadius; y < height - kernelRadius; y++) {
+                    for (let x = kernelRadius; x < width - kernelRadius; x++) {
+                        const centerIdx = y * width + x;
+                        const centerIntensity = grayscale[centerIdx];
+                        
+                        let weightSum = 0;
+                        let depthSum = 0;
+                        
+                        for (let ky = -kernelRadius; ky <= kernelRadius; ky++) {
+                            for (let kx = -kernelRadius; kx <= kernelRadius; kx++) {
+                                const neighborIdx = (y + ky) * width + (x + kx);
+                                const neighborIntensity = grayscale[neighborIdx];
+                                
+                                // Spatial weight (Gaussian)
+                                const spatialDist = Math.sqrt(kx * kx + ky * ky);
+                                const spatialWeight = Math.exp(-(spatialDist * spatialDist) / (2 * spatialSigma * spatialSigma));
+                                
+                                // Intensity weight (preserve edges)
+                                const intensityDist = Math.abs(centerIntensity - neighborIntensity);
+                                const intensityWeight = Math.exp(-(intensityDist * intensityDist) / (2 * intensitySigma * intensitySigma));
+                                
+                                const totalWeight = spatialWeight * intensityWeight;
+                                weightSum += totalWeight;
+                                depthSum += depthMap[neighborIdx] * totalWeight;
+                            }
+                        }
+                        
+                        filtered[centerIdx] = weightSum > 0 ? depthSum / weightSum : depthMap[centerIdx];
+                    }
+                }
+                
+                // Copy borders
+                for (let i = 0; i < depthMap.length; i++) {
+                    const y = Math.floor(i / width);
+                    const x = i % width;
+                    if (y < kernelRadius || y >= height - kernelRadius || 
+                        x < kernelRadius || x >= width - kernelRadius) {
+                        filtered[i] = depthMap[i];
+                    }
+                }
+                
+                return filtered;
+            }
+
+            edgePreservingSmooth(depthMap, gradientX, gradientY, width, height) {
+                this.debugLog('✨ Applying edge-preserving smoothing', 'info');
+                const smoothed = new Float32Array(depthMap.length);
+                
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        
+                        // Calculate edge strength
+                        const edgeStrength = Math.sqrt(gradientX[idx] * gradientX[idx] + gradientY[idx] * gradientY[idx]);
+                        const edgeThreshold = 20.0;
+                        
+                        if (edgeStrength > edgeThreshold) {
+                            // Strong edge - preserve original depth
+                            smoothed[idx] = depthMap[idx];
+                        } else {
+                            // Smooth area - apply 3x3 Gaussian
+                            let sum = 0;
+                            let weightSum = 0;
+                            const weights = [
+                                [1, 2, 1],
+                                [2, 4, 2], 
+                                [1, 2, 1]
+                            ];
+                            
+                            for (let ky = -1; ky <= 1; ky++) {
+                                for (let kx = -1; kx <= 1; kx++) {
+                                    const nIdx = (y + ky) * width + (x + kx);
+                                    const weight = weights[ky + 1][kx + 1];
+                                    sum += depthMap[nIdx] * weight;
+                                    weightSum += weight;
+                                }
+                            }
+                            
+                            smoothed[idx] = sum / weightSum;
+                        }
+                    }
+                }
+                
+                // Copy borders
+                for (let y = 0; y < height; y++) {
+                    smoothed[y * width] = depthMap[y * width]; // Left edge
+                    smoothed[y * width + width - 1] = depthMap[y * width + width - 1]; // Right edge
+                }
+                for (let x = 0; x < width; x++) {
+                    smoothed[x] = depthMap[x]; // Top edge
+                    smoothed[(height - 1) * width + x] = depthMap[(height - 1) * width + x]; // Bottom edge
+                }
+                
+                return smoothed;
             }
 
             calculateVariance(values) {
@@ -969,34 +1141,48 @@
             }
 
             generatePointCloud(imageData, depthMap) {
+                this.debugLog('☁️ Generating enhanced point cloud with improved spacing', 'step');
                 const { width, height } = imageData;
                 const points = [];
                 
-                // Generate 3D points from depth map
-                for (let y = 0; y < height; y += 2) { // Skip pixels for performance
-                    for (let x = 0; x < width; x += 2) {
+                // Enhanced point cloud generation with better scaling
+                const skipFactor = 3; // Process every 3rd pixel for better performance but still good detail
+                const scaleX = 30; // Wider range for better proportions
+                const scaleY = 30;
+                const scaleZ = 15; // Height scaling
+                
+                let pointCount = 0;
+                for (let y = 0; y < height; y += skipFactor) {
+                    for (let x = 0; x < width; x += skipFactor) {
                         const idx = y * width + x;
                         const depth = depthMap[idx];
                         
-                        // Convert 2D coordinates to 3D
-                        const worldX = (x - width / 2) / width * 20; // Scale to reasonable size
-                        const worldY = (height / 2 - y) / height * 20;
-                        const worldZ = depth * 10; // Height based on depth
+                        // Improved 3D coordinate mapping
+                        const worldX = ((x / width) - 0.5) * scaleX; // Center around 0
+                        const worldY = (0.5 - (y / height)) * scaleY; // Flip Y and center
+                        const worldZ = depth * scaleZ; // Scale depth appropriately
                         
                         // Get color from original image
                         const pixelIdx = idx * 4;
-                        const r = imageData.data.data[pixelIdx];
-                        const g = imageData.data.data[pixelIdx + 1];
-                        const b = imageData.data.data[pixelIdx + 2];
+                        const r = imageData.data.data[pixelIdx] || 128;
+                        const g = imageData.data.data[pixelIdx + 1] || 128;
+                        const b = imageData.data.data[pixelIdx + 2] || 128;
                         
                         points.push({
                             x: worldX,
                             y: worldY,
                             z: worldZ,
-                            color: { r, g, b }
+                            color: { r, g, b },
+                            originalX: x,
+                            originalY: y,
+                            depth: depth
                         });
+                        pointCount++;
                     }
                 }
+                
+                this.debugLog(`✅ Generated ${pointCount} 3D points with improved scaling`, 'info');
+                this.debugLog(`📐 Scale factors: X=${scaleX}, Y=${scaleY}, Z=${scaleZ}`, 'info');
                 
                 return points;
             }
