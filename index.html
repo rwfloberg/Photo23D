@@ -207,7 +207,63 @@
 
         .result h3 {
             color: #4CAF50;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .model-preview {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin: 15px 0;
+            background: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .preview-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preview-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .preview-btn:not(.active) {
+            background: #e3f2fd;
+            color: #2196F3;
+        }
+
+        .preview-info {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .preview-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
         }
 
         .file-info {
@@ -303,6 +359,29 @@
 
         <div class="result hidden" id="result">
             <h3>✅ 3D Model Created!</h3>
+            
+            <!-- 3D Model Preview -->
+            <div class="model-preview" id="modelPreview">
+                <div class="preview-loading" id="previewLoading">
+                    <div class="spinner"></div>
+                    <p>Loading 3D preview...</p>
+                </div>
+            </div>
+            
+            <!-- Preview Controls -->
+            <div class="preview-controls">
+                <button class="preview-btn active" id="wireframeBtn">🔲 Wireframe</button>
+                <button class="preview-btn" id="solidBtn">🎯 Solid</button>
+                <button class="preview-btn" id="resetViewBtn">🔄 Reset View</button>
+            </div>
+            
+            <!-- Model Info -->
+            <div class="preview-info">
+                <p><strong>💡 3D Preview Tips:</strong></p>
+                <p>• Drag to rotate • Pinch/scroll to zoom • Two fingers to pan</p>
+                <p>• Check wireframe to see mesh structure</p>
+            </div>
+            
             <div class="file-info">
                 <p><strong>File:</strong> <span id="fileName">model.stl</span></p>
                 <p><strong>Size:</strong> <span id="fileSize">0 KB</span></p>
@@ -316,6 +395,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         class PhotoTo3DApp {
             constructor() {
@@ -324,6 +404,12 @@
                 this.depthModel = null;
                 this.canvas = null;
                 this.ctx = null;
+                this.currentMesh = null;
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.model3D = null;
+                this.controls = null;
                 this.initializeElements();
                 this.bindEvents();
                 this.registerServiceWorker();
@@ -352,7 +438,12 @@
                     fileName: document.getElementById('fileName'),
                     fileSize: document.getElementById('fileSize'),
                     triangleCount: document.getElementById('triangleCount'),
-                    printTime: document.getElementById('printTime')
+                    printTime: document.getElementById('printTime'),
+                    modelPreview: document.getElementById('modelPreview'),
+                    previewLoading: document.getElementById('previewLoading'),
+                    wireframeBtn: document.getElementById('wireframeBtn'),
+                    solidBtn: document.getElementById('solidBtn'),
+                    resetViewBtn: document.getElementById('resetViewBtn')
                 };
             }
 
@@ -365,6 +456,11 @@
                 this.elements.stopCameraBtn.addEventListener('click', () => this.stopCamera());
                 this.elements.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
                 this.elements.downloadBtn.addEventListener('click', () => this.downloadModel());
+                
+                // Preview controls
+                this.elements.wireframeBtn.addEventListener('click', () => this.setWireframeMode(true));
+                this.elements.solidBtn.addEventListener('click', () => this.setWireframeMode(false));
+                this.elements.resetViewBtn.addEventListener('click', () => this.resetCamera());
             }
 
             async loadDepthModel() {
@@ -653,6 +749,9 @@
             }
 
             optimizeForPrinting(mesh) {
+                // Store the mesh for 3D preview
+                this.currentMesh = mesh;
+                
                 // Add base thickness for printability
                 const baseThickness = 2.0;
                 const optimizedVertices = [];
@@ -694,10 +793,15 @@
                     ]);
                 });
                 
-                return {
+                const optimizedMesh = {
                     vertices: optimizedVertices,
                     faces: optimizedFaces
                 };
+                
+                // Update stored mesh for preview
+                this.currentMesh = optimizedMesh;
+                
+                return optimizedMesh;
             }
 
             generateAdvancedSTL(mesh) {
@@ -764,6 +868,267 @@
                 this.elements.processing.classList.add('hidden');
                 this.elements.result.classList.remove('hidden');
                 this.elements.processBtn.disabled = false;
+                
+                // Initialize 3D preview
+                this.init3DPreview();
+            }
+
+            init3DPreview() {
+                const container = this.elements.modelPreview;
+                
+                // Clear previous preview
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+                
+                // Create Three.js scene
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0xf0f0f0);
+                
+                // Create camera
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    container.clientWidth / container.clientHeight, 
+                    0.1, 
+                    1000
+                );
+                
+                // Create renderer
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(container.clientWidth, container.clientHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                container.appendChild(this.renderer.domElement);
+                
+                // Add lights
+                this.addLights();
+                
+                // Create 3D model from mesh data
+                this.create3DModel();
+                
+                // Add controls
+                this.addOrbitControls();
+                
+                // Position camera
+                this.resetCamera();
+                
+                // Start render loop
+                this.animate();
+                
+                // Hide loading indicator
+                this.elements.previewLoading.style.display = 'none';
+            }
+
+            addLights() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                this.scene.add(ambientLight);
+                
+                // Directional light (main)
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(10, 10, 5);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 1024;
+                directionalLight.shadow.mapSize.height = 1024;
+                this.scene.add(directionalLight);
+                
+                // Point light (fill)
+                const pointLight = new THREE.PointLight(0xffffff, 0.3, 100);
+                pointLight.position.set(-10, -10, 10);
+                this.scene.add(pointLight);
+            }
+
+            create3DModel() {
+                if (!this.currentMesh) return;
+                
+                // Create geometry from mesh data
+                const geometry = new THREE.BufferGeometry();
+                
+                // Convert vertices to flat array
+                const vertices = [];
+                const normals = [];
+                
+                this.currentMesh.faces.forEach(face => {
+                    const v1 = this.currentMesh.vertices[face[0]];
+                    const v2 = this.currentMesh.vertices[face[1]];
+                    const v3 = this.currentMesh.vertices[face[2]];
+                    
+                    // Add vertices
+                    vertices.push(v1.x, v1.y, v1.z);
+                    vertices.push(v2.x, v2.y, v2.z);
+                    vertices.push(v3.x, v3.y, v3.z);
+                    
+                    // Calculate normal
+                    const normal = this.calculateNormal(v1, v2, v3);
+                    normals.push(normal.x, normal.y, normal.z);
+                    normals.push(normal.x, normal.y, normal.z);
+                    normals.push(normal.x, normal.y, normal.z);
+                });
+                
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                
+                // Create materials
+                const solidMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x4CAF50,
+                    side: THREE.DoubleSide
+                });
+                
+                const wireframeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x2196F3,
+                    wireframe: true,
+                    side: THREE.DoubleSide
+                });
+                
+                // Create mesh
+                this.model3D = new THREE.Mesh(geometry, solidMaterial);
+                this.model3D.castShadow = true;
+                this.model3D.receiveShadow = true;
+                
+                // Store materials for switching
+                this.model3D.userData.solidMaterial = solidMaterial;
+                this.model3D.userData.wireframeMaterial = wireframeMaterial;
+                
+                this.scene.add(this.model3D);
+                
+                // Add ground plane
+                this.addGroundPlane();
+            }
+
+            addGroundPlane() {
+                const planeGeometry = new THREE.PlaneGeometry(50, 50);
+                const planeMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0xcccccc,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                
+                const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+                plane.rotation.x = -Math.PI / 2;
+                plane.position.y = -5;
+                plane.receiveShadow = true;
+                
+                this.scene.add(plane);
+            }
+
+            addOrbitControls() {
+                // Simple orbit controls implementation
+                let isMouseDown = false;
+                let mouseX = 0;
+                let mouseY = 0;
+                let targetRotationX = 0;
+                let targetRotationY = 0;
+                let rotationX = 0;
+                let rotationY = 0;
+                
+                const canvas = this.renderer.domElement;
+                
+                canvas.addEventListener('mousedown', (e) => {
+                    isMouseDown = true;
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+                
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!isMouseDown) return;
+                    
+                    const deltaX = e.clientX - mouseX;
+                    const deltaY = e.clientY - mouseY;
+                    
+                    targetRotationY += deltaX * 0.01;
+                    targetRotationX += deltaY * 0.01;
+                    
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+                
+                canvas.addEventListener('mouseup', () => {
+                    isMouseDown = false;
+                });
+                
+                // Touch controls for mobile
+                canvas.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        isMouseDown = true;
+                        mouseX = e.touches[0].clientX;
+                        mouseY = e.touches[0].clientY;
+                    }
+                });
+                
+                canvas.addEventListener('touchmove', (e) => {
+                    if (!isMouseDown || e.touches.length !== 1) return;
+                    e.preventDefault();
+                    
+                    const deltaX = e.touches[0].clientX - mouseX;
+                    const deltaY = e.touches[0].clientY - mouseY;
+                    
+                    targetRotationY += deltaX * 0.01;
+                    targetRotationX += deltaY * 0.01;
+                    
+                    mouseX = e.touches[0].clientX;
+                    mouseY = e.touches[0].clientY;
+                });
+                
+                canvas.addEventListener('touchend', () => {
+                    isMouseDown = false;
+                });
+                
+                // Zoom with wheel/pinch
+                canvas.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const zoom = e.deltaY * 0.01;
+                    this.camera.position.z = Math.max(5, Math.min(50, this.camera.position.z + zoom));
+                });
+                
+                // Store rotation update function
+                this.updateRotation = () => {
+                    rotationX += (targetRotationX - rotationX) * 0.1;
+                    rotationY += (targetRotationY - rotationY) * 0.1;
+                    
+                    if (this.model3D) {
+                        this.model3D.rotation.x = rotationX;
+                        this.model3D.rotation.y = rotationY;
+                    }
+                };
+            }
+
+            animate() {
+                if (!this.renderer || !this.scene || !this.camera) return;
+                
+                requestAnimationFrame(() => this.animate());
+                
+                // Update controls
+                if (this.updateRotation) {
+                    this.updateRotation();
+                }
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            setWireframeMode(wireframe) {
+                if (!this.model3D) return;
+                
+                if (wireframe) {
+                    this.model3D.material = this.model3D.userData.wireframeMaterial;
+                    this.elements.wireframeBtn.classList.add('active');
+                    this.elements.solidBtn.classList.remove('active');
+                } else {
+                    this.model3D.material = this.model3D.userData.solidMaterial;
+                    this.elements.wireframeBtn.classList.remove('active');
+                    this.elements.solidBtn.classList.add('active');
+                }
+            }
+
+            resetCamera() {
+                if (!this.camera) return;
+                
+                this.camera.position.set(15, 15, 15);
+                this.camera.lookAt(0, 0, 0);
+                
+                if (this.model3D) {
+                    this.model3D.rotation.x = 0.3;
+                    this.model3D.rotation.y = 0.5;
+                }
             }
 
             generate3DFile() {
@@ -817,6 +1182,16 @@
             resetApp() {
                 this.currentImage = null;
                 this.modelBlob = null;
+                this.currentMesh = null;
+                
+                // Clean up 3D scene
+                if (this.renderer) {
+                    this.renderer.dispose();
+                    this.renderer = null;
+                }
+                this.scene = null;
+                this.camera = null;
+                this.model3D = null;
                 
                 this.elements.photoPreview.classList.add('hidden');
                 this.elements.placeholder.classList.remove('hidden');
@@ -827,6 +1202,7 @@
                 this.elements.result.classList.add('hidden');
                 this.elements.progressFill.style.width = '0%';
                 this.elements.fileInput.value = '';
+                this.elements.previewLoading.style.display = 'block';
             }
 
             delay(ms) {
