@@ -302,6 +302,111 @@
             display: none;
         }
 
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 400px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 1000;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .debug-toggle {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .debug-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .debug-log {
+            margin: 5px 0;
+            padding: 3px 5px;
+            border-radius: 3px;
+        }
+
+        .debug-log.error {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff9999;
+        }
+
+        .debug-log.warning {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffcc99;
+        }
+
+        .debug-log.info {
+            background: rgba(0, 255, 0, 0.1);
+            color: #99ff99;
+        }
+
+        .debug-log.step {
+            background: rgba(0, 150, 255, 0.2);
+            color: #99ccff;
+        }
+
+        .debug-stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 4px;
+            color: #cccccc;
+        }
+
+        .debug-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+        }
+
+        @media (max-width: 600px) {
+            .debug-panel {
+                width: calc(100vw - 40px);
+                right: 20px;
+                left: 20px;
+                bottom: 90px;
+            }
+            
+            .debug-fab {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
         @media (max-width: 600px) {
             .container {
                 margin: 10px;
@@ -394,6 +499,23 @@
         <input type="file" id="fileInput" accept="image/*">
     </div>
 
+    <!-- Debug Panel -->
+    <button class="debug-fab" id="debugFab">🐛</button>
+    <div class="debug-panel hidden" id="debugPanel">
+        <div class="debug-header">
+            <span>🐛 Debug Console</span>
+            <button class="debug-toggle" id="debugClose">✕</button>
+        </div>
+        <div class="debug-stats" id="debugStats">
+            <div>Status: Ready</div>
+            <div>Memory: --</div>
+            <div>Performance: --</div>
+        </div>
+        <div class="debug-content" id="debugContent">
+            <div class="debug-log info">Debug panel initialized</div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -410,10 +532,12 @@
                 this.renderer = null;
                 this.model3D = null;
                 this.controls = null;
+                this.debugLogs = [];
                 this.initializeElements();
                 this.bindEvents();
                 this.registerServiceWorker();
                 this.loadDepthModel();
+                this.initDebugPanel();
             }
 
             initializeElements() {
@@ -443,7 +567,12 @@
                     previewLoading: document.getElementById('previewLoading'),
                     wireframeBtn: document.getElementById('wireframeBtn'),
                     solidBtn: document.getElementById('solidBtn'),
-                    resetViewBtn: document.getElementById('resetViewBtn')
+                    resetViewBtn: document.getElementById('resetViewBtn'),
+                    debugFab: document.getElementById('debugFab'),
+                    debugPanel: document.getElementById('debugPanel'),
+                    debugClose: document.getElementById('debugClose'),
+                    debugContent: document.getElementById('debugContent'),
+                    debugStats: document.getElementById('debugStats')
                 };
             }
 
@@ -461,6 +590,100 @@
                 this.elements.wireframeBtn.addEventListener('click', () => this.setWireframeMode(true));
                 this.elements.solidBtn.addEventListener('click', () => this.setWireframeMode(false));
                 this.elements.resetViewBtn.addEventListener('click', () => this.resetCamera());
+                
+                // Debug panel controls
+                this.elements.debugFab.addEventListener('click', () => this.toggleDebugPanel());
+                this.elements.debugClose.addEventListener('click', () => this.toggleDebugPanel());
+            }
+
+            initDebugPanel() {
+                this.debugLog('Debug panel initialized', 'info');
+                this.updateDebugStats('Ready', '--', '--');
+                
+                // Override console methods to capture logs
+                const originalConsoleLog = console.log;
+                const originalConsoleError = console.error;
+                const originalConsoleWarn = console.warn;
+                
+                console.log = (...args) => {
+                    originalConsoleLog.apply(console, args);
+                    this.debugLog(args.join(' '), 'info');
+                };
+                
+                console.error = (...args) => {
+                    originalConsoleError.apply(console, args);
+                    this.debugLog(args.join(' '), 'error');
+                };
+                
+                console.warn = (...args) => {
+                    originalConsoleWarn.apply(console, args);
+                    this.debugLog(args.join(' '), 'warning');
+                };
+                
+                // Capture unhandled errors
+                window.addEventListener('error', (e) => {
+                    this.debugLog(`ERROR: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+                });
+                
+                // Monitor memory usage
+                setInterval(() => {
+                    if (performance.memory) {
+                        const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + 'MB';
+                        this.updateMemoryStats(memory);
+                    }
+                }, 2000);
+            }
+
+            debugLog(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = {
+                    time: timestamp,
+                    message: message,
+                    type: type
+                };
+                
+                this.debugLogs.push(logEntry);
+                
+                // Keep only last 50 logs
+                if (this.debugLogs.length > 50) {
+                    this.debugLogs.shift();
+                }
+                
+                this.updateDebugDisplay();
+            }
+
+            updateDebugDisplay() {
+                const content = this.elements.debugContent;
+                content.innerHTML = '';
+                
+                this.debugLogs.forEach(log => {
+                    const div = document.createElement('div');
+                    div.className = `debug-log ${log.type}`;
+                    div.innerHTML = `<span style="color: #666;">${log.time}</span> ${log.message}`;
+                    content.appendChild(div);
+                });
+                
+                // Auto-scroll to bottom
+                content.scrollTop = content.scrollHeight;
+            }
+
+            updateDebugStats(status, memory, performance) {
+                const stats = this.elements.debugStats;
+                stats.innerHTML = `
+                    <div>Status: ${status}</div>
+                    <div>Memory: ${memory}</div>
+                    <div>Performance: ${performance}</div>
+                `;
+            }
+
+            updateMemoryStats(memory) {
+                const currentStats = this.elements.debugStats.innerHTML;
+                const updatedStats = currentStats.replace(/Memory: [^<]*/, `Memory: ${memory}`);
+                this.elements.debugStats.innerHTML = updatedStats;
+            }
+
+            toggleDebugPanel() {
+                this.elements.debugPanel.classList.toggle('hidden');
             }
 
             async loadDepthModel() {
@@ -541,65 +764,97 @@
             async process3DModel() {
                 this.elements.processing.classList.remove('hidden');
                 this.elements.processBtn.disabled = true;
+                this.debugLog('🚀 Starting 3D model processing', 'step');
+                this.updateDebugStats('Processing', '--', '--');
+                
+                const startTime = performance.now();
                 
                 try {
                     // Step 1: Prepare image
                     await this.updateProgress('Preparing image...', 10);
+                    this.debugLog('📷 Preparing image for processing', 'step');
                     const imageData = await this.prepareImageForProcessing();
                     
                     if (!imageData || !imageData.data) {
                         throw new Error('Failed to prepare image data');
                     }
+                    this.debugLog(`✅ Image prepared: ${imageData.width}x${imageData.height}`, 'info');
                     
                     // Step 2: Estimate depth
                     await this.updateProgress('Analyzing depth information...', 30);
+                    this.debugLog('🔍 Estimating depth from image', 'step');
                     const depthMap = await this.estimateDepth(imageData);
                     
                     if (!depthMap || depthMap.length === 0) {
                         throw new Error('Failed to estimate depth');
                     }
+                    this.debugLog(`✅ Depth map created: ${depthMap.length} points`, 'info');
                     
                     // Step 3: Generate point cloud
                     await this.updateProgress('Creating 3D point cloud...', 50);
+                    this.debugLog('☁️ Generating 3D point cloud', 'step');
                     const pointCloud = this.generatePointCloud(imageData, depthMap);
                     
                     if (!pointCloud || pointCloud.length === 0) {
                         throw new Error('Failed to generate point cloud');
                     }
+                    this.debugLog(`✅ Point cloud generated: ${pointCloud.length} points`, 'info');
                     
                     // Step 4: Create mesh
                     await this.updateProgress('Generating mesh...', 70);
+                    this.debugLog('🔺 Creating triangular mesh', 'step');
                     const mesh = this.createMeshFromPointCloud(pointCloud);
                     
                     if (!mesh || !mesh.vertices || !mesh.faces) {
                         throw new Error('Failed to create mesh');
                     }
+                    this.debugLog(`✅ Mesh created: ${mesh.vertices.length} vertices, ${mesh.faces.length} faces`, 'info');
                     
                     // Step 5: Optimize for 3D printing
                     await this.updateProgress('Optimizing for 3D printing...', 85);
+                    this.debugLog('⚙️ Optimizing mesh for 3D printing', 'step');
                     const optimizedMesh = this.optimizeForPrinting(mesh);
                     
                     if (!optimizedMesh || !optimizedMesh.vertices || !optimizedMesh.faces) {
                         throw new Error('Failed to optimize mesh');
                     }
+                    this.debugLog(`✅ Mesh optimized: ${optimizedMesh.vertices.length} vertices, ${optimizedMesh.faces.length} faces`, 'info');
                     
                     // Step 6: Generate STL
                     await this.updateProgress('Creating STL file...', 95);
+                    this.debugLog('📄 Generating STL file', 'step');
                     const stlContent = this.generateAdvancedSTL(optimizedMesh);
                     
                     if (!stlContent) {
                         throw new Error('Failed to generate STL');
                     }
                     
+                    const endTime = performance.now();
+                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
+                    this.debugLog(`✅ STL generated successfully in ${processTime}s`, 'info');
+                    
                     await this.updateProgress('Complete!', 100);
+                    this.updateDebugStats('Complete', '--', `${processTime}s`);
                     this.finalize3DModel(stlContent);
                     
                 } catch (error) {
+                    const endTime = performance.now();
+                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
+                    
+                    this.debugLog(`❌ PROCESSING FAILED: ${error.message}`, 'error');
+                    this.debugLog(`📊 Failed after ${processTime}s`, 'error');
+                    
+                    if (error.stack) {
+                        this.debugLog(`📋 Stack trace: ${error.stack}`, 'error');
+                    }
+                    
                     console.error('Processing error details:', error);
                     console.error('Error stack:', error.stack);
-                    alert(`Error processing image: ${error.message}. Please try another photo.`);
+                    
+                    alert(`Error processing image: ${error.message}. Check debug panel for details.`);
                     this.elements.processing.classList.add('hidden');
                     this.elements.processBtn.disabled = false;
+                    this.updateDebugStats('Failed', '--', `${processTime}s`);
                 }
             }
 
@@ -748,6 +1003,7 @@
 
             createMeshFromPointCloud(pointCloud) {
                 try {
+                    this.debugLog('🔺 Starting mesh creation from point cloud', 'step');
                     const vertices = [];
                     const faces = [];
                     
@@ -756,7 +1012,7 @@
                     const gridWidth = Math.floor(Math.sqrt(totalPoints));
                     const gridHeight = Math.floor(totalPoints / gridWidth);
                     
-                    console.log(`Creating mesh: ${totalPoints} points, ${gridWidth}x${gridHeight} grid`);
+                    this.debugLog(`📐 Grid dimensions: ${gridWidth}x${gridHeight} (${totalPoints} total points)`, 'info');
                     
                     // Add all vertices
                     pointCloud.forEach(point => {
@@ -768,7 +1024,10 @@
                         });
                     });
                     
+                    this.debugLog(`✅ Added ${vertices.length} vertices to mesh`, 'info');
+                    
                     // Create triangular faces
+                    let faceCount = 0;
                     for (let row = 0; row < gridHeight - 1; row++) {
                         for (let col = 0; col < gridWidth - 1; col++) {
                             const i = row * gridWidth + col;
@@ -790,20 +1049,24 @@
                                 // Create two triangles per quad
                                 faces.push([topLeft, topRight, bottomLeft]);
                                 faces.push([topRight, bottomRight, bottomLeft]);
+                                faceCount += 2;
                             }
                         }
                     }
                     
-                    console.log(`Mesh created: ${vertices.length} vertices, ${faces.length} faces`);
+                    this.debugLog(`✅ Created ${faceCount} triangular faces`, 'info');
                     
                     if (vertices.length === 0 || faces.length === 0) {
                         throw new Error('No valid mesh geometry created');
                     }
                     
-                    return { vertices, faces };
+                    const result = { vertices, faces };
+                    this.debugLog(`🎯 Mesh creation complete: ${result.vertices.length} vertices, ${result.faces.length} faces`, 'info');
+                    
+                    return result;
                     
                 } catch (error) {
-                    console.error('Error in createMeshFromPointCloud:', error);
+                    this.debugLog(`❌ Error in createMeshFromPointCloud: ${error.message}`, 'error');
                     throw error;
                 }
             }
@@ -1046,6 +1309,7 @@
             }
 
             init3DPreview() {
+                this.debugLog('🎬 Initializing 3D preview', 'step');
                 const container = this.elements.modelPreview;
                 
                 // Clear previous preview
@@ -1053,42 +1317,52 @@
                     container.removeChild(container.firstChild);
                 }
                 
-                // Create Three.js scene
-                this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0xf0f0f0);
-                
-                // Create camera
-                this.camera = new THREE.PerspectiveCamera(
-                    75, 
-                    container.clientWidth / container.clientHeight, 
-                    0.1, 
-                    1000
-                );
-                
-                // Create renderer
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                this.renderer.setSize(container.clientWidth, container.clientHeight);
-                this.renderer.shadowMap.enabled = true;
-                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                container.appendChild(this.renderer.domElement);
-                
-                // Add lights
-                this.addLights();
-                
-                // Create 3D model from mesh data
-                this.create3DModel();
-                
-                // Add controls
-                this.addOrbitControls();
-                
-                // Position camera
-                this.resetCamera();
-                
-                // Start render loop
-                this.animate();
-                
-                // Hide loading indicator
-                this.elements.previewLoading.style.display = 'none';
+                try {
+                    // Create Three.js scene
+                    this.scene = new THREE.Scene();
+                    this.scene.background = new THREE.Color(0xf0f0f0);
+                    this.debugLog('✅ Three.js scene created', 'info');
+                    
+                    // Create camera
+                    this.camera = new THREE.PerspectiveCamera(
+                        75, 
+                        container.clientWidth / container.clientHeight, 
+                        0.1, 
+                        1000
+                    );
+                    this.debugLog('✅ Camera created', 'info');
+                    
+                    // Create renderer
+                    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                    this.renderer.setSize(container.clientWidth, container.clientHeight);
+                    this.renderer.shadowMap.enabled = true;
+                    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                    container.appendChild(this.renderer.domElement);
+                    this.debugLog('✅ WebGL renderer created', 'info');
+                    
+                    // Add lights
+                    this.addLights();
+                    
+                    // Create 3D model from mesh data
+                    this.create3DModel();
+                    
+                    // Add controls
+                    this.addOrbitControls();
+                    
+                    // Position camera
+                    this.resetCamera();
+                    
+                    // Start render loop
+                    this.animate();
+                    
+                    // Hide loading indicator
+                    this.elements.previewLoading.style.display = 'none';
+                    this.debugLog('🎯 3D preview initialization complete', 'info');
+                    
+                } catch (error) {
+                    this.debugLog(`❌ 3D preview initialization failed: ${error.message}`, 'error');
+                    this.elements.previewLoading.innerHTML = `<p style="color: red;">3D Preview Error: ${error.message}</p>`;
+                }
             }
 
             addLights() {
