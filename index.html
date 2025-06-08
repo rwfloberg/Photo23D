@@ -1,4 +1,383 @@
-<!DOCTYPE html>
+            async prepareImageForProcessingFromFile(file) {
+                return new Promise((resolve) => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.onload = () => {
+                        const maxSize = 512;
+                        let { width, height } = img;
+                        
+                        if (width > height) {
+                            if (width > maxSize) {
+                                height = (height * maxSize) / width;
+                                width = maxSize;
+                            }
+                        } else {
+                            if (height > maxSize) {
+                                width = (width * maxSize) / height;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        const imageData = ctx.getImageData(0, 0, width, height);
+                        resolve({ data: imageData, width, height });
+                    };
+                    
+                    img.src = URL.createObjectURL(file);
+                });
+            }
+
+            combineMultipleDepthMaps(photoAnalyses) {
+                this.debugLog('🔄 Combining multiple depth maps for enhanced accuracy', 'step');
+                
+                if (photoAnalyses.length === 0) return null;
+                
+                const firstAnalysis = photoAnalyses[0];
+                const { width, height } = firstAnalysis.imageData;
+                const combinedDepth = new Float32Array(width * height);
+                
+                // Initialize with first depth map
+                for (let i = 0; i < combinedDepth.length; i++) {
+                    combinedDepth[i] = firstAnalysis.depthMap[i];
+                }
+                
+                // Combine with other depth maps using weighted average
+                for (let analysisIndex = 1; analysisIndex < photoAnalyses.length; analysisIndex++) {
+                    const analysis = photoAnalyses[analysisIndex];
+                    const weight = 1.0 / (analysisIndex + 1); // Decreasing weight for subsequent images
+                    
+                    for (let i = 0; i < combinedDepth.length; i++) {
+                        // Weighted average with edge preservation
+                        const currentDepth = combinedDepth[i];
+                        const newDepth = analysis.depthMap[i];
+                        
+                        // If depths are similar, average them
+                        // If they're very different, favor the higher confidence one
+                        const depthDiff = Math.abs(currentDepth - newDepth);
+                        if (depthDiff < 0.3) {
+                            combinedDepth[i] = currentDepth * (1 - weight) + newDepth * weight;
+                        } else {
+                            // Large difference - choose the one with more local consistency
+                            // For now, use a simple rule: favor the higher value (closer objects)
+                            combinedDepth[i] = Math.max(currentDepth, newDepth);
+                        }
+                    }
+                }
+                
+                // Apply final smoothing while preserving edges
+                const smoothed = this.edgePreservingSmooth(
+                    combinedDepth, 
+                    new Float32Array(width * height), // dummy gradients
+                    new Float32Array(width * height), 
+                    width, 
+                    height
+                );
+                
+                this.debugLog(`✅ Combined ${photoAnalyses.length} depth maps successfully`, 'info');
+                return smoothed;
+            }
+
+            generateEnhancedPointCloud(imageData, depthMap) {
+                this.debugLog('☁️ Generating enhanced multi-photo point cloud', 'step');
+                const { width, height } = imageData;
+                const points = [];
+                
+                const skipFactor = 2; // Higher detail for multi-photo mode
+                const scaleX = 40; // Larger scale for better detail
+                const scaleY = 40;
+                const scaleZ = 20; // Enhanced height scaling
+                
+                let pointCount = 0;
+                for (let y = 0; y < height; y += skipFactor) {
+                    for (let x = 0; x < width; x += skipFactor) {
+                        const idx = y * width + x;
+                        const depth = depthMap[idx];
+                        
+                        // Enhanced 3D coordinate mapping
+                        const worldX = ((x / width) - 0.5) * scaleX;
+                        const worldY = (0.5 - (y / height)) * scaleY;
+                        const worldZ = depth * scaleZ;
+                        
+                        // Get color from original image
+                        const pixelIdx = idx * 4;
+                        const r = imageData.data.data[pixelIdx] || 128;
+                        const g = imageData.data.data[pixelIdx + 1] || 128;
+                        const b = imageData.data.data[pixelIdx + 2] || 128;
+                        
+                        points.push({
+                            x: worldX,
+                            y: worldY,
+                            z: worldZ,
+                            color: { r, g, b },
+                            confidence: depth, // Store depth as confidence measure
+                            originalX: x,
+                            originalY: y
+                        });
+                        pointCount++;
+                    }
+                }
+                
+                this.debugLog(`✅ Generated ${pointCount} enhanced 3D points`, 'info');
+                return points;
+            }
+
+            // Mode switching functions
+            switchToSingleMode() {
+                this.isMultiPhotoMode = false;
+                this.elements.singleModeBtn.classList.add('active');
+                this.elements.multiModeBtn.classList.remove('active');
+                this.elements.singlePhotoSection.classList.remove('hidden');
+                this.elements.multiPhotoSection.classList.add('hidden');
+                this.elements.singleModeButtons.classList.remove('hidden');
+                this.elements.multiModeButtons.classList.add('hidden');
+                this.debugLog('📷 Switched to single photo mode', 'info');
+            }
+
+            switchToMultiMode() {
+                this.isMultiPhotoMode = true;
+                this.elements.singleModeBtn.classList.remove('active');
+                this.elements.multiModeBtn.classList.add('active');
+                this.elements.singlePhotoSection.classList.add('hidden');
+                this.elements.multiPhotoSection.classList.remove('hidden');
+                this.elements.singleModeButtons.classList.add('hidden');
+                this.elements.multiModeButtons.classList.remove('hidden');
+                this.debugLog('📸 Switched to multi-photo mode', 'info');
+                this.updateMultiPhotoUI();
+            }
+
+            // Multi-photo functions
+            startMultiCamera() {
+                this.startCamera(true);
+            }
+
+            async startCamera(isMultiMode = false) {
+                try {
+                    this.stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' } 
+                    });
+                    
+                    this.elements.videoPreview.srcObject = this.stream;
+                    
+                    if (isMultiMode) {
+                        this.elements.multiCameraControls.classList.remove('hidden');
+                        this.elements.multiCameraBtn.classList.add('hidden');
+                        this.elements.multiLibraryBtn.classList.add('hidden');
+                    } else {
+                        this.elements.placeholder.classList.add('hidden');
+                        this.elements.photoPreview.classList.add('hidden');
+                        this.elements.videoPreview.classList.remove('hidden');
+                        this.elements.cameraControls.classList.remove('hidden');
+                        this.elements.cameraBtn.classList.add('hidden');
+                        this.elements.libraryBtn.classList.add('hidden');
+                    }
+                } catch (error) {
+                    this.debugLog(`❌ Camera access failed: ${error.message}`, 'error');
+                    alert('Camera access denied or not available');
+                }
+            }
+
+            captureMultiPhoto() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const video = this.elements.videoPreview;
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    this.addPhotoToGrid(blob);
+                });
+            }
+
+            addPhotoToGrid(imageFile) {
+                if (this.multiPhotos.length >= 6) {
+                    alert('Maximum 6 photos allowed');
+                    return;
+                }
+
+                const photoData = {
+                    file: imageFile,
+                    url: URL.createObjectURL(imageFile),
+                    index: this.multiPhotos.length
+                };
+
+                this.multiPhotos.push(photoData);
+                this.updateMultiPhotoUI();
+                this.debugLog(`📸 Added photo ${this.multiPhotos.length}/6`, 'info');
+            }
+
+            updateMultiPhotoUI() {
+                const slots = this.elements.photoGrid.querySelectorAll('.photo-slot');
+                
+                slots.forEach((slot, index) => {
+                    const photo = this.multiPhotos[index];
+                    if (photo) {
+                        slot.classList.add('filled');
+                        slot.innerHTML = `
+                            <img src="${photo.url}" alt="Photo ${index + 1}">
+                            <button class="remove-btn" data-index="${index}">×</button>
+                        `;
+                    } else {
+                        slot.classList.remove('filled');
+                        slot.innerHTML = `
+                            <div class="placeholder">
+                                <div>📷</div>
+                                <div>Photo ${index + 1}</div>
+                            </div>
+                            <button class="remove-btn">×</button>
+                        `;
+                    }
+                });
+
+                // Show/hide process button
+                if (this.multiPhotos.length >= 3) {
+                    this.elements.multiProcessBtn.classList.remove('hidden');
+                    this.elements.clearAllBtn.classList.remove('hidden');
+                } else {
+                    this.elements.multiProcessBtn.classList.add('hidden');
+                }
+            }
+
+            handlePhotoGridClick(e) {
+                if (e.target.classList.contains('remove-btn')) {
+                    const index = parseInt(e.target.dataset.index);
+                    if (!isNaN(index)) {
+                        this.removePhoto(index);
+                    }
+                } else if (e.target.closest('.photo-slot') && !e.target.closest('.photo-slot').classList.contains('filled')) {
+                    // Add photo to empty slot
+                    this.elements.fileInput.click();
+                }
+            }
+
+            removePhoto(index) {
+                if (this.multiPhotos[index]) {
+                    URL.revokeObjectURL(this.multiPhotos[index].url);
+                    this.multiPhotos.splice(index, 1);
+                    this.updateMultiPhotoUI();
+                    this.debugLog(`🗑️ Removed photo ${index + 1}`, 'info');
+                }
+            }
+
+            clearAllPhotos() {
+                this.multiPhotos.forEach(photo => URL.revokeObjectURL(photo.url));
+                this.multiPhotos = [];
+                this.updateMultiPhotoUI();
+                this.debugLog('🗑️ Cleared all photos', 'info');
+            }
+
+            addFromLibrary() {
+                this.elements.fileInput.click();
+            }
+
+            stopMultiCamera() {
+                this.stopCamera();
+                this.elements.multiCameraControls.classList.add('hidden');
+                this.elements.multiCameraBtn.classList.remove('hidden');
+                this.elements.multiLibraryBtn.classList.remove('hidden');
+            }
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    if (this.isMultiPhotoMode) {
+                        this.addPhotoToGrid(file);
+                    } else {
+                        this.displayCapturedImage(file);
+                    }
+                }
+            }
+
+            async processMultiPhoto3D() {
+                if (this.multiPhotos.length < 3) {
+                    alert('Please add at least 3 photos for multi-photo reconstruction');
+                    return;
+                }
+
+                this.debugLog(`🚀 Starting multi-photo 3D reconstruction with ${this.multiPhotos.length} photos`, 'step');
+                this.elements.processing.classList.remove('hidden');
+                this.elements.multiProcessBtn.disabled = true;
+                this.updateDebugStats('Processing Multiple Photos', '--', '--');
+
+                const startTime = performance.now();
+
+                try {
+                    // Process each photo and combine results
+                    await this.updateProgress('Analyzing multiple photos...', 10);
+                    const photoAnalyses = [];
+
+                    for (let i = 0; i < this.multiPhotos.length; i++) {
+                        this.debugLog(`📷 Processing photo ${i + 1}/${this.multiPhotos.length}`, 'step');
+                        await this.updateProgress(`Processing photo ${i + 1}/${this.multiPhotos.length}...`, 10 + (i * 20 / this.multiPhotos.length));
+                        
+                        const imageData = await this.prepareImageForProcessingFromFile(this.multiPhotos[i].file);
+                        const depthMap = await this.estimateDepth(imageData);
+                        
+                        photoAnalyses.push({
+                            imageData,
+                            depthMap,
+                            index: i
+                        });
+                    }
+
+                    // Combine multiple depth maps
+                    await this.updateProgress('Combining depth information...', 40);
+                    this.debugLog('🔄 Combining multiple depth maps for better accuracy', 'step');
+                    const combinedDepth = this.combineMultipleDepthMaps(photoAnalyses);
+
+                    // Generate enhanced point cloud
+                    await this.updateProgress('Creating enhanced point cloud...', 60);
+                    const pointCloud = this.generateEnhancedPointCloud(photoAnalyses[0].imageData, combinedDepth);
+
+                    // Create mesh
+                    await this.updateProgress('Generating mesh...', 75);
+                    const mesh = this.createMeshFromPointCloud(pointCloud);
+
+                    // Optimize for printing
+                    await this.updateProgress('Optimizing for 3D printing...', 85);
+                    const optimizedMesh = this.optimizeForPrinting(mesh);
+
+                    // Generate STL
+                    await this.updateProgress('Creating STL file...', 95);
+                    const stlContent = this.generateAdvancedSTL(optimizedMesh);
+
+                    const endTime = performance.now();
+                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
+                    this.debugLog(`✅ Multi-photo reconstruction complete in ${processTime}s`, 'info');
+
+                    await this.updateProgress('Complete!', 100);
+                    this.updateDebugStats('Complete', '--', `${processTime}s`);
+                    this.finalize3DModel(stlContent);
+
+                } catch (error) {
+                    const endTime = performance.now();
+                    const processTime = ((endTime - startTime) / 1000).toFixed(2);
+                    
+                    this.debugLog(`❌ Multi-photo processing failed: ${error.message}`, 'error');
+                    this.debugLog(`📊 Failed after ${processTime}s`, 'error');
+                    
+                    alert(`Error processing photos: ${error.message}. Check debug panel for details.`);
+                    this.elements.processing.classList.add('hidden');
+                    this.elements.multiProcessBtn.disabled = false;
+                    this.updateDebugStats('Failed', '--', `${processTime}s`);
+                }
+            }
+
+            async prepareImageForProcessingFromFile(file) {
+                return new Promise((resolve) => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.onload = () => {
+                        const maxSize = 512;
+                        let { width, height }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -101,6 +480,119 @@
             flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
+        }
+
+        .photo-mode-selector {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .mode-btn:not(.active) {
+            background: transparent;
+            color: #666;
+        }
+
+        .multi-photo-section {
+            margin-bottom: 20px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .photo-slot {
+            aspect-ratio: 1;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-slot.filled {
+            border: 2px solid #4CAF50;
+        }
+
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .photo-slot .placeholder {
+            text-align: center;
+            color: #999;
+            font-size: 0.8em;
+        }
+
+        .photo-slot .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .photo-slot.filled:hover .remove-btn {
+            display: block;
+        }
+
+        .multi-photo-info {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #1976D2;
+        }
+
+        .photo-instructions {
+            background: #fff3e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #F57C00;
+        }
+
+        .single-photo-section .photo-container {
+            display: block;
+        }
+
+        .multi-photo-mode .photo-container {
+            display: none;
         }
 
         .btn {
@@ -431,26 +923,109 @@
         </div>
 
         <div class="photo-section">
-            <div class="photo-container" id="photoContainer">
-                <div class="placeholder" id="placeholder">
-                    <div class="icon">📷</div>
-                    <p>Take a photo or select from library</p>
-                </div>
-                <img id="photoPreview" class="photo-preview hidden" alt="Selected photo">
-                <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
+            <!-- Photo Mode Selector -->
+            <div class="photo-mode-selector">
+                <button class="mode-btn active" id="singleModeBtn">📷 Single Photo</button>
+                <button class="mode-btn" id="multiModeBtn">📸 Multi Photo</button>
             </div>
 
-            <div class="camera-controls hidden" id="cameraControls">
-                <button class="btn btn-primary" id="captureBtn">📸 Capture</button>
-                <button class="btn btn-secondary" id="stopCameraBtn">❌ Cancel</button>
+            <!-- Single Photo Mode -->
+            <div class="single-photo-section" id="singlePhotoSection">
+                <div class="photo-container" id="photoContainer">
+                    <div class="placeholder" id="placeholder">
+                        <div class="icon">📷</div>
+                        <p>Take a photo or select from library</p>
+                    </div>
+                    <img id="photoPreview" class="photo-preview hidden" alt="Selected photo">
+                    <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
+                </div>
+
+                <div class="camera-controls hidden" id="cameraControls">
+                    <button class="btn btn-primary" id="captureBtn">📸 Capture</button>
+                    <button class="btn btn-secondary" id="stopCameraBtn">❌ Cancel</button>
+                </div>
+            </div>
+
+            <!-- Multi Photo Mode -->
+            <div class="multi-photo-section hidden" id="multiPhotoSection">
+                <div class="multi-photo-info">
+                    <p><strong>📸 Multi-Photo Mode:</strong> Take 3-6 photos from different angles for better 3D reconstruction</p>
+                </div>
+                
+                <div class="photo-instructions">
+                    <p><strong>💡 Tips for best results:</strong></p>
+                    <p>• Keep the object in center of frame</p>
+                    <p>• Move around the object (don't move the object)</p>
+                    <p>• Take photos every 45-60 degrees</p>
+                    <p>• Keep consistent distance from object</p>
+                </div>
+
+                <div class="photo-grid" id="photoGrid">
+                    <div class="photo-slot" data-slot="0">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 1</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                    <div class="photo-slot" data-slot="1">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 2</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                    <div class="photo-slot" data-slot="2">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 3</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                    <div class="photo-slot" data-slot="3">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 4</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                    <div class="photo-slot" data-slot="4">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 5</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                    <div class="photo-slot" data-slot="5">
+                        <div class="placeholder">
+                            <div>📷</div>
+                            <div>Photo 6</div>
+                        </div>
+                        <button class="remove-btn">×</button>
+                    </div>
+                </div>
+
+                <div class="camera-controls hidden" id="multiCameraControls">
+                    <button class="btn btn-primary" id="multiCaptureBtn">📸 Add Photo</button>
+                    <button class="btn btn-secondary" id="stopMultiCameraBtn">❌ Cancel</button>
+                </div>
             </div>
         </div>
 
         <div class="buttons">
-            <button class="btn btn-primary" id="cameraBtn">📷 Take Photo</button>
-            <button class="btn btn-secondary" id="libraryBtn">📁 Choose from Library</button>
-            <button class="btn btn-success hidden" id="processBtn">⚡ Create 3D Model</button>
-            <button class="btn btn-secondary hidden" id="newPhotoBtn">🔄 Take Another Photo</button>
+            <div id="singleModeButtons">
+                <button class="btn btn-primary" id="cameraBtn">📷 Take Photo</button>
+                <button class="btn btn-secondary" id="libraryBtn">📁 Choose from Library</button>
+                <button class="btn btn-success hidden" id="processBtn">⚡ Create 3D Model</button>
+                <button class="btn btn-secondary hidden" id="newPhotoBtn">🔄 Take Another Photo</button>
+            </div>
+            
+            <div id="multiModeButtons" class="hidden">
+                <button class="btn btn-primary" id="multiCameraBtn">📷 Take Photos</button>
+                <button class="btn btn-secondary" id="multiLibraryBtn">📁 Add from Library</button>
+                <button class="btn btn-success hidden" id="multiProcessBtn">⚡ Create 3D Model</button>
+                <button class="btn btn-secondary hidden" id="clearAllBtn">🗑️ Clear All Photos</button>
+            </div>
         </div>
 
         <div class="processing hidden" id="processing">
@@ -533,6 +1108,9 @@
                 this.model3D = null;
                 this.controls = null;
                 this.debugLogs = [];
+                this.isMultiPhotoMode = false;
+                this.multiPhotos = [];
+                this.currentSlot = 0;
                 this.initializeElements();
                 this.bindEvents();
                 this.registerServiceWorker();
@@ -572,11 +1150,28 @@
                     debugPanel: document.getElementById('debugPanel'),
                     debugClose: document.getElementById('debugClose'),
                     debugContent: document.getElementById('debugContent'),
-                    debugStats: document.getElementById('debugStats')
+                    debugStats: document.getElementById('debugStats'),
+                    
+                    // Multi-photo elements
+                    singleModeBtn: document.getElementById('singleModeBtn'),
+                    multiModeBtn: document.getElementById('multiModeBtn'),
+                    singlePhotoSection: document.getElementById('singlePhotoSection'),
+                    multiPhotoSection: document.getElementById('multiPhotoSection'),
+                    singleModeButtons: document.getElementById('singleModeButtons'),
+                    multiModeButtons: document.getElementById('multiModeButtons'),
+                    photoGrid: document.getElementById('photoGrid'),
+                    multiCameraBtn: document.getElementById('multiCameraBtn'),
+                    multiLibraryBtn: document.getElementById('multiLibraryBtn'),
+                    multiProcessBtn: document.getElementById('multiProcessBtn'),
+                    clearAllBtn: document.getElementById('clearAllBtn'),
+                    multiCameraControls: document.getElementById('multiCameraControls'),
+                    multiCaptureBtn: document.getElementById('multiCaptureBtn'),
+                    stopMultiCameraBtn: document.getElementById('stopMultiCameraBtn')
                 };
             }
 
             bindEvents() {
+                // Single photo mode events
                 this.elements.cameraBtn.addEventListener('click', () => this.startCamera());
                 this.elements.libraryBtn.addEventListener('click', () => this.elements.fileInput.click());
                 this.elements.processBtn.addEventListener('click', () => this.process3DModel());
@@ -585,6 +1180,21 @@
                 this.elements.stopCameraBtn.addEventListener('click', () => this.stopCamera());
                 this.elements.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
                 this.elements.downloadBtn.addEventListener('click', () => this.downloadModel());
+                
+                // Mode switching
+                this.elements.singleModeBtn.addEventListener('click', () => this.switchToSingleMode());
+                this.elements.multiModeBtn.addEventListener('click', () => this.switchToMultiMode());
+                
+                // Multi photo mode events
+                this.elements.multiCameraBtn.addEventListener('click', () => this.startMultiCamera());
+                this.elements.multiLibraryBtn.addEventListener('click', () => this.addFromLibrary());
+                this.elements.multiProcessBtn.addEventListener('click', () => this.processMultiPhoto3D());
+                this.elements.clearAllBtn.addEventListener('click', () => this.clearAllPhotos());
+                this.elements.multiCaptureBtn.addEventListener('click', () => this.captureMultiPhoto());
+                this.elements.stopMultiCameraBtn.addEventListener('click', () => this.stopMultiCamera());
+                
+                // Photo grid events
+                this.elements.photoGrid.addEventListener('click', (e) => this.handlePhotoGridClick(e));
                 
                 // Preview controls
                 this.elements.wireframeBtn.addEventListener('click', () => this.setWireframeMode(true));
@@ -1816,6 +2426,10 @@
                 this.modelBlob = null;
                 this.currentMesh = null;
                 
+                // Clean up multi-photos
+                this.multiPhotos.forEach(photo => URL.revokeObjectURL(photo.url));
+                this.multiPhotos = [];
+                
                 // Clean up 3D scene
                 if (this.renderer) {
                     this.renderer.dispose();
@@ -1825,16 +2439,26 @@
                 this.camera = null;
                 this.model3D = null;
                 
+                // Reset single photo UI
                 this.elements.photoPreview.classList.add('hidden');
                 this.elements.placeholder.classList.remove('hidden');
                 this.elements.photoContainer.classList.remove('has-image');
                 this.elements.processBtn.classList.add('hidden');
                 this.elements.newPhotoBtn.classList.add('hidden');
+                
+                // Reset multi-photo UI
+                this.updateMultiPhotoUI();
+                this.elements.multiProcessBtn.classList.add('hidden');
+                this.elements.clearAllBtn.classList.add('hidden');
+                
+                // Reset common UI
                 this.elements.processing.classList.add('hidden');
                 this.elements.result.classList.add('hidden');
                 this.elements.progressFill.style.width = '0%';
                 this.elements.fileInput.value = '';
                 this.elements.previewLoading.style.display = 'block';
+                
+                this.debugLog('🔄 App reset complete', 'info');
             }
 
             delay(ms) {
