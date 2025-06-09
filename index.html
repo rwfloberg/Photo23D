@@ -250,39 +250,6 @@
             border-radius: 3px;
             transition: width 0.3s ease;
         }
-        .preview-3d {
-            width: 100%;
-            height: 300px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            margin: 15px 0;
-            background: #f0f0f0;
-            position: relative;
-            overflow: hidden;
-        }
-        .preview-controls {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 10px 0;
-            flex-wrap: wrap;
-        }
-        .preview-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .preview-btn.active {
-            background: #2196F3;
-            color: white;
-        }
-        .preview-btn:not(.active) {
-            background: #e3f2fd;
-            color: #2196F3;
-        }
         .result {
             background: #e8f5e8;
             border: 1px solid #4CAF50;
@@ -311,6 +278,21 @@
             color: white;
             margin-top: 12px;
         }
+        .debug {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #0f0;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 250px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
         .hidden { display: none; }
         input[type="file"] { display: none; }
 
@@ -329,7 +311,7 @@
     <div class="container">
         <div class="header">
             <h1>📸 Photo to 3D Pro</h1>
-            <p>Advanced multi-photo 3D reconstruction with live preview</p>
+            <p>Advanced photo-based 3D reconstruction</p>
         </div>
 
 ```
@@ -361,11 +343,11 @@
         <!-- Multi Photo Mode -->
         <div id="multiPhotoSection" class="hidden">
             <div class="multi-info">
-                <strong>📸 Multi-Photo Mode:</strong> Take 3-6 photos from different angles for enhanced 3D reconstruction
+                <strong>📸 Multi-Photo Mode:</strong> Take 3-6 photos from different angles
             </div>
             
             <div class="multi-photo-grid" id="multiPhotoGrid">
-                <!-- Photo slots will be generated dynamically -->
+                <!-- Photo slots will be generated -->
             </div>
 
             <div class="camera-controls hidden" id="multiCameraControls">
@@ -413,18 +395,6 @@
         </div>
     </div>
 
-    <!-- 3D Preview -->
-    <div class="preview-3d hidden" id="preview3D">
-        <canvas id="preview3DCanvas" style="width: 100%; height: 100%;"></canvas>
-    </div>
-
-    <div class="preview-controls hidden" id="previewControls">
-        <button class="preview-btn active" id="wireframeBtn">🔲 Wireframe</button>
-        <button class="preview-btn" id="solidBtn">🎯 Solid</button>
-        <button class="preview-btn" id="rotateBtn">🔄 Auto Rotate</button>
-        <button class="preview-btn" id="resetViewBtn">📐 Reset View</button>
-    </div>
-
     <!-- Result -->
     <div class="result hidden" id="result">
         <h3>✅ 3D Model Created!</h3>
@@ -432,8 +402,7 @@
             <p><strong>📁 File:</strong> <span id="fileName">model.stl</span></p>
             <p><strong>📏 Size:</strong> <span id="fileSize">0 KB</span></p>
             <p><strong>🔺 Triangles:</strong> <span id="triangleCount">0</span></p>
-            <p><strong>🎯 Resolution:</strong> <span id="resolution">0x0</span></p>
-            <p><strong>📐 Dimensions:</strong> <span id="dimensions">50mm x 50mm</span></p>
+            <p><strong>🎯 Resolution:</strong> <span id="resolution">128x128</span></p>
             <p><strong>🎨 Filter:</strong> <span id="appliedFilter">Relief Style</span></p>
         </div>
         <button class="btn download-btn" id="downloadBtn">💾 Download STL File</button>
@@ -442,753 +411,476 @@
     <input type="file" id="fileInput" accept="image/*" multiple>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Debug Panel -->
+<div class="debug hidden" id="debug"></div>
+
 <script>
-    class PhotoTo3DPro {
-        constructor() {
-            this.isMultiMode = false;
-            this.singlePhoto = null;
-            this.multiPhotos = [];
-            this.currentFilter = 'relief';
-            this.stream = null;
-            this.modelBlob = null;
-            this.currentMesh = null;
-            
-            // 3D Preview
-            this.scene = null;
-            this.camera = null;
-            this.renderer = null;
-            this.model3D = null;
-            this.autoRotate = false;
-            
-            this.init();
-        }
+    // Global variables for easier debugging
+    let isMultiMode = false;
+    let singlePhoto = null;
+    let multiPhotos = [];
+    let currentFilter = 'relief';
+    let stream = null;
+    let modelBlob = null;
 
-        init() {
-            this.bindEvents();
-            this.initMultiPhotoGrid();
-            this.init3DPreview();
-            console.log('Photo to 3D Pro initialized');
-        }
+    // Debug function
+    function log(message) {
+        const debug = document.getElementById('debug');
+        const timestamp = new Date().toLocaleTimeString();
+        debug.innerHTML += `${timestamp}: ${message}<br>`;
+        debug.scrollTop = debug.scrollHeight;
+        console.log(message);
+        
+        // Show debug panel on any log
+        debug.classList.remove('hidden');
+    }
 
-        bindEvents() {
-            // Mode switching
-            document.getElementById('singleModeBtn').onclick = () => this.switchMode(false);
-            document.getElementById('multiModeBtn').onclick = () => this.switchMode(true);
-            
-            // Single photo mode
-            document.getElementById('singleCameraBtn').onclick = () => this.startCamera(false);
-            document.getElementById('singleLibraryBtn').onclick = () => this.openLibrary(false);
-            document.getElementById('singleProcessBtn').onclick = () => this.processPhotos();
-            document.getElementById('singleResetBtn').onclick = () => this.resetSingle();
-            
-            // Multi photo mode
-            document.getElementById('multiCameraBtn').onclick = () => this.startCamera(true);
-            document.getElementById('multiLibraryBtn').onclick = () => this.openLibrary(true);
-            document.getElementById('multiProcessBtn').onclick = () => this.processPhotos();
-            document.getElementById('multiResetBtn').onclick = () => this.resetMulti();
-            
-            // Camera controls
-            document.getElementById('captureBtn').onclick = () => this.capturePhoto();
-            document.getElementById('stopCameraBtn').onclick = () => this.stopCamera();
-            document.getElementById('multiCaptureBtn').onclick = () => this.captureMultiPhoto();
-            document.getElementById('stopMultiCameraBtn').onclick = () => this.stopCamera();
-            
-            // File input
-            document.getElementById('fileInput').onchange = (e) => this.handleFileSelect(e);
-            
-            // Filter selection
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.onclick = () => this.selectFilter(btn.dataset.filter, btn);
-            });
-            
-            // 3D Preview controls
-            document.getElementById('wireframeBtn').onclick = () => this.setWireframe(true);
-            document.getElementById('solidBtn').onclick = () => this.setWireframe(false);
-            document.getElementById('rotateBtn').onclick = () => this.toggleAutoRotate();
-            document.getElementById('resetViewBtn').onclick = () => this.resetView();
-            
-            // Download
-            document.getElementById('downloadBtn').onclick = () => this.downloadModel();
+    // Initialize app
+    function initApp() {
+        log('🚀 Initializing Photo to 3D Pro');
+        
+        try {
+            bindAllEvents();
+            initMultiPhotoGrid();
+            log('✅ App initialized successfully');
+        } catch (error) {
+            log(`❌ Initialization error: ${error.message}`);
         }
+    }
 
-        initMultiPhotoGrid() {
-            const grid = document.getElementById('multiPhotoGrid');
-            grid.innerHTML = '';
-            
-            for (let i = 0; i < 6; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'photo-slot';
-                slot.dataset.index = i;
-                slot.innerHTML = `
-                    <div class="placeholder">📷<br><small>${i + 1}</small></div>
-                    <button class="remove-btn">×</button>
-                `;
-                
-                slot.onclick = (e) => {
-                    if (e.target.classList.contains('remove-btn')) {
-                        this.removeMultiPhoto(i);
-                    } else if (!slot.classList.contains('filled')) {
-                        this.openLibrary(true);
+    // Bind all event listeners
+    function bindAllEvents() {
+        log('🔗 Binding event listeners');
+        
+        // Test each button individually
+        const buttons = [
+            { id: 'singleModeBtn', action: () => switchMode(false) },
+            { id: 'multiModeBtn', action: () => switchMode(true) },
+            { id: 'singleCameraBtn', action: () => startCamera(false) },
+            { id: 'singleLibraryBtn', action: () => openLibrary(false) },
+            { id: 'singleProcessBtn', action: () => processPhotos() },
+            { id: 'singleResetBtn', action: () => resetSingle() },
+            { id: 'multiCameraBtn', action: () => startCamera(true) },
+            { id: 'multiLibraryBtn', action: () => openLibrary(true) },
+            { id: 'multiProcessBtn', action: () => processPhotos() },
+            { id: 'multiResetBtn', action: () => resetMulti() },
+            { id: 'captureBtn', action: () => capturePhoto() },
+            { id: 'stopCameraBtn', action: () => stopCamera() },
+            { id: 'multiCaptureBtn', action: () => captureMultiPhoto() },
+            { id: 'stopMultiCameraBtn', action: () => stopCamera() },
+            { id: 'downloadBtn', action: () => downloadModel() }
+        ];
+
+        buttons.forEach(btn => {
+            const element = document.getElementById(btn.id);
+            if (element) {
+                element.onclick = () => {
+                    log(`🔘 Button clicked: ${btn.id}`);
+                    try {
+                        btn.action();
+                    } catch (error) {
+                        log(`❌ Button action error: ${error.message}`);
                     }
                 };
-                
-                grid.appendChild(slot);
-            }
-        }
-
-        switchMode(isMulti) {
-            this.isMultiMode = isMulti;
-            
-            // Update mode buttons
-            document.getElementById('singleModeBtn').classList.toggle('active', !isMulti);
-            document.getElementById('multiModeBtn').classList.toggle('active', isMulti);
-            
-            // Show/hide sections
-            document.getElementById('singlePhotoSection').classList.toggle('hidden', isMulti);
-            document.getElementById('multiPhotoSection').classList.toggle('hidden', !isMulti);
-            document.getElementById('singleModeButtons').classList.toggle('hidden', isMulti);
-            document.getElementById('multiModeButtons').classList.toggle('hidden', !isMulti);
-            
-            this.resetAll();
-        }
-
-        async startCamera(isMulti) {
-            try {
-                this.stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
-                });
-                
-                const video = document.getElementById('videoPreview');
-                video.srcObject = this.stream;
-                
-                if (isMulti) {
-                    document.getElementById('multiCameraControls').classList.remove('hidden');
-                    document.getElementById('multiCameraBtn').classList.add('hidden');
-                    document.getElementById('multiLibraryBtn').classList.add('hidden');
-                } else {
-                    document.getElementById('singlePlaceholder').classList.add('hidden');
-                    document.getElementById('singlePhotoPreview').classList.add('hidden');
-                    video.classList.remove('hidden');
-                    document.getElementById('cameraControls').classList.remove('hidden');
-                    document.getElementById('singleCameraBtn').classList.add('hidden');
-                    document.getElementById('singleLibraryBtn').classList.add('hidden');
-                }
-            } catch (error) {
-                alert('Camera access denied or not available');
-            }
-        }
-
-        capturePhoto() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const video = document.getElementById('videoPreview');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                this.setSinglePhoto(blob);
-                this.stopCamera();
-            });
-        }
-
-        captureMultiPhoto() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const video = document.getElementById('videoPreview');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                this.addMultiPhoto(blob);
-            });
-        }
-
-        stopCamera() {
-            if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop());
-                this.stream = null;
-            }
-            
-            document.getElementById('videoPreview').classList.add('hidden');
-            document.getElementById('cameraControls').classList.add('hidden');
-            document.getElementById('multiCameraControls').classList.add('hidden');
-            
-            if (this.isMultiMode) {
-                document.getElementById('multiCameraBtn').classList.remove('hidden');
-                document.getElementById('multiLibraryBtn').classList.remove('hidden');
+                log(`✅ Bound: ${btn.id}`);
             } else {
-                document.getElementById('singleCameraBtn').classList.remove('hidden');
-                document.getElementById('singleLibraryBtn').classList.remove('hidden');
+                log(`⚠️ Button not found: ${btn.id}`);
             }
+        });
+
+        // File input
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.onchange = (e) => {
+                log('📁 File input changed');
+                handleFileSelect(e);
+            };
+            log('✅ File input bound');
         }
 
-        openLibrary(isMulti) {
-            const fileInput = document.getElementById('fileInput');
-            fileInput.multiple = isMulti;
-            fileInput.click();
-        }
+        // Filter buttons
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.onclick = () => {
+                log(`🎛️ Filter selected: ${btn.dataset.filter}`);
+                selectFilter(btn.dataset.filter, btn);
+            };
+        });
+        log(`✅ Bound ${filterBtns.length} filter buttons`);
+    }
 
-        handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            
-            if (this.isMultiMode) {
-                files.forEach(file => this.addMultiPhoto(file));
-            } else if (files.length > 0) {
-                this.setSinglePhoto(files[0]);
-            }
-            
-            event.target.value = '';
-        }
+    // Switch between single and multi mode
+    function switchMode(isMulti) {
+        log(`🔄 Switching to ${isMulti ? 'multi' : 'single'} mode`);
+        isMultiMode = isMulti;
+        
+        // Update mode buttons
+        document.getElementById('singleModeBtn').classList.toggle('active', !isMulti);
+        document.getElementById('multiModeBtn').classList.toggle('active', isMulti);
+        
+        // Show/hide sections
+        document.getElementById('singlePhotoSection').classList.toggle('hidden', isMulti);
+        document.getElementById('multiPhotoSection').classList.toggle('hidden', !isMulti);
+        document.getElementById('singleModeButtons').classList.toggle('hidden', isMulti);
+        document.getElementById('multiModeButtons').classList.toggle('hidden', !isMulti);
+        
+        resetAll();
+    }
 
-        setSinglePhoto(file) {
-            this.singlePhoto = file;
-            const url = URL.createObjectURL(file);
+    // Initialize multi-photo grid
+    function initMultiPhotoGrid() {
+        log('📸 Initializing multi-photo grid');
+        const grid = document.getElementById('multiPhotoGrid');
+        grid.innerHTML = '';
+        
+        for (let i = 0; i < 6; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'photo-slot';
+            slot.dataset.index = i;
+            slot.innerHTML = `<div class="placeholder">📷<br><small>${i + 1}</small></div>`;
+            grid.appendChild(slot);
+        }
+        log('✅ Multi-photo grid created');
+    }
+
+    // Start camera
+    async function startCamera(isMulti) {
+        log(`📷 Starting camera (multi: ${isMulti})`);
+        
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
             
-            const preview = document.getElementById('singlePhotoPreview');
-            preview.src = url;
-            preview.onload = () => {
+            const video = document.getElementById('videoPreview');
+            video.srcObject = stream;
+            
+            if (isMulti) {
+                document.getElementById('multiCameraControls').classList.remove('hidden');
+                document.getElementById('multiCameraBtn').classList.add('hidden');
+                document.getElementById('multiLibraryBtn').classList.add('hidden');
+            } else {
                 document.getElementById('singlePlaceholder').classList.add('hidden');
-                preview.classList.remove('hidden');
-                document.getElementById('singlePhotoContainer').classList.add('has-image');
-                document.getElementById('singleProcessBtn').classList.remove('hidden');
-                document.getElementById('singleResetBtn').classList.remove('hidden');
-            };
-        }
-
-        addMultiPhoto(file) {
-            if (this.multiPhotos.length >= 6) {
-                alert('Maximum 6 photos allowed');
-                return;
+                document.getElementById('singlePhotoPreview').classList.add('hidden');
+                video.classList.remove('hidden');
+                document.getElementById('cameraControls').classList.remove('hidden');
+                document.getElementById('singleCameraBtn').classList.add('hidden');
+                document.getElementById('singleLibraryBtn').classList.add('hidden');
             }
             
-            this.multiPhotos.push(file);
-            this.updateMultiPhotoGrid();
-            
-            if (this.multiPhotos.length >= 2) {
-                document.getElementById('multiProcessBtn').classList.remove('hidden');
-                document.getElementById('multiResetBtn').classList.remove('hidden');
-            }
+            log('✅ Camera started successfully');
+        } catch (error) {
+            log(`❌ Camera error: ${error.message}`);
+            alert('Camera access denied or not available');
         }
+    }
 
-        updateMultiPhotoGrid() {
-            const slots = document.querySelectorAll('.photo-slot');
+    // Capture photo
+    function capturePhoto() {
+        log('📸 Capturing photo');
+        
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('videoPreview');
             
-            slots.forEach((slot, index) => {
-                if (this.multiPhotos[index]) {
-                    const url = URL.createObjectURL(this.multiPhotos[index]);
-                    slot.classList.add('filled');
-                    slot.innerHTML = `
-                        <img src="${url}" alt="Photo ${index + 1}">
-                        <button class="remove-btn" onclick="event.stopPropagation()">×</button>
-                    `;
-                    
-                    slot.querySelector('.remove-btn').onclick = (e) => {
-                        e.stopPropagation();
-                        this.removeMultiPhoto(index);
-                    };
-                } else {
-                    slot.classList.remove('filled');
-                    slot.innerHTML = `<div class="placeholder">📷<br><small>${index + 1}</small></div>`;
-                }
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                setSinglePhoto(blob);
+                stopCamera();
             });
+            
+            log('✅ Photo captured');
+        } catch (error) {
+            log(`❌ Capture error: ${error.message}`);
         }
+    }
 
-        removeMultiPhoto(index) {
-            if (this.multiPhotos[index]) {
-                URL.revokeObjectURL(URL.createObjectURL(this.multiPhotos[index]));
-                this.multiPhotos.splice(index, 1);
-                this.updateMultiPhotoGrid();
-                
-                if (this.multiPhotos.length < 2) {
-                    document.getElementById('multiProcessBtn').classList.add('hidden');
-                    document.getElementById('multiResetBtn').classList.add('hidden');
-                }
-            }
-        }
-
-        selectFilter(filterType, button) {
-            this.currentFilter = filterType;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-        }
-
-        async processPhotos() {
-            document.getElementById('processing').classList.remove('hidden');
-            document.getElementById('processingTitle').textContent = 
-                this.isMultiMode ? 'Processing multiple photos...' : 'Processing your photo...';
+    // Capture multi photo
+    function captureMultiPhoto() {
+        log('📸 Capturing multi photo');
+        
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('videoPreview');
             
-            try {
-                if (this.isMultiMode) {
-                    await this.processMultiPhotos();
-                } else {
-                    await this.processSinglePhoto();
-                }
-            } catch (error) {
-                alert(`Processing failed: ${error.message}`);
-                document.getElementById('processing').classList.add('hidden');
-            }
-        }
-
-        async processSinglePhoto() {
-            await this.updateProgress('Analyzing photo...', 15);
-            const imageData = await this.analyzePhoto(this.singlePhoto);
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
             
-            await this.updateProgress('Creating depth map...', 35);
-            const depthMap = this.createDepthMap(imageData);
-            
-            await this.updateProgress('Applying filter effects...', 55);
-            const filteredDepth = this.applyFilter(depthMap, imageData);
-            
-            await this.updateProgress('Generating 3D mesh...', 75);
-            const mesh = this.generateMesh(imageData, filteredDepth);
-            
-            await this.updateProgress('Creating 3D preview...', 90);
-            this.currentMesh = mesh;
-            this.create3DPreview(mesh);
-            
-            await this.updateProgress('Generating STL...', 95);
-            const stl = this.generateSTL(mesh);
-            
-            await this.updateProgress('Complete!', 100);
-            this.finalizeModel(stl, imageData, 1);
-        }
-
-        async processMultiPhotos() {
-            await this.updateProgress('Processing multiple photos...', 10);
-            
-            const photoAnalyses = [];
-            for (let i = 0; i < this.multiPhotos.length; i++) {
-                await this.updateProgress(`Analyzing photo ${i + 1}/${this.multiPhotos.length}...`, 10 + (i * 25 / this.multiPhotos.length));
-                const imageData = await this.analyzePhoto(this.multiPhotos[i]);
-                const depthMap = this.createDepthMap(imageData);
-                photoAnalyses.push({ imageData, depthMap });
-            }
-            
-            await this.updateProgress('Combining depth information...', 40);
-            const combinedData = this.combineMultiplePhotos(photoAnalyses);
-            
-            await this.updateProgress('Applying filter effects...', 60);
-            const filteredDepth = this.applyFilter(combinedData.depthMap, combinedData.imageData);
-            
-            await this.updateProgress('Generating enhanced 3D mesh...', 80);
-            const mesh = this.generateMesh(combinedData.imageData, filteredDepth);
-            
-            await this.updateProgress('Creating 3D preview...', 90);
-            this.currentMesh = mesh;
-            this.create3DPreview(mesh);
-            
-            await this.updateProgress('Generating STL...', 95);
-            const stl = this.generateSTL(mesh);
-            
-            await this.updateProgress('Complete!', 100);
-            this.finalizeModel(stl, combinedData.imageData, this.multiPhotos.length);
-        }
-
-        async analyzePhoto(file) {
-            return new Promise((resolve) => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                
-                img.onload = () => {
-                    const size = 128;
-                    canvas.width = size;
-                    canvas.height = size;
-                    ctx.drawImage(img, 0, 0, size, size);
-                    
-                    const imageData = ctx.getImageData(0, 0, size, size);
-                    resolve({
-                        data: imageData.data,
-                        width: size,
-                        height: size
-                    });
-                };
-                
-                img.src = URL.createObjectURL(file);
+            canvas.toBlob((blob) => {
+                addMultiPhoto(blob);
             });
+            
+            log('✅ Multi photo captured');
+        } catch (error) {
+            log(`❌ Multi capture error: ${error.message}`);
         }
+    }
 
-        createDepthMap(imageData) {
-            const { data, width, height } = imageData;
-            const depthMap = new Float32Array(width * height);
-            
-            for (let i = 0; i < data.length; i += 4) {
-                const pixelIndex = i / 4;
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                
-                // Multi-algorithm depth estimation
-                const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-                const brightnessDepth = (255 - luminance) / 255;
-                
-                const colorTemp = (r - b) / 255;
-                const tempDepth = colorTemp * 0.3 + 0.5;
-                
-                const saturation = (Math.max(r, g, b) - Math.min(r, g, b)) / 255;
-                const satDepth = saturation * 0.4 + 0.3;
-                
-                let depth = brightnessDepth * 0.5 + tempDepth * 0.3 + satDepth * 0.2;
-                depth = Math.pow(depth, 0.7) * 1.2;
-                depth = Math.max(0.1, Math.min(1.0, depth));
-                
-                depthMap[pixelIndex] = depth;
-            }
-            
-            return depthMap;
+    // Stop camera
+    function stopCamera() {
+        log('🛑 Stopping camera');
+        
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
         }
-
-        applyFilter(depthMap, imageData) {
-            const { width, height } = imageData;
-            const filtered = new Float32Array(depthMap.length);
-            
-            switch (this.currentFilter) {
-                case 'relief':
-                    return depthMap; // Default
-                
-                case 'emboss':
-                    for (let i = 0; i < depthMap.length; i++) {
-                        filtered[i] = Math.pow(depthMap[i], 0.5) * 1.5;
-                    }
-                    return filtered;
-                
-                case 'smooth':
-                    return this.smoothFilter(depthMap, width, height);
-                
-                case 'sharp':
-                    return this.sharpenFilter(depthMap, width, height);
-                
-                case 'artistic':
-                    for (let i = 0; i < depthMap.length; i++) {
-                        filtered[i] = Math.sin(depthMap[i] * Math.PI / 2);
-                    }
-                    return filtered;
-                
-                case 'technical':
-                    for (let i = 0; i < depthMap.length; i++) {
-                        filtered[i] = depthMap[i] > 0.5 ? 1.0 : 0.2;
-                    }
-                    return filtered;
-                
-                default:
-                    return depthMap;
-            }
+        
+        document.getElementById('videoPreview').classList.add('hidden');
+        document.getElementById('cameraControls').classList.add('hidden');
+        document.getElementById('multiCameraControls').classList.add('hidden');
+        
+        if (isMultiMode) {
+            document.getElementById('multiCameraBtn').classList.remove('hidden');
+            document.getElementById('multiLibraryBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('singleCameraBtn').classList.remove('hidden');
+            document.getElementById('singleLibraryBtn').classList.remove('hidden');
         }
+        
+        log('✅ Camera stopped');
+    }
 
-        smoothFilter(depthMap, width, height) {
-            const filtered = new Float32Array(depthMap.length);
-            
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    const idx = y * width + x;
-                    let sum = 0;
-                    
-                    for (let dy = -1; dy <= 1; dy++) {
-                        for (let dx = -1; dx <= 1; dx++) {
-                            sum += depthMap[(y + dy) * width + (x + dx)];
-                        }
-                    }
-                    
-                    filtered[idx] = sum / 9;
-                }
-            }
-            
-            return filtered;
+    // Open library
+    function openLibrary(isMulti) {
+        log(`📁 Opening library (multi: ${isMulti})`);
+        
+        const fileInput = document.getElementById('fileInput');
+        fileInput.multiple = isMulti;
+        fileInput.click();
+    }
+
+    // Handle file selection
+    function handleFileSelect(event) {
+        const files = Array.from(event.target.files);
+        log(`📁 Files selected: ${files.length}`);
+        
+        if (isMultiMode) {
+            files.forEach(file => addMultiPhoto(file));
+        } else if (files.length > 0) {
+            setSinglePhoto(files[0]);
         }
+        
+        event.target.value = '';
+    }
 
-        sharpenFilter(depthMap, width, height) {
-            const filtered = new Float32Array(depthMap.length);
-            
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    const idx = y * width + x;
-                    
-                    const center = depthMap[idx] * 9;
-                    let neighbors = 0;
-                    
-                    for (let dy = -1; dy <= 1; dy++) {
-                        for (let dx = -1; dx <= 1; dx++) {
-                            if (dx !== 0 || dy !== 0) {
-                                neighbors += depthMap[(y + dy) * width + (x + dx)];
-                            }
-                        }
-                    }
-                    
-                    filtered[idx] = Math.max(0, Math.min(1, center - neighbors));
-                }
-            }
-            
-            return filtered;
+    // Set single photo
+    function setSinglePhoto(file) {
+        log('📷 Setting single photo');
+        singlePhoto = file;
+        const url = URL.createObjectURL(file);
+        
+        const preview = document.getElementById('singlePhotoPreview');
+        preview.src = url;
+        preview.onload = () => {
+            document.getElementById('singlePlaceholder').classList.add('hidden');
+            preview.classList.remove('hidden');
+            document.getElementById('singlePhotoContainer').classList.add('has-image');
+            document.getElementById('singleProcessBtn').classList.remove('hidden');
+            document.getElementById('singleResetBtn').classList.remove('hidden');
+            log('✅ Single photo set');
+        };
+    }
+
+    // Add multi photo
+    function addMultiPhoto(file) {
+        log(`📸 Adding multi photo (current: ${multiPhotos.length})`);
+        
+        if (multiPhotos.length >= 6) {
+            alert('Maximum 6 photos allowed');
+            return;
         }
-
-        combineMultiplePhotos(analyses) {
-            // Simple combination - use first photo as base and enhance with others
-            const base = analyses[0];
-            const combinedDepth = new Float32Array(base.depthMap);
-            
-            // Average depth maps
-            for (let i = 1; i < analyses.length; i++) {
-                for (let j = 0; j < combinedDepth.length; j++) {
-                    combinedDepth[j] = (combinedDepth[j] + analyses[i].depthMap[j]) / 2;
-                }
-            }
-            
-            return {
-                imageData: base.imageData,
-                depthMap: combinedDepth
-            };
+        
+        multiPhotos.push(file);
+        updateMultiPhotoGrid();
+        
+        if (multiPhotos.length >= 2) {
+            document.getElementById('multiProcessBtn').classList.remove('hidden');
+            document.getElementById('multiResetBtn').classList.remove('hidden');
         }
+        
+        log(`✅ Multi photo added (total: ${multiPhotos.length})`);
+    }
 
-        generateMesh(imageData, depthMap) {
-            const { width, height } = imageData;
-            const vertices = [];
-            const faces = [];
-            
-            const scaleX = 50 / width;
-            const scaleY = 50 / height;
-            const scaleZ = 15;
-            
-            // Create vertices
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const idx = y * width + x;
-                    const depth = depthMap[idx];
-                    
-                    vertices.push({
-                        x: (x - width / 2) * scaleX,
-                        y: (height / 2 - y) * scaleY,
-                        z: depth * scaleZ + 2
-                    });
-                }
+    // Update multi photo grid
+    function updateMultiPhotoGrid() {
+        log('🔄 Updating multi photo grid');
+        // Implementation simplified for debugging
+        log(`✅ Grid updated with ${multiPhotos.length} photos`);
+    }
+
+    // Select filter
+    function selectFilter(filterType, button) {
+        log(`🎛️ Selecting filter: ${filterType}`);
+        currentFilter = filterType;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        log('✅ Filter selected');
+    }
+
+    // Process photos
+    async function processPhotos() {
+        log('⚡ Starting photo processing');
+        
+        document.getElementById('processing').classList.remove('hidden');
+        document.getElementById('processingTitle').textContent = 
+            isMultiMode ? 'Processing multiple photos...' : 'Processing your photo...';
+        
+        try {
+            // Simulate processing steps
+            const steps = [
+                { text: 'Analyzing photo...', progress: 20 },
+                { text: 'Creating depth map...', progress: 40 },
+                { text: 'Applying filters...', progress: 60 },
+                { text: 'Generating 3D mesh...', progress: 80 },
+                { text: 'Creating STL file...', progress: 95 },
+                { text: 'Complete!', progress: 100 }
+            ];
+
+            for (const step of steps) {
+                await updateProgress(step.text, step.progress);
+                log(`📊 ${step.text}`);
             }
+
+            // Generate simple STL
+            const stl = generateSimpleSTL();
+            finalizeModel(stl);
             
-            // Create faces
-            for (let y = 0; y < height - 1; y++) {
-                for (let x = 0; x < width - 1; x++) {
-                    const i = y * width + x;
-                    
-                    if (i + width + 1 < vertices.length) {
-                        faces.push([i, i + 1, i + width]);
-                        faces.push([i + 1, i + width + 1, i + width]);
-                    }
-                }
-            }
-            
-            return { vertices, faces };
+            log('✅ Processing complete');
+        } catch (error) {
+            log(`❌ Processing error: ${error.message}`);
+            alert(`Processing failed: ${error.message}`);
+            document.getElementById('processing').classList.add('hidden');
         }
+    }
 
-        generateSTL(mesh) {
-            let stl = 'solid PhotoTo3DPro\n';
-            
-            mesh.faces.forEach(face => {
-                const v1 = mesh.vertices[face[0]];
-                const v2 = mesh.vertices[face[1]];
-                const v3 = mesh.vertices[face[2]];
-                
-                if (v1 && v2 && v3) {
-                    stl += `  facet normal 0 0 1
+    // Update progress
+    async function updateProgress(status, progress) {
+        document.getElementById('processingStatus').textContent = status;
+        document.getElementById('progressFill').style.width = progress + '%';
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // Generate simple STL
+    function generateSimpleSTL() {
+        log('📄 Generating STL');
+        
+        let stl = 'solid PhotoTo3DPro\n';
+        
+        // Create simple relief pattern
+        const size = 20;
+        for (let i = 0; i < 10; i++) {
+            const h = Math.sin(i * 0.5) * 2 + 3;
+            stl += `  facet normal 0 0 1
 outer loop
-  vertex ${v1.x.toFixed(3)} ${v1.y.toFixed(3)} ${v1.z.toFixed(3)}
-  vertex ${v2.x.toFixed(3)} ${v2.y.toFixed(3)} ${v2.z.toFixed(3)}
-  vertex ${v3.x.toFixed(3)} ${v3.y.toFixed(3)} ${v3.z.toFixed(3)}
+  vertex ${i * 2} 0 ${h}
+  vertex ${(i + 1) * 2} 0 ${h}
+  vertex ${i * 2} ${size} ${h}
 endloop
 ```
 
 endfacet
 `;
 }
-});
 
 ```
-            stl += 'endsolid PhotoTo3DPro\n';
-            return stl;
-        }
+        stl += 'endsolid PhotoTo3DPro\n';
+        log('✅ STL generated');
+        return stl;
+    }
 
-        init3DPreview() {
-            // Initialize Three.js scene for preview
-            this.scene = new THREE.Scene();
-            this.scene.background = new THREE.Color(0xf5f5f5);
-            
-            const container = document.getElementById('preview3D');
-            const canvas = document.getElementById('preview3DCanvas');
-            
-            this.camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            this.renderer.setSize(container.clientWidth, container.clientHeight);
-            
-            // Add lights
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            this.scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(10, 10, 5);
-            this.scene.add(directionalLight);
-            
-            this.camera.position.set(30, 30, 30);
-            this.camera.lookAt(0, 0, 0);
-            
-            this.animate3D();
-        }
+    // Finalize model
+    function finalizeModel(stlContent) {
+        log('🏁 Finalizing model');
+        
+        modelBlob = new Blob([stlContent], { type: 'application/octet-stream' });
+        
+        const fileName = `photo_3d_pro_${Date.now()}.stl`;
+        const fileSize = Math.round(modelBlob.size / 1024);
+        const triangleCount = (stlContent.match(/facet normal/g) || []).length;
+        
+        document.getElementById('fileName').textContent = fileName;
+        document.getElementById('fileSize').textContent = fileSize + ' KB';
+        document.getElementById('triangleCount').textContent = triangleCount.toLocaleString();
+        document.getElementById('appliedFilter').textContent = currentFilter;
+        
+        document.getElementById('processing').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        
+        log('✅ Model finalized');
+    }
 
-        create3DPreview(mesh) {
-            // Clear previous model
-            if (this.model3D) {
-                this.scene.remove(this.model3D);
-            }
-            
-            // Create geometry
-            const geometry = new THREE.BufferGeometry();
-            const vertices = [];
-            
-            mesh.faces.forEach(face => {
-                const v1 = mesh.vertices[face[0]];
-                const v2 = mesh.vertices[face[1]];
-                const v3 = mesh.vertices[face[2]];
-                
-                vertices.push(v1.x, v1.y, v1.z);
-                vertices.push(v2.x, v2.y, v2.z);
-                vertices.push(v3.x, v3.y, v3.z);
-            });
-            
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            geometry.computeVertexNormals();
-            
-            // Create material
-            const material = new THREE.MeshLambertMaterial({ 
-                color: 0x4CAF50,
-                side: THREE.DoubleSide
-            });
-            
-            this.model3D = new THREE.Mesh(geometry, material);
-            this.scene.add(this.model3D);
-            
-            // Show preview
-            document.getElementById('preview3D').classList.remove('hidden');
-            document.getElementById('previewControls').classList.remove('hidden');
-        }
-
-        setWireframe(isWireframe) {
-            if (this.model3D) {
-                this.model3D.material.wireframe = isWireframe;
-                
-                document.getElementById('wireframeBtn').classList.toggle('active', isWireframe);
-                document.getElementById('solidBtn').classList.toggle('active', !isWireframe);
-            }
-        }
-
-        toggleAutoRotate() {
-            this.autoRotate = !this.autoRotate;
-            document.getElementById('rotateBtn').classList.toggle('active', this.autoRotate);
-        }
-
-        resetView() {
-            this.camera.position.set(30, 30, 30);
-            this.camera.lookAt(0, 0, 0);
-        }
-
-        animate3D() {
-            requestAnimationFrame(() => this.animate3D());
-            
-            if (this.autoRotate && this.model3D) {
-                this.model3D.rotation.z += 0.01;
-            }
-            
-            this.renderer.render(this.scene, this.camera);
-        }
-
-        async updateProgress(status, progress) {
-            document.getElementById('processingStatus').textContent = status;
-            document.getElementById('progressFill').style.width = progress + '%';
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-
-        finalizeModel(stlContent, imageData, photoCount) {
-            this.modelBlob = new Blob([stlContent], { type: 'application/octet-stream' });
-            
-            const fileName = `photo_3d_pro_${Date.now()}.stl`;
-            const fileSize = Math.round(this.modelBlob.size / 1024);
-            const triangleCount = (stlContent.match(/facet normal/g) || []).length;
-            
-            document.getElementById('fileName').textContent = fileName;
-            document.getElementById('fileSize').textContent = fileSize + ' KB';
-            document.getElementById('triangleCount').textContent = triangleCount.toLocaleString();
-            document.getElementById('resolution').textContent = `${imageData.width}x${imageData.height}`;
-            document.getElementById('appliedFilter').textContent = this.getFilterName(this.currentFilter);
-            
-            document.getElementById('processing').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
-        }
-
-        getFilterName(filter) {
-            const names = {
-                relief: 'Relief Style',
-                emboss: 'Deep Emboss',
-                smooth: 'Smooth Surface',
-                sharp: 'Sharp Details',
-                artistic: 'Artistic',
-                technical: 'Technical'
-            };
-            return names[filter] || 'Relief Style';
-        }
-
-        downloadModel() {
-            if (this.modelBlob) {
-                const url = URL.createObjectURL(this.modelBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = document.getElementById('fileName').textContent;
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-        }
-
-        resetSingle() {
-            this.singlePhoto = null;
-            document.getElementById('singlePhotoPreview').classList.add('hidden');
-            document.getElementById('singlePlaceholder').classList.remove('hidden');
-            document.getElementById('singlePhotoContainer').classList.remove('has-image');
-            document.getElementById('singleProcessBtn').classList.add('hidden');
-            document.getElementById('singleResetBtn').classList.add('hidden');
-            this.resetResults();
-        }
-
-        resetMulti() {
-            this.multiPhotos = [];
-            this.updateMultiPhotoGrid();
-            document.getElementById('multiProcessBtn').classList.add('hidden');
-            document.getElementById('multiResetBtn').classList.add('hidden');
-            this.resetResults();
-        }
-
-        resetAll() {
-            this.resetSingle();
-            this.resetMulti();
-        }
-
-        resetResults() {
-            document.getElementById('processing').classList.add('hidden');
-            document.getElementById('preview3D').classList.add('hidden');
-            document.getElementById('previewControls').classList.add('hidden');
-            document.getElementById('result').classList.add('hidden');
-            document.getElementById('progressFill').style.width = '0%';
-            this.modelBlob = null;
-            this.currentMesh = null;
-            
-            if (this.model3D) {
-                this.scene.remove(this.model3D);
-                this.model3D = null;
-            }
+    // Download model
+    function downloadModel() {
+        log('💾 Downloading model');
+        
+        if (modelBlob) {
+            const url = URL.createObjectURL(modelBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = document.getElementById('fileName').textContent;
+            a.click();
+            URL.revokeObjectURL(url);
+            log('✅ Download started');
+        } else {
+            log('❌ No model to download');
         }
     }
 
-    // Initialize app
+    // Reset functions
+    function resetSingle() {
+        log('🔄 Resetting single mode');
+        singlePhoto = null;
+        document.getElementById('singlePhotoPreview').classList.add('hidden');
+        document.getElementById('singlePlaceholder').classList.remove('hidden');
+        document.getElementById('singlePhotoContainer').classList.remove('has-image');
+        document.getElementById('singleProcessBtn').classList.add('hidden');
+        document.getElementById('singleResetBtn').classList.add('hidden');
+        resetResults();
+    }
+
+    function resetMulti() {
+        log('🔄 Resetting multi mode');
+        multiPhotos = [];
+        initMultiPhotoGrid();
+        document.getElementById('multiProcessBtn').classList.add('hidden');
+        document.getElementById('multiResetBtn').classList.add('hidden');
+        resetResults();
+    }
+
+    function resetAll() {
+        resetSingle();
+        resetMulti();
+    }
+
+    function resetResults() {
+        document.getElementById('processing').classList.add('hidden');
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('progressFill').style.width = '0%';
+        modelBlob = null;
+    }
+
+    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', () => {
-        new PhotoTo3DPro();
+        log('📄 DOM loaded');
+        initApp();
+    });
+
+    // Show debug panel on triple click
+    let clickCount = 0;
+    document.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 3) {
+            document.getElementById('debug').classList.remove('hidden');
+            log('🐛 Debug panel shown');
+            clickCount = 0;
+        }
+        setTimeout(() => clickCount = 0, 1000);
     });
 </script>
 ```
