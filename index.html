@@ -4,63 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo to 3D - Pro</title>
+    <title>Photo to 3D - Debug</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
             color: #333;
         }
         .container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            padding: 25px;
+            padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .header h1 {
             font-size: 2.5em;
             color: #2196F3;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
-        .mode-selector {
-            display: flex;
-            background: #f0f0f0;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .mode-btn.active {
-            background: #2196F3;
-            color: white;
-        }
-        .mode-btn:not(.active) {
-            background: transparent;
-            color: #666;
-        }
-        .photo-section {
-            margin-bottom: 20px;
-        }
-        .single-photo-container {
+        .photo-container {
             width: 100%;
-            height: 280px;
+            height: 300px;
             border: 2px dashed #ddd;
             border-radius: 15px;
             display: flex;
@@ -68,9 +41,9 @@
             justify-content: center;
             overflow: hidden;
             background: #f9f9f9;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .single-photo-container.has-image {
+        .photo-container.has-image {
             border: 2px solid #4CAF50;
         }
         .photo-preview {
@@ -90,106 +63,23 @@
             color: #999;
         }
         .placeholder .icon {
-            font-size: 3.5em;
-            margin-bottom: 8px;
-        }
-        .multi-photo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .photo-slot {
-            aspect-ratio: 1;
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f9f9f9;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .photo-slot.filled {
-            border: 2px solid #4CAF50;
-        }
-        .photo-slot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .photo-slot .remove-btn {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-        }
-        .photo-slot.filled:hover .remove-btn {
-            display: block;
-        }
-        .multi-info {
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 0.85em;
-            color: #1976D2;
-        }
-        .filters-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .filters-title {
-            font-weight: 600;
+            font-size: 4em;
             margin-bottom: 10px;
-            color: #333;
-        }
-        .filter-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-        .filter-btn {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .filter-btn.active {
-            background: #2196F3;
-            color: white;
-            border-color: #2196F3;
         }
         .btn {
-            padding: 12px 20px;
+            padding: 15px 25px;
             border: none;
-            border-radius: 10px;
-            font-size: 1em;
+            border-radius: 12px;
+            font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .btn-primary {
             background: #2196F3;
@@ -204,7 +94,7 @@
             color: white;
         }
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
         .btn:disabled {
             opacity: 0.6;
@@ -213,42 +103,28 @@
         }
         .camera-controls {
             display: flex;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 15px;
         }
         .processing {
             text-align: center;
             padding: 20px;
             background: #f0f0f0;
             border-radius: 12px;
-            margin: 15px 0;
+            margin: 20px 0;
         }
         .spinner {
-            width: 35px;
-            height: 35px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #2196F3;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196F3;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
+            margin: 0 auto 15px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: #2196F3;
-            border-radius: 3px;
-            transition: width 0.3s ease;
         }
         .result {
             background: #e8f5e8;
@@ -256,52 +132,60 @@
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            margin: 15px 0;
+            margin: 20px 0;
         }
         .result h3 {
             color: #4CAF50;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         .file-info {
             background: #f5f5f5;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
-            margin: 12px 0;
+            margin: 15px 0;
             text-align: left;
         }
         .file-info p {
-            margin: 4px 0;
-            font-size: 0.85em;
+            margin: 5px 0;
+            font-size: 0.9em;
         }
         .download-btn {
             background: #FF9800;
             color: white;
-            margin-top: 12px;
+            margin-top: 15px;
         }
         .debug {
             position: fixed;
-            bottom: 10px;
+            top: 10px;
             right: 10px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             color: #0f0;
-            padding: 8px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 5px;
             font-family: monospace;
-            font-size: 11px;
-            max-width: 250px;
-            max-height: 150px;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
+            border: 2px solid #0f0;
+        }
+        .js-test {
+            background: #ff0000;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
         }
         .hidden { display: none; }
         input[type="file"] { display: none; }
 
 ```
     @media (max-width: 600px) {
-        .container { margin: 8px; padding: 18px; }
-        .header h1 { font-size: 2.2em; }
-        .single-photo-container { height: 220px; }
-        .filter-options { grid-template-columns: 1fr; }
+        .container { margin: 10px; padding: 20px; }
+        .header h1 { font-size: 2em; }
+        .photo-container { height: 250px; }
     }
 </style>
 ```
@@ -310,514 +194,274 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📸 Photo to 3D Pro</h1>
-            <p>Advanced photo-based 3D reconstruction</p>
+            <h1>📸 Photo to 3D</h1>
+            <p>Debug Version - Testing JavaScript</p>
         </div>
 
 ```
-    <!-- Mode Selector -->
-    <div class="mode-selector">
-        <button class="mode-btn active" id="singleModeBtn">📷 Single Photo</button>
-        <button class="mode-btn" id="multiModeBtn">🔄 Multi-Photo</button>
+    <!-- JavaScript Test Indicator -->
+    <div class="js-test" id="jsTest">
+        ❌ JavaScript NOT loaded - If you see this red box, JS is broken
     </div>
 
-    <!-- Photo Section -->
-    <div class="photo-section">
-        <!-- Single Photo Mode -->
-        <div id="singlePhotoSection">
-            <div class="single-photo-container" id="singlePhotoContainer">
-                <div class="placeholder" id="singlePlaceholder">
-                    <div class="icon">📷</div>
-                    <p>Take or select a photo</p>
-                </div>
-                <img id="singlePhotoPreview" class="photo-preview hidden" alt="Photo">
-                <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
-            </div>
-
-            <div class="camera-controls hidden" id="cameraControls">
-                <button class="btn btn-primary" id="captureBtn">📸 Capture</button>
-                <button class="btn btn-secondary" id="stopCameraBtn">❌ Cancel</button>
-            </div>
+    <div class="photo-container" id="photoContainer">
+        <div class="placeholder" id="placeholder">
+            <div class="icon">📷</div>
+            <p>Select a photo to convert to 3D</p>
         </div>
-
-        <!-- Multi Photo Mode -->
-        <div id="multiPhotoSection" class="hidden">
-            <div class="multi-info">
-                <strong>📸 Multi-Photo Mode:</strong> Take 3-6 photos from different angles
-            </div>
-            
-            <div class="multi-photo-grid" id="multiPhotoGrid">
-                <!-- Photo slots will be generated -->
-            </div>
-
-            <div class="camera-controls hidden" id="multiCameraControls">
-                <button class="btn btn-primary" id="multiCaptureBtn">📸 Add Photo</button>
-                <button class="btn btn-secondary" id="stopMultiCameraBtn">❌ Cancel</button>
-            </div>
-        </div>
+        <img id="photoPreview" class="photo-preview hidden" alt="Selected photo">
+        <video id="videoPreview" class="video-preview hidden" autoplay playsinline></video>
     </div>
 
-    <!-- Advanced Filters -->
-    <div class="filters-section">
-        <div class="filters-title">🎛️ 3D Enhancement Filters</div>
-        <div class="filter-options">
-            <div class="filter-btn active" data-filter="relief">📋 Relief Style</div>
-            <div class="filter-btn" data-filter="emboss">⚡ Deep Emboss</div>
-            <div class="filter-btn" data-filter="smooth">🌊 Smooth Surface</div>
-            <div class="filter-btn" data-filter="sharp">🔪 Sharp Details</div>
-            <div class="filter-btn" data-filter="artistic">🎨 Artistic</div>
-            <div class="filter-btn" data-filter="technical">⚙️ Technical</div>
-        </div>
+    <div class="camera-controls hidden" id="cameraControls">
+        <button class="btn btn-primary" onclick="capturePhoto()">📸 Capture</button>
+        <button class="btn btn-secondary" onclick="stopCamera()">❌ Cancel</button>
     </div>
 
-    <!-- Action Buttons -->
-    <div id="singleModeButtons">
-        <button class="btn btn-primary" id="singleCameraBtn">📷 Take Photo</button>
-        <button class="btn btn-secondary" id="singleLibraryBtn">📁 Choose from Library</button>
-        <button class="btn btn-success hidden" id="singleProcessBtn">⚡ Create 3D Model</button>
-        <button class="btn btn-secondary hidden" id="singleResetBtn">🔄 New Photo</button>
-    </div>
+    <button class="btn btn-primary" onclick="startCamera()">📷 Take Photo</button>
+    <button class="btn btn-secondary" onclick="selectPhoto()">📁 Choose from Library</button>
+    <button class="btn btn-success hidden" id="processBtn" onclick="processPhoto()">⚡ Create 3D Model</button>
+    <button class="btn btn-secondary hidden" id="newPhotoBtn" onclick="resetApp()">🔄 Take Another Photo</button>
 
-    <div id="multiModeButtons" class="hidden">
-        <button class="btn btn-primary" id="multiCameraBtn">📷 Take Photos</button>
-        <button class="btn btn-secondary" id="multiLibraryBtn">📁 Add from Library</button>
-        <button class="btn btn-success hidden" id="multiProcessBtn">⚡ Create 3D Model</button>
-        <button class="btn btn-secondary hidden" id="multiResetBtn">🗑️ Clear All</button>
-    </div>
-
-    <!-- Processing -->
     <div class="processing hidden" id="processing">
         <div class="spinner"></div>
-        <h3 id="processingTitle">Processing your photo...</h3>
-        <p id="processingStatus">Starting analysis...</p>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-        </div>
+        <h3>Processing your photo...</h3>
+        <p id="processingStatus">Analyzing image...</p>
     </div>
 
-    <!-- Result -->
     <div class="result hidden" id="result">
         <h3>✅ 3D Model Created!</h3>
         <div class="file-info">
-            <p><strong>📁 File:</strong> <span id="fileName">model.stl</span></p>
-            <p><strong>📏 Size:</strong> <span id="fileSize">0 KB</span></p>
-            <p><strong>🔺 Triangles:</strong> <span id="triangleCount">0</span></p>
-            <p><strong>🎯 Resolution:</strong> <span id="resolution">128x128</span></p>
-            <p><strong>🎨 Filter:</strong> <span id="appliedFilter">Relief Style</span></p>
+            <p><strong>File:</strong> <span id="fileName">model.stl</span></p>
+            <p><strong>Size:</strong> <span id="fileSize">0 KB</span></p>
+            <p><strong>Triangles:</strong> <span id="triangleCount">0</span></p>
         </div>
-        <button class="btn download-btn" id="downloadBtn">💾 Download STL File</button>
+        <button class="btn download-btn" onclick="downloadModel()">💾 Download STL File</button>
     </div>
 
-    <input type="file" id="fileInput" accept="image/*" multiple>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
 </div>
 
-<!-- Debug Panel -->
-<div class="debug hidden" id="debug"></div>
+<!-- Debug Panel - Always Visible for Testing -->
+<div class="debug" id="debug">
+    <strong>🐛 DEBUG PANEL</strong><br>
+    <span id="debugContent">Waiting for JavaScript...</span>
+</div>
 
 <script>
-    // Global variables for easier debugging
-    let isMultiMode = false;
-    let singlePhoto = null;
-    let multiPhotos = [];
-    let currentFilter = 'relief';
-    let stream = null;
+    // IMMEDIATE TEST - This should run as soon as the page loads
+    console.log('🚀 JavaScript is running!');
+    
+    // Change the red error box to green success
+    document.getElementById('jsTest').style.background = '#4CAF50';
+    document.getElementById('jsTest').innerHTML = '✅ JavaScript loaded successfully!';
+    
+    // Update debug panel
+    document.getElementById('debugContent').innerHTML = 'JavaScript loaded!<br>Functions ready.<br>Click buttons to test.';
+
+    // Global variables
+    let currentPhoto = null;
+    let currentStream = null;
     let modelBlob = null;
 
-    // Debug function
+    // Debug logging function
     function log(message) {
-        const debug = document.getElementById('debug');
-        const timestamp = new Date().toLocaleTimeString();
-        debug.innerHTML += `${timestamp}: ${message}<br>`;
-        debug.scrollTop = debug.scrollHeight;
         console.log(message);
+        const debug = document.getElementById('debugContent');
+        const time = new Date().toLocaleTimeString();
+        debug.innerHTML += `<br>${time}: ${message}`;
         
-        // Show debug panel on any log
-        debug.classList.remove('hidden');
+        // Scroll to bottom
+        const debugPanel = document.getElementById('debug');
+        debugPanel.scrollTop = debugPanel.scrollHeight;
     }
 
-    // Initialize app
-    function initApp() {
-        log('🚀 Initializing Photo to 3D Pro');
-        
-        try {
-            bindAllEvents();
-            initMultiPhotoGrid();
-            log('✅ App initialized successfully');
-        } catch (error) {
-            log(`❌ Initialization error: ${error.message}`);
-        }
-    }
+    // Test that functions are defined
+    log('✅ All functions defined');
 
-    // Bind all event listeners
-    function bindAllEvents() {
-        log('🔗 Binding event listeners');
+    // Start camera function
+    function startCamera() {
+        log('📷 startCamera() called');
         
-        // Test each button individually
-        const buttons = [
-            { id: 'singleModeBtn', action: () => switchMode(false) },
-            { id: 'multiModeBtn', action: () => switchMode(true) },
-            { id: 'singleCameraBtn', action: () => startCamera(false) },
-            { id: 'singleLibraryBtn', action: () => openLibrary(false) },
-            { id: 'singleProcessBtn', action: () => processPhotos() },
-            { id: 'singleResetBtn', action: () => resetSingle() },
-            { id: 'multiCameraBtn', action: () => startCamera(true) },
-            { id: 'multiLibraryBtn', action: () => openLibrary(true) },
-            { id: 'multiProcessBtn', action: () => processPhotos() },
-            { id: 'multiResetBtn', action: () => resetMulti() },
-            { id: 'captureBtn', action: () => capturePhoto() },
-            { id: 'stopCameraBtn', action: () => stopCamera() },
-            { id: 'multiCaptureBtn', action: () => captureMultiPhoto() },
-            { id: 'stopMultiCameraBtn', action: () => stopCamera() },
-            { id: 'downloadBtn', action: () => downloadModel() }
-        ];
-
-        buttons.forEach(btn => {
-            const element = document.getElementById(btn.id);
-            if (element) {
-                element.onclick = () => {
-                    log(`🔘 Button clicked: ${btn.id}`);
-                    try {
-                        btn.action();
-                    } catch (error) {
-                        log(`❌ Button action error: ${error.message}`);
-                    }
-                };
-                log(`✅ Bound: ${btn.id}`);
-            } else {
-                log(`⚠️ Button not found: ${btn.id}`);
-            }
-        });
-
-        // File input
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) {
-            fileInput.onchange = (e) => {
-                log('📁 File input changed');
-                handleFileSelect(e);
-            };
-            log('✅ File input bound');
-        }
-
-        // Filter buttons
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-            btn.onclick = () => {
-                log(`🎛️ Filter selected: ${btn.dataset.filter}`);
-                selectFilter(btn.dataset.filter, btn);
-            };
-        });
-        log(`✅ Bound ${filterBtns.length} filter buttons`);
-    }
-
-    // Switch between single and multi mode
-    function switchMode(isMulti) {
-        log(`🔄 Switching to ${isMulti ? 'multi' : 'single'} mode`);
-        isMultiMode = isMulti;
-        
-        // Update mode buttons
-        document.getElementById('singleModeBtn').classList.toggle('active', !isMulti);
-        document.getElementById('multiModeBtn').classList.toggle('active', isMulti);
-        
-        // Show/hide sections
-        document.getElementById('singlePhotoSection').classList.toggle('hidden', isMulti);
-        document.getElementById('multiPhotoSection').classList.toggle('hidden', !isMulti);
-        document.getElementById('singleModeButtons').classList.toggle('hidden', isMulti);
-        document.getElementById('multiModeButtons').classList.toggle('hidden', !isMulti);
-        
-        resetAll();
-    }
-
-    // Initialize multi-photo grid
-    function initMultiPhotoGrid() {
-        log('📸 Initializing multi-photo grid');
-        const grid = document.getElementById('multiPhotoGrid');
-        grid.innerHTML = '';
-        
-        for (let i = 0; i < 6; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'photo-slot';
-            slot.dataset.index = i;
-            slot.innerHTML = `<div class="placeholder">📷<br><small>${i + 1}</small></div>`;
-            grid.appendChild(slot);
-        }
-        log('✅ Multi-photo grid created');
-    }
-
-    // Start camera
-    async function startCamera(isMulti) {
-        log(`📷 Starting camera (multi: ${isMulti})`);
-        
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' } 
-            });
-            
-            const video = document.getElementById('videoPreview');
-            video.srcObject = stream;
-            
-            if (isMulti) {
-                document.getElementById('multiCameraControls').classList.remove('hidden');
-                document.getElementById('multiCameraBtn').classList.add('hidden');
-                document.getElementById('multiLibraryBtn').classList.add('hidden');
-            } else {
-                document.getElementById('singlePlaceholder').classList.add('hidden');
-                document.getElementById('singlePhotoPreview').classList.add('hidden');
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                log('✅ Camera access granted');
+                currentStream = stream;
+                
+                const video = document.getElementById('videoPreview');
+                video.srcObject = stream;
+                
+                // Show video, hide placeholder
+                document.getElementById('placeholder').classList.add('hidden');
+                document.getElementById('photoPreview').classList.add('hidden');
                 video.classList.remove('hidden');
                 document.getElementById('cameraControls').classList.remove('hidden');
-                document.getElementById('singleCameraBtn').classList.add('hidden');
-                document.getElementById('singleLibraryBtn').classList.add('hidden');
-            }
-            
-            log('✅ Camera started successfully');
-        } catch (error) {
-            log(`❌ Camera error: ${error.message}`);
-            alert('Camera access denied or not available');
-        }
+                
+                log('✅ Camera started successfully');
+            })
+            .catch(error => {
+                log(`❌ Camera error: ${error.message}`);
+                alert('Camera not available: ' + error.message);
+            });
     }
 
-    // Capture photo
+    // Capture photo function
     function capturePhoto() {
-        log('📸 Capturing photo');
+        log('📸 capturePhoto() called');
         
         try {
+            const video = document.getElementById('videoPreview');
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const video = document.getElementById('videoPreview');
             
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0);
             
-            canvas.toBlob((blob) => {
-                setSinglePhoto(blob);
+            canvas.toBlob(blob => {
+                displayPhoto(blob);
                 stopCamera();
+                log('✅ Photo captured');
             });
-            
-            log('✅ Photo captured');
         } catch (error) {
             log(`❌ Capture error: ${error.message}`);
         }
     }
 
-    // Capture multi photo
-    function captureMultiPhoto() {
-        log('📸 Capturing multi photo');
-        
-        try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const video = document.getElementById('videoPreview');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                addMultiPhoto(blob);
-            });
-            
-            log('✅ Multi photo captured');
-        } catch (error) {
-            log(`❌ Multi capture error: ${error.message}`);
-        }
-    }
-
-    // Stop camera
+    // Stop camera function
     function stopCamera() {
-        log('🛑 Stopping camera');
+        log('🛑 stopCamera() called');
         
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
         }
         
         document.getElementById('videoPreview').classList.add('hidden');
         document.getElementById('cameraControls').classList.add('hidden');
-        document.getElementById('multiCameraControls').classList.add('hidden');
-        
-        if (isMultiMode) {
-            document.getElementById('multiCameraBtn').classList.remove('hidden');
-            document.getElementById('multiLibraryBtn').classList.remove('hidden');
-        } else {
-            document.getElementById('singleCameraBtn').classList.remove('hidden');
-            document.getElementById('singleLibraryBtn').classList.remove('hidden');
-        }
         
         log('✅ Camera stopped');
     }
 
-    // Open library
-    function openLibrary(isMulti) {
-        log(`📁 Opening library (multi: ${isMulti})`);
-        
-        const fileInput = document.getElementById('fileInput');
-        fileInput.multiple = isMulti;
-        fileInput.click();
+    // Select photo function
+    function selectPhoto() {
+        log('📁 selectPhoto() called');
+        document.getElementById('fileInput').click();
     }
 
     // Handle file selection
     function handleFileSelect(event) {
-        const files = Array.from(event.target.files);
-        log(`📁 Files selected: ${files.length}`);
+        log('📁 handleFileSelect() called');
         
-        if (isMultiMode) {
-            files.forEach(file => addMultiPhoto(file));
-        } else if (files.length > 0) {
-            setSinglePhoto(files[0]);
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            displayPhoto(file);
+            log('✅ File selected');
         }
-        
-        event.target.value = '';
     }
 
-    // Set single photo
-    function setSinglePhoto(file) {
-        log('📷 Setting single photo');
-        singlePhoto = file;
+    // Display photo
+    function displayPhoto(file) {
+        log('🖼️ displayPhoto() called');
+        
+        currentPhoto = file;
         const url = URL.createObjectURL(file);
         
-        const preview = document.getElementById('singlePhotoPreview');
-        preview.src = url;
-        preview.onload = () => {
-            document.getElementById('singlePlaceholder').classList.add('hidden');
-            preview.classList.remove('hidden');
-            document.getElementById('singlePhotoContainer').classList.add('has-image');
-            document.getElementById('singleProcessBtn').classList.remove('hidden');
-            document.getElementById('singleResetBtn').classList.remove('hidden');
-            log('✅ Single photo set');
+        const img = document.getElementById('photoPreview');
+        img.src = url;
+        img.onload = () => {
+            document.getElementById('placeholder').classList.add('hidden');
+            img.classList.remove('hidden');
+            document.getElementById('photoContainer').classList.add('has-image');
+            document.getElementById('processBtn').classList.remove('hidden');
+            document.getElementById('newPhotoBtn').classList.remove('hidden');
+            log('✅ Photo displayed');
         };
     }
 
-    // Add multi photo
-    function addMultiPhoto(file) {
-        log(`📸 Adding multi photo (current: ${multiPhotos.length})`);
+    // Process photo function
+    function processPhoto() {
+        log('⚡ processPhoto() called');
         
-        if (multiPhotos.length >= 6) {
-            alert('Maximum 6 photos allowed');
+        if (!currentPhoto) {
+            log('❌ No photo to process');
             return;
         }
         
-        multiPhotos.push(file);
-        updateMultiPhotoGrid();
-        
-        if (multiPhotos.length >= 2) {
-            document.getElementById('multiProcessBtn').classList.remove('hidden');
-            document.getElementById('multiResetBtn').classList.remove('hidden');
-        }
-        
-        log(`✅ Multi photo added (total: ${multiPhotos.length})`);
-    }
-
-    // Update multi photo grid
-    function updateMultiPhotoGrid() {
-        log('🔄 Updating multi photo grid');
-        // Implementation simplified for debugging
-        log(`✅ Grid updated with ${multiPhotos.length} photos`);
-    }
-
-    // Select filter
-    function selectFilter(filterType, button) {
-        log(`🎛️ Selecting filter: ${filterType}`);
-        currentFilter = filterType;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        log('✅ Filter selected');
-    }
-
-    // Process photos
-    async function processPhotos() {
-        log('⚡ Starting photo processing');
-        
         document.getElementById('processing').classList.remove('hidden');
-        document.getElementById('processingTitle').textContent = 
-            isMultiMode ? 'Processing multiple photos...' : 'Processing your photo...';
         
-        try {
-            // Simulate processing steps
-            const steps = [
-                { text: 'Analyzing photo...', progress: 20 },
-                { text: 'Creating depth map...', progress: 40 },
-                { text: 'Applying filters...', progress: 60 },
-                { text: 'Generating 3D mesh...', progress: 80 },
-                { text: 'Creating STL file...', progress: 95 },
-                { text: 'Complete!', progress: 100 }
-            ];
-
-            for (const step of steps) {
-                await updateProgress(step.text, step.progress);
-                log(`📊 ${step.text}`);
-            }
-
-            // Generate simple STL
-            const stl = generateSimpleSTL();
-            finalizeModel(stl);
+        // Simulate processing
+        setTimeout(() => {
+            document.getElementById('processingStatus').textContent = 'Creating 3D mesh...';
+            log('📊 Creating mesh...');
             
-            log('✅ Processing complete');
-        } catch (error) {
-            log(`❌ Processing error: ${error.message}`);
-            alert(`Processing failed: ${error.message}`);
-            document.getElementById('processing').classList.add('hidden');
-        }
+            setTimeout(() => {
+                document.getElementById('processingStatus').textContent = 'Generating STL file...';
+                log('📄 Generating STL...');
+                
+                setTimeout(() => {
+                    // Create simple STL
+                    const stl = createSimpleSTL();
+                    finishProcessing(stl);
+                    log('✅ Processing complete');
+                }, 1000);
+            }, 1000);
+        }, 1000);
     }
 
-    // Update progress
-    async function updateProgress(status, progress) {
-        document.getElementById('processingStatus').textContent = status;
-        document.getElementById('progressFill').style.width = progress + '%';
-        await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    // Generate simple STL
-    function generateSimpleSTL() {
-        log('📄 Generating STL');
+    // Create simple STL
+    function createSimpleSTL() {
+        log('📄 createSimpleSTL() called');
         
-        let stl = 'solid PhotoTo3DPro\n';
+        let stl = 'solid PhotoModel\n';
         
-        // Create simple relief pattern
-        const size = 20;
-        for (let i = 0; i < 10; i++) {
-            const h = Math.sin(i * 0.5) * 2 + 3;
-            stl += `  facet normal 0 0 1
+        // Create a simple pyramid
+        stl += `  facet normal 0 0 1
 outer loop
-  vertex ${i * 2} 0 ${h}
-  vertex ${(i + 1) * 2} 0 ${h}
-  vertex ${i * 2} ${size} ${h}
+  vertex 0 0 0
+  vertex 10 0 0
+  vertex 5 10 0
 endloop
 ```
 
 endfacet
+facet normal 0 0 1
+outer loop
+vertex 0 0 0
+vertex 5 5 10
+vertex 10 0 0
+endloop
+endfacet
 `;
-}
 
 ```
-        stl += 'endsolid PhotoTo3DPro\n';
-        log('✅ STL generated');
+        stl += 'endsolid PhotoModel\n';
         return stl;
     }
 
-    // Finalize model
-    function finalizeModel(stlContent) {
-        log('🏁 Finalizing model');
+    // Finish processing
+    function finishProcessing(stlContent) {
+        log('🏁 finishProcessing() called');
         
         modelBlob = new Blob([stlContent], { type: 'application/octet-stream' });
         
-        const fileName = `photo_3d_pro_${Date.now()}.stl`;
+        const fileName = `photo_3d_${Date.now()}.stl`;
         const fileSize = Math.round(modelBlob.size / 1024);
         const triangleCount = (stlContent.match(/facet normal/g) || []).length;
         
         document.getElementById('fileName').textContent = fileName;
         document.getElementById('fileSize').textContent = fileSize + ' KB';
-        document.getElementById('triangleCount').textContent = triangleCount.toLocaleString();
-        document.getElementById('appliedFilter').textContent = currentFilter;
+        document.getElementById('triangleCount').textContent = triangleCount;
         
         document.getElementById('processing').classList.add('hidden');
         document.getElementById('result').classList.remove('hidden');
         
-        log('✅ Model finalized');
+        log('✅ Results displayed');
     }
 
     // Download model
     function downloadModel() {
-        log('💾 Downloading model');
+        log('💾 downloadModel() called');
         
         if (modelBlob) {
             const url = URL.createObjectURL(modelBlob);
@@ -827,61 +471,35 @@ endfacet
             a.click();
             URL.revokeObjectURL(url);
             log('✅ Download started');
-        } else {
-            log('❌ No model to download');
         }
     }
 
-    // Reset functions
-    function resetSingle() {
-        log('🔄 Resetting single mode');
-        singlePhoto = null;
-        document.getElementById('singlePhotoPreview').classList.add('hidden');
-        document.getElementById('singlePlaceholder').classList.remove('hidden');
-        document.getElementById('singlePhotoContainer').classList.remove('has-image');
-        document.getElementById('singleProcessBtn').classList.add('hidden');
-        document.getElementById('singleResetBtn').classList.add('hidden');
-        resetResults();
-    }
-
-    function resetMulti() {
-        log('🔄 Resetting multi mode');
-        multiPhotos = [];
-        initMultiPhotoGrid();
-        document.getElementById('multiProcessBtn').classList.add('hidden');
-        document.getElementById('multiResetBtn').classList.add('hidden');
-        resetResults();
-    }
-
-    function resetAll() {
-        resetSingle();
-        resetMulti();
-    }
-
-    function resetResults() {
+    // Reset app
+    function resetApp() {
+        log('🔄 resetApp() called');
+        
+        currentPhoto = null;
+        modelBlob = null;
+        
+        document.getElementById('photoPreview').classList.add('hidden');
+        document.getElementById('placeholder').classList.remove('hidden');
+        document.getElementById('photoContainer').classList.remove('has-image');
+        document.getElementById('processBtn').classList.add('hidden');
+        document.getElementById('newPhotoBtn').classList.add('hidden');
         document.getElementById('processing').classList.add('hidden');
         document.getElementById('result').classList.add('hidden');
-        document.getElementById('progressFill').style.width = '0%';
-        modelBlob = null;
+        
+        log('✅ App reset');
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        log('📄 DOM loaded');
-        initApp();
-    });
+    // Test function for debugging
+    function testFunction() {
+        log('🧪 Test function called');
+        alert('JavaScript is working!');
+    }
 
-    // Show debug panel on triple click
-    let clickCount = 0;
-    document.addEventListener('click', () => {
-        clickCount++;
-        if (clickCount === 3) {
-            document.getElementById('debug').classList.remove('hidden');
-            log('🐛 Debug panel shown');
-            clickCount = 0;
-        }
-        setTimeout(() => clickCount = 0, 1000);
-    });
+    // Log that everything is ready
+    log('🚀 All functions ready - try clicking buttons!');
 </script>
 ```
 
