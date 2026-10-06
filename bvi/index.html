@@ -210,6 +210,8 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .seg button[aria-pressed="true"] { background: var(--surface); box-shadow: var(--shadow); color: var(--accent); }
 .form { display: grid; grid-template-columns: 1fr; gap: 12px; }
 @media (min-width: 560px) { .form { grid-template-columns: 1fr 1fr; } .form .wide { grid-column: 1 / -1; } }
+.form.compact { grid-template-columns: 1fr 1fr; }
+.form.compact .wide { grid-column: 1 / -1; }
 .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .field label { font-size: .82rem; font-weight: 600; color: var(--ink-2); }
 .field input, .field select, .field textarea {
@@ -325,15 +327,13 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .install { border: 1px dashed var(--accent); background: var(--accent-soft); }
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--warn); margin-right: 6px; vertical-align: 1px; }
 .status-dot.ok { background: var(--ok); }
-.cat-only, .mono-only { }
-body.is-cat .mono-only, body.is-mono .cat-only { display: none !important; }
 footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 @media (min-width: 760px) { .appbar, .subnav { padding-left: max(16px, calc((100vw - 760px) / 2 + 16px)); } }
 </style>
 </head>
-<body class="is-cat">
+<body>
 
 <header class="appbar">
   <div class="appbar-row">
@@ -416,11 +416,13 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <p class="lede">The BVI is a separate country (a British Overseas Territory). St. Thomas is US soil, so you cross a border on the ferry.</p></header>
     <div class="card">
       <ol class="steps">
+        <li><strong>Plan to arrive Saturday, Dec 12.</strong> Charter day 1 is Sunday, Dec 13, and Sunday ferries are fewer. Ask The Moorings for a sleep-aboard night (boarding 6 PM Saturday) so you start Sunday rested.</li>
         <li><strong>Passports for everyone, kids included.</strong> Check they're valid well past your return date.</li>
         <li><strong>BVI entry card (ED card) online.</strong> Fill it in at <a href="https://bviedcard.gov.vg" target="_blank" rel="noopener">bviedcard.gov.vg</a> within 72 hours before you arrive (The Moorings suggests 36–72 hours). You get an email with a QR code. Screenshot it for each traveler.</li>
         <li><strong>Book the ferry.</strong> Buy round-trip tickets from Charlotte Amalie to Road Town in advance (it's cheaper and guarantees seats in holiday weeks).</li>
         <li><strong>Charter paperwork.</strong> Moorings confirmation, approved sailing résumé, crew list, and the credit card used for the security deposit.</li>
         <li><strong>Provisioning order</strong> (if using Moorings provisioning) is due 5 days before your charter starts.</li>
+        <li><strong>Fuel prepayment.</strong> Fuel isn't included on power charters; in the BVI, The Moorings has you prepay. Ask what it covers.</li>
         <li><strong>Request kid-sized life jackets</strong> when you confirm the boat, or bring your own US Coast Guard–approved ones.</li>
         <li><strong>Download for offline:</strong> this app, a chart app with the BVI saved offline (Navionics or similar), offline Google Maps of St. Thomas and Tortola, and your entertainment.</li>
       </ol>
@@ -491,24 +493,27 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <header><span class="eyebrow">Leg 3</span><h2>At the base</h2>
       <p class="lede">You'll get a chart briefing (where to go and what to avoid) and a boat briefing on the dock. Take notes and video the boat walk-through on your phone.</p></header>
     <div class="grid2">
-      <div class="tile"><div class="k">Standard boarding</div><div class="v num">12:00</div><div class="d">noon on charter day 1</div></div>
-      <div class="tile"><div class="k">Sleep-aboard</div><div class="v num">6:00 PM</div><div class="d">night before, if booked</div></div>
+      <div class="tile"><div class="k">Standard boarding</div><div class="v num">12:00</div><div class="d">noon, Sun Dec 13</div></div>
+      <div class="tile"><div class="k">Sleep-aboard</div><div class="v num">6:00 PM</div><div class="d">Sat Dec 12, if booked</div></div>
       <div class="tile"><div class="k">Chart briefings</div><div class="v num">9:30 · 12 · 4</div><div class="d">daily, mandatory</div></div>
-      <div class="tile"><div class="k">Charter ends</div><div class="v num">11:00 AM</div><div class="d">sailing yachts</div></div>
+      <div class="tile"><div class="k">Back at base</div><div class="v num">9:00 AM</div><div class="d">Sun Dec 20 · off the boat by 10</div></div>
     </div>
     <div class="card">
       <h3>Ask these at the briefing</h3>
       <ul>
         <li><strong>Anegada:</strong> may we go? (You need The Moorings' OK.)</li>
+        <li><strong>Fuel:</strong> what the prepayment covers, which tank feeds which engine, and whether to refuel before returning.</li>
+        <li><strong>Helms:</strong> how to switch control between the flybridge and inside helm; is there a bow thruster?</li>
+        <li><strong>Recommended cruise speed</strong> and rpm for this boat, and the no-wake rules they care about.</li>
+        <li><strong>Generator and A/C:</strong> start, stop, how long to run it, and the watermaker routine.</li>
         <li>Emergency and breakdown phone numbers, and the VHF channel (base uses <strong>channel 12</strong>). Save them in Settings.</li>
-        <li>Fuel policy on return: refuel yourselves, or they top off and charge you?</li>
         <li>Holding-tank rules and where to pump out.</li>
-        <li>Battery routine: how long to run engines (or generator) each day.</li>
         <li>What's included: snorkel gear, towels, Wi-Fi, paddleboard, BoatyBall?</li>
         <li>Where and when to bring the boat back, and whether to return the night before.</li>
       </ul>
       <p><a href="#cl-checkout">Open the boat check-out checklist →</a></p>
     </div>
+    <p class="small">The base (The Moorings Yacht Club) has Charlie's Bar &amp; Restaurant, Island Roots coffee shop, The Moorings Market &amp; Deli, a pool, laundry, showers and Wi-Fi.</p>
     <div class="callout info">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
       <div><b class="t">Luggage</b>Soft-sided bags fold away on board. The base can store extras until you're back.</div>
@@ -517,14 +522,14 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
   <section class="block" id="travel-home">
     <header><span class="eyebrow">The way back</span><h2>Going home</h2>
-      <p class="lede">Leave a buffer of 4–5 hours between the ferry and your flight. Holiday Saturdays are the busiest.</p></header>
+      <p class="lede">Sunday, Dec 20. Power charters are due back at 9:00 AM for the exit briefing. Leave a 4–5 hour buffer between the ferry and your flight, and check the Sunday ferry times.</p></header>
     <div class="card">
       <ol class="steps">
-        <li><strong>Return the boat.</strong> Charter ends at 11:00 AM. Many crews come back the afternoon before to fuel, pack, and shower.</li>
-        <li><strong>Call The Moorings on VHF 12</strong> about 30 minutes out for docking instructions. Fenders and lines ready. They often send a dock hand.</li>
+        <li><strong>Be back at the base by 9:00 AM</strong> for the exit briefing; you're off the boat by 10:00. Spend the last night 30 minutes away (Norman or Peter Island) or come back Saturday evening.</li>
+        <li><strong>Call The Moorings on VHF 12</strong> about 15–20 minutes out for docking instructions. Fenders and lines ready. They often send a dock hand.</li>
         <li><strong>Pump out the holding tank</strong> offshore (or as instructed) before entering Road Harbour.</li>
         <li><strong>Check out.</strong> Report any damage or breakage, hand back keys and the outboard kill cord.</li>
-        <li><strong>Ferry back to Charlotte Amalie.</strong> Typical departures from Road Town ≈ 7:30 AM, 10:00 AM, 11:30 AM and 3:30 PM (confirm). Arrive 60–90 minutes early and pay the $20 per person departure tax.</li>
+        <li><strong>Ferry back to Charlotte Amalie.</strong> Typical departures from Road Town ≈ 7:30 AM, 10:00 AM, 11:30 AM and 3:30 PM, with fewer on Sundays (confirm). Arrive 60–90 minutes early and pay the $20 per person departure tax.</li>
         <li><strong>US Customs (CBP) at the Charlotte Amalie terminal.</strong> Passports out.</li>
         <li><strong>Taxi to STT</strong> (≈ $12–15 per person). There is an extra US Customs check at STT before airport security for flights to the mainland. Allow 2–3 hours at the airport.</li>
       </ol>
@@ -537,159 +542,190 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 <section class="view" id="boat" data-title="The boat" hidden>
   <nav class="subnav" aria-label="Boat sections">
     <a class="chip" href="#boat-specs">Your boat</a>
+    <a class="chip" href="#boat-driving">Driving</a>
     <a class="chip" href="#boat-fuel">Fuel</a>
     <a class="chip" href="#boat-engines">Engines</a>
-    <a class="chip" href="#boat-power">Power</a>
+    <a class="chip" href="#boat-power">Power &amp; A/C</a>
     <a class="chip" href="#boat-water">Water &amp; heads</a>
     <a class="chip" href="#boat-galley">Galley</a>
-    <a class="chip" href="#boat-sailing">Sailing</a>
     <a class="chip" href="#boat-dinghy">Dinghy</a>
     <a class="chip" href="#boat-anchor">Anchor gear</a>
     <a class="chip" href="#boat-rules">Do's &amp; don'ts</a>
   </nav>
 
   <section class="block" id="boat-specs">
-    <header><span class="eyebrow">40 ft Moorings yacht</span><h2>Your boat</h2>
-      <p class="lede">Pick the hull type. Numbers below are typical for Moorings' 40-foot boats; correct them in Settings from your boat briefing.</p></header>
-    <div class="seg" role="group" aria-label="Boat type">
-      <button type="button" data-boat="cat" aria-pressed="true">Catamaran</button>
-      <button type="button" data-boat="mono" aria-pressed="false">Monohull</button>
+    <header><span class="eyebrow">40 ft power catamaran</span><h2>Moorings 403PC</h2>
+      <p class="lede">Numbers from The Moorings' spec sheet for the 403PC (a Leopard 40 PowerCat built for charter). Confirm the details for your boat at the briefing and correct them in Settings.</p></header>
+    <div class="card">
+      <dl class="kv">
+        <dt>Length</dt><dd>40 ft</dd>
+        <dt>Beam / draft</dt><dd>21′ 8″ wide · 3′ 7″ draft</dd>
+        <dt>Engines</dt><dd>2 × 320 hp Yanmar diesels</dd>
+        <dt>Fuel</dt><dd><span class="num" data-bind="fuelCap">370</span> gal diesel (two 185-gal tanks)</dd>
+        <dt>Water</dt><dd><span class="num" data-bind="waterCap">170</span> gal, plus a watermaker</dd>
+        <dt>Power</dt><dd>Generator (runs the A/C), solar panels, inverter/charger, shore power</dd>
+        <dt>Helms</dt><dd>Two: inside lower helm and flybridge helm. Bow and stern cameras.</dd>
+        <dt>Layout</dt><dd>3 cabins, 2 heads; flybridge with wet bar, electric grill and fridge</dd>
+        <dt>Deck gear</dt><dd>Electric windlass; davits with an electric winch for the dinghy</dd>
+        <dt>Passengers</dt><dd>The Moorings lists a maximum of 6</dd>
+      </dl>
+    </div>
+    <div class="callout info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">What's different from a sailboat</b>No sails to manage. Hops that take a sailboat two hours take you 20–40 minutes. In exchange you burn far more fuel, throw a big wake, and feel every wave if you run fast into December chop. Most of what follows is about speed control.</div>
+    </div>
+  </section>
+
+  <section class="block" id="boat-driving">
+    <header><span class="eyebrow">Power-cat handling</span><h2>Driving the boat</h2>
+      <p class="lede">At 17 knots you cover a mile every 3½ minutes. Reefs, mooring balls, dinghies and swimmers arrive fast, so the job is mostly picking the right speed for the water you're in.</p></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Mode</th><th>Speed</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>No wake</strong></td><td class="n">3–5 kn (idle)</td><td>Harbors, mooring fields, anchorages, channels, near swimmers, dinghies and docks</td></tr>
+        <tr><td><strong>Economy</strong></td><td class="n">6–7 kn</td><td>Short hops, rough head seas, stretching fuel</td></tr>
+        <tr><td><strong>Transition</strong></td><td class="n">≈ 9–13 kn</td><td>Avoid lingering here: the bow rises, it burns lots of fuel and blocks your view ahead. Go slower or push through.</td></tr>
+        <tr><td><strong>Fast cruise</strong></td><td class="n">15–18 kn</td><td>Open water in moderate seas. Around 3,000 rpm on the test boat.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="card">
+      <h3>Helms &amp; controls</h3>
+      <ul>
+        <li><strong>Flybridge helm</strong> has the best view. Use it for docking, mooring pickups and reading the water.</li>
+        <li><strong>Inside helm</strong> is for rain and A/C. You can't see the bow area well, so post a lookout.</li>
+        <li><strong>Electronic throttles:</strong> you usually have to press a station or "take command" button at the helm you move to. Have them show you at the briefing.</li>
+        <li><strong>Low-speed steering:</strong> use the throttles, not the wheel. One forward and one reverse spins the boat in place. Practice in open water on day 1.</li>
+        <li><strong>Docking:</strong> the tall flybridge catches wind and pushes the boat sideways. Short bursts of throttle, use the cameras, and go only as fast as you're willing to hit something. Use the bow thruster if your boat has one.</li>
+        <li><strong>Warm up and cool down:</strong> a few minutes at idle after starting before running fast, and a few minutes at idle after a fast run before shutting the engines off.</li>
+      </ul>
     </div>
     <div class="card">
-      <dl class="kv cat-only">
-        <dt>Typical model</dt><dd>Moorings 4000 (Leopard 40 hull), 39′ 4″</dd>
-        <dt>Beam / draft</dt><dd>≈ 20′ wide · ≈ 4′ draft</dd>
-        <dt>Engines</dt><dd>2 × ~29–30 hp Yanmar diesels</dd>
-        <dt>Fuel</dt><dd><span class="num" data-bind="fuelCap">95</span> gal (diesel)</dd>
-        <dt>Water</dt><dd><span class="num" data-bind="waterCap">206</span> gal</dd>
-        <dt>Layout</dt><dd>3–4 cabins, 2+ heads</dd>
-      </dl>
-      <dl class="kv mono-only">
-        <dt>Typical model</dt><dd>Moorings 41.3 / 42.3 (Beneteau Oceanis class)</dd>
-        <dt>Beam / draft</dt><dd>≈ 13′ wide · 5′–6′3″ draft</dd>
-        <dt>Engine</dt><dd>1 × ~40 hp Yanmar diesel</dd>
-        <dt>Fuel</dt><dd><span class="num" data-bind="fuelCap">53</span> gal (diesel)</dd>
-        <dt>Water</dt><dd><span class="num" data-bind="waterCap">120</span> gal</dd>
-        <dt>Layout</dt><dd>3 cabins, 2 heads</dd>
-      </dl>
+      <h3>December chop</h3>
+      <ul>
+        <li>The Christmas winds (E–NE 15–25 knots, gusts 30) build short, steep waves in Sir Francis Drake Channel and on open runs like Anegada and Tortola's north shore. They build through the day.</li>
+        <li><strong>Run into the waves in the morning.</strong> Plan eastbound legs early and westbound (following-sea) legs for the afternoon.</li>
+        <li><strong>Slow down until the ride is comfortable.</strong> Pounding at 17 knots is hard on people and the boat. Taking head seas 20–40° off the bow softens them.</li>
+        <li>In following seas, keep a steady speed and don't let the bows bury into the wave ahead.</li>
+        <li>Everyone seated and holding on when running fast. Nobody on the foredeck or trampolines under way. Stow everything loose; it will fly.</li>
+        <li>The flybridge moves the most. Seasick-prone crew sit low and aft with eyes on the horizon.</li>
+      </ul>
     </div>
-    <div class="callout info cat-only">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
-      <div><b class="t">Cat quirks</b>Catamarans don't heel, so the boat won't warn you it's over-canvassed. Reef by wind speed. From the helm you can't see the bow close up, so bow crew and hand signals matter. Twin engines let you spin in place.</div>
-    </div>
-    <div class="callout info mono-only">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
-      <div><b class="t">Monohull quirks</b>She'll heel in gusts; reef when you're regularly past ~20°. In reverse, prop walk kicks the stern (usually to port). Stow everything before you leave the mooring.</div>
+    <div class="card">
+      <h3>Wake &amp; lookout</h3>
+      <ul>
+        <li><strong>You are responsible for damage your wake causes.</strong> Drop to no-wake 200+ yards before mooring fields, anchorages, marinas and docks.</li>
+        <li>Slow down to pass sailboats, dinghies, paddleboards and snorkelers (look for dive flags). Pass astern of sailboats.</li>
+        <li>Watch for fish-trap floats near shore. Their lines wrap props.</li>
+        <li>Keep clear of the fast ferries between Road Town, West End, Jost Van Dyke and Virgin Gorda.</li>
+        <li>Never run fast over shallow or reef water. Slow down entering every bay.</li>
+        <li><strong>Red right returning:</strong> same buoy system as the US. Red markers on your right entering a harbor.</li>
+        <li><strong>Read the water:</strong> brown or dark patches are reef or rock, pale turquoise is shallow sand, deep blue is deep. Best 10 AM–2 PM with the sun behind you and polarized sunglasses.</li>
+        <li>VHF on channel 16 under way. Never leave the helm unattended.</li>
+      </ul>
     </div>
   </section>
 
   <section class="block" id="boat-fuel">
     <header><span class="eyebrow">Diesel</span><h2>Fuel burn</h2>
-      <p class="lede">Fuel gauges on charter boats are unreliable. Log engine hours each morning and multiply by the burn rate.</p></header>
+      <p class="lede">Speed is the whole story. Doubling your speed from 8 to 17 knots roughly quintuples the fuel per hour and halves your miles per gallon.</p></header>
     <div class="table-wrap"><table>
-      <thead><tr><th>Engine speed</th><th>Per engine</th><th>Boat speed (flat water)</th></tr></thead>
-      <tbody class="cat-only">
-        <tr><td>Idle / charging (~1,200 rpm)</td><td class="n">≈ 0.2 gal/h</td><td>0</td></tr>
-        <tr><td>Slow cruise (~2,000 rpm)</td><td class="n">≈ 0.35 gal/h</td><td class="n">5–6 kn on both</td></tr>
-        <tr><td>Cruise (2,400–2,600 rpm)</td><td class="n">≈ 0.55 gal/h</td><td class="n">6.5–7.5 kn on both · 5–5.5 on one</td></tr>
-        <tr><td>Fast (2,800+ rpm)</td><td class="n">≈ 0.8+ gal/h</td><td>Little extra speed</td></tr>
-      </tbody>
-      <tbody class="mono-only">
-        <tr><td>Idle / charging (~1,200 rpm)</td><td class="n">≈ 0.25 gal/h</td><td>0</td></tr>
-        <tr><td>Slow cruise (~2,000 rpm)</td><td class="n">≈ 0.45 gal/h</td><td class="n">5–5.5 kn</td></tr>
-        <tr><td>Cruise (2,200–2,400 rpm)</td><td class="n">≈ 0.7 gal/h</td><td class="n">6–6.5 kn</td></tr>
-        <tr><td>Fast (2,800+ rpm)</td><td class="n">≈ 1.0+ gal/h</td><td>Little extra speed</td></tr>
+      <thead><tr><th>Speed</th><th>Both engines</th><th>Miles per gal</th></tr></thead>
+      <tbody>
+        <tr><td>Idle / no wake (~1,000 rpm)</td><td class="n">≈ 1–1.5 gal/h</td><td class="n">≈ 4–5</td></tr>
+        <tr><td>Economy, 7–8 kn</td><td class="n">≈ 4–5 gal/h</td><td class="n">≈ 1.6</td></tr>
+        <tr><td>Fast cruise, 17–18 kn</td><td class="n">≈ 21–24 gal/h</td><td class="n">≈ 0.8</td></tr>
+        <tr><td>Wide open, ~22 kn</td><td class="n">30+ gal/h</td><td class="n">&lt; 0.7</td></tr>
+        <tr><td>Generator (A/C on)</td><td class="n">≈ 0.5–0.9 gal/h</td><td>—</td></tr>
       </tbody>
     </table></div>
-    <p class="small">Estimates from engine size and typical prop loads. Your Moorings tech will know the real numbers for your boat. Ask at the briefing.</p>
+    <p class="small">From published tests of the Leopard 40 PowerCat (twin 370 hp, 370 gal tank; about 280 nm of range at 18 knots and 600 nm at 8). Your 320 hp boat will be in the same ballpark. Generator figure is typical for a ~9 kW diesel generator.</p>
 
     <div class="card" id="fuel-calc">
       <h3>Fuel calculator</h3>
-      <div class="form">
-        <div class="field"><label for="fc-eng">Engines running</label>
-          <select id="fc-eng"><option value="2">Both engines</option><option value="1">One engine</option></select></div>
-        <div class="field"><label for="fc-rpm">Typical speed</label>
-          <select id="fc-rpm"><option value="slow">Slow cruise (~2,000 rpm)</option><option value="cruise" selected>Cruise (~2,400 rpm)</option><option value="fast">Fast (2,800+ rpm)</option></select></div>
-        <div class="field"><label for="fc-hrs">Motoring hours per day</label><input id="fc-hrs" type="number" inputmode="decimal" min="0" max="12" step="0.5" value="2.5"></div>
-        <div class="field"><label for="fc-chg">Charging-only hours per day</label><input id="fc-chg" type="number" inputmode="decimal" min="0" max="12" step="0.5" value="1"></div>
-        <div class="field"><label for="fc-gen">Generator hours per day (if fitted)</label><input id="fc-gen" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="0"></div>
+      <div class="form compact">
+        <div class="field"><label for="fc-fast">Fast-cruise miles / day</label><input id="fc-fast" type="number" inputmode="decimal" min="0" max="100" step="1" value="12"></div>
+        <div class="field"><label for="fc-slow">Slow miles / day</label><input id="fc-slow" type="number" inputmode="decimal" min="0" max="50" step="1" value="3"></div>
+        <div class="field"><label for="fc-gen">Generator hours / day</label><input id="fc-gen" type="number" inputmode="decimal" min="0" max="24" step="1" value="8"></div>
         <div class="field"><label for="fc-days">Days</label><input id="fc-days" type="number" inputmode="numeric" min="1" max="14" step="1" value="7"></div>
-        <div class="field"><label for="fc-tank">Tank size (gal)</label><input id="fc-tank" type="number" inputmode="decimal" min="10" max="400" step="1" value="95"></div>
+        <div class="field"><label for="fc-tank">Tank (gal)</label><input id="fc-tank" type="number" inputmode="decimal" min="10" max="800" step="1" value="370"></div>
         <div class="field"><label for="fc-start">Starting level</label>
           <select id="fc-start"><option value="1">Full</option><option value="0.75">3/4</option><option value="0.5">1/2</option></select></div>
+        <div class="field wide"><label for="fc-price">Diesel price, $/gal (optional)</label><input id="fc-price" type="number" inputmode="decimal" min="0" max="20" step="0.01" placeholder="ask at the dock"></div>
       </div>
       <div class="calc-out">
         <div class="tile"><div class="k">Per day</div><div class="v" id="fc-day">—</div><div class="d">gallons</div></div>
-        <div class="tile"><div class="k">Whole trip</div><div class="v" id="fc-trip">—</div><div class="d">gallons</div></div>
+        <div class="tile"><div class="k">Whole trip</div><div class="v" id="fc-trip">—</div><div class="d" id="fc-cost">gallons</div></div>
         <div class="tile"><div class="k">Left at the end</div><div class="v" id="fc-left">—</div><div class="d" id="fc-left-d">of tank</div></div>
       </div>
       <div class="gauge" id="fc-gauge"><i style="width:60%"></i></div>
       <p class="small" id="fc-advice"></p>
+    </div>
+    <div class="callout warn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Fuel isn't included on power charters</b>In the BVI, The Moorings has power charterers prepay for fuel. Ask at check-in how much your prepayment covers, whether unused fuel is credited, and whether to refuel before you return.</div>
     </div>
     <div class="callout bad">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
       <div><b class="t">Read the deck-fill cap every time</b>Caps are labeled <strong>DIESEL</strong>, <strong>WATER</strong> and <strong>WASTE</strong>. Diesel in the water tank ends the vacation. The dinghy outboard takes <strong>gasoline</strong>, never diesel.</div>
     </div>
     <ul>
-      <li>Most efficient: one engine at moderate rpm, or both at ~2,200. Above ~2,600 rpm you burn a lot more for very little speed.</li>
-      <li>A typical week burns roughly <strong class="cat-only">25–45 gal</strong><strong class="mono-only">15–30 gal</strong>. Top off mid-week if you're under half, and always before Anegada.</li>
+      <li>Two 185-gal tanks: ask which tank feeds which engine and the generator, and how to keep them balanced.</li>
+      <li>Charter-boat fuel gauges are rough. Write down engine hours and the gauge every morning.</li>
+      <li>The suggested 7-night plan is about 100 nm. At fast cruise that's roughly 125 gal, plus 30–50 gal if you run the generator every night. You likely won't need a fuel dock, but top off if you drop below half.</li>
     </ul>
   </section>
 
   <section class="block" id="boat-engines">
-    <header><span class="eyebrow">Every morning</span><h2>Engines</h2></header>
+    <header><span class="eyebrow">Every morning</span><h2>Engines &amp; generator</h2></header>
     <div class="card">
-      <h3>Daily check (each engine, before first start)</h3>
+      <h3>Daily check (both engines and the generator)</h3>
       <ol class="steps">
         <li><strong>Oil:</strong> dipstick between the marks.</li>
         <li><strong>Coolant:</strong> level visible in the overflow/expansion tank.</li>
         <li><strong>Raw-water strainer:</strong> clear of weed or plastic, seacock open.</li>
-        <li><strong>Belt:</strong> tight, not frayed or shedding black dust.</li>
-        <li><strong>Bilge and engine bay:</strong> dry, no fuel or oil smell, no new drips.</li>
-        <li><strong>After starting:</strong> water spitting from the exhaust within 30 seconds. If not, shut down and check the seacock, strainer and impeller.</li>
+        <li><strong>Belts:</strong> tight, not frayed or shedding black dust.</li>
+        <li><strong>Engine rooms and bilges:</strong> dry, no fuel or oil smell, no new drips.</li>
+        <li><strong>After starting:</strong> water spitting from each exhaust (and the generator's) within 30 seconds. If not, shut down and check the seacock, strainer and impeller.</li>
       </ol>
       <p><a href="#cl-engine">Use the tick-box version →</a></p>
     </div>
     <div class="card">
-      <h3>Start and stop (typical Yanmar panel)</h3>
+      <h3>Start and stop</h3>
       <ul>
-        <li><strong>Start:</strong> throttle in neutral, key on (alarm beeps), preheat ~10 s if your panel has it, press start until it catches (no more than 10 s at a time).</li>
-        <li><strong>Stop:</strong> press the stop button until the engine stops, <em>then</em> turn the key off. Turning the key off with the engine running can damage the alternator.</li>
-        <li><strong>Before shifting into gear:</strong> look behind for lines in the water (dinghy painter, mooring lines, swim-ladder ropes). A line around the prop is the most common charter breakdown.</li>
+        <li><strong>Start:</strong> throttles in neutral, ignition on, start each engine. Check the engine display for oil pressure, temperature and charging.</li>
+        <li><strong>Warm up</strong> a few minutes before running fast. <strong>Cool down</strong> a few minutes at idle before shutting off after a fast run.</li>
+        <li><strong>Before shifting into gear:</strong> look behind for lines in the water (dinghy painter, mooring lines, swim-ladder ropes). A line around a prop is the most common charter breakdown.</li>
       </ul>
     </div>
     <div class="card">
       <h3>Alarms</h3>
       <dl class="kv">
-        <dt>Overheat</dt><dd>Throttle back, neutral, shut down. Check raw-water flow (seacock, strainer, impeller), belt and coolant. Call the base.</dd>
+        <dt>Overheat</dt><dd>Throttle back, neutral, shut that engine down. Check raw-water flow (seacock, strainer, impeller), belt and coolant. Call the base. You can motor home slowly on one engine.</dd>
         <dt>Oil pressure</dt><dd>Shut down immediately and call the base.</dd>
-        <dt>Charging light</dt><dd>Usually a belt. Check it, then call the base.</dd>
+        <dt>Charging</dt><dd>Usually a belt. Check it, then call the base.</dd>
       </dl>
-    </div>
-    <div class="callout info cat-only">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
-      <div><b class="t">Twin-engine steering</b>At low speed, steer with the throttles. One forward and one reverse spins the boat in its own length. Practice in open water on day 1 before your first mooring.</div>
     </div>
   </section>
 
   <section class="block" id="boat-power">
-    <header><span class="eyebrow">12-volt life</span><h2>Batteries &amp; power</h2>
-      <p class="lede">The fridge is the big draw. On a mooring you make power by running the engines, the generator (if fitted) or solar.</p></header>
+    <header><span class="eyebrow">12 volts &amp; 110 volts</span><h2>Power, generator &amp; A/C</h2>
+      <p class="lede">The A/C only runs on the generator or shore power. Batteries are charged by the engines, solar, the generator and shore power.</p></header>
     <div class="table-wrap"><table>
       <thead><tr><th>House battery (at rest)</th><th>Charge</th><th>What to do</th></tr></thead>
       <tbody>
         <tr><td class="n">12.7 V</td><td>Full</td><td>All good</td></tr>
         <tr><td class="n">12.4 V</td><td>≈ 75%</td><td>Fine for the night</td></tr>
-        <tr><td class="n">12.2 V</td><td>≈ 50%</td><td>Charge now (run engines ~1 h)</td></tr>
+        <tr><td class="n">12.2 V</td><td>≈ 50%</td><td>Charge now (generator or engines)</td></tr>
         <tr><td class="n">below 12.0 V</td><td>Low</td><td>Cut non-essentials, charge, call base if it won't hold</td></tr>
       </tbody>
     </table></div>
     <ul>
-      <li>Leave battery switches as set at the briefing. Start batteries are kept separate so you can always start the engines.</li>
-      <li>Run the engine(s) whenever you use the anchor windlass.</li>
-      <li>The inverter powers the 110 V (US-style) outlets. Use it for phones and laptops, and turn it off when not needed. No hair dryers.</li>
+      <li><strong>Generator:</strong> start and stop it at its panel as shown at the briefing. Check for cooling water at its exhaust. It burns roughly 0.5–0.9 gal an hour from the main tanks.</li>
+      <li><strong>Carbon monoxide:</strong> the generator exhaust exits near the stern. Nobody swims, hangs on the swim steps or sits in the dinghy at the stern while it runs. Test the CO alarms on day 1.</li>
+      <li><strong>A/C:</strong> close hatches and doors when it's on. Be considerate of neighbors with generator noise late at night.</li>
+      <li>Leave battery switches as set at the briefing. Start batteries are kept separate.</li>
+      <li>The inverter powers the 110 V (US-style) outlets from the batteries. Big loads (microwave, hair dryer) want the generator running.</li>
       <li>Shore power at a marina: plug the cable into the boat first, then the dock. Reverse to unplug.</li>
-      <li>Generator and air-con (if fitted): A/C only runs on the generator or shore power. Check for cooling water at the genset exhaust. Close hatches when the A/C is on.</li>
     </ul>
   </section>
 
@@ -698,26 +734,26 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <div class="card">
       <h3>Fresh water</h3>
       <ul>
-        <li>Tanks hold about <strong><span class="num" data-bind="waterCap">206</span> gal</strong>. A careful family uses 20–35 gal a day. Showers are the big user.</li>
-        <li>Navy showers: wet down, water off, soap up, quick rinse. Rinse snorkel gear in a bucket of sea water first, then a splash of fresh.</li>
+        <li>Tanks hold about <strong><span class="num" data-bind="waterCap">170</span> gal</strong>. A careful family uses 20–35 gal a day, so the tanks alone last 5–7 days. Showers are the big user.</li>
+        <li><strong>Watermaker:</strong> run it only in clean, clear open water, away from marinas and silty bays, and only as shown at the briefing (usually with the generator on).</li>
+        <li>Navy showers: wet down, water off, soap up, quick rinse. Rinse snorkel gear in sea water first, then a splash of fresh.</li>
         <li>Turn the <strong>water-pump breaker off</strong> at night and when you leave the boat. If the pump runs with no tap open, a tank is empty or something is leaking.</li>
-        <li>Refill at marinas for roughly 15–25¢ a gallon. See <a href="#log-fuel">where to fill up</a>.</li>
-        <li>Watermaker (if fitted): run only in clean, clear water away from marinas and silty bays.</li>
+        <li>Top up at marinas for roughly 15–25¢ a gallon. See <a href="#log-fuel">where to fill up</a>.</li>
       </ul>
     </div>
     <div class="card">
       <h3>Marine toilets ("heads")</h3>
       <p><strong>Nothing goes in the head unless you ate it first</strong>, plus a little toilet paper (ask whether your boat allows paper at all). No wipes, tampons, paper towels or hair.</p>
       <ul>
-        <li>Manual heads: pump 10–15 extra strokes after the bowl is clear to flush the hose. Electric: hold until clear.</li>
+        <li>Pump or hold the button until the bowl is clear, then a few seconds more to flush the hose.</li>
         <li>In anchorages, marinas and near reefs, use the <strong>holding tank</strong>. Empty it only in open water well offshore, or at a pump-out, following your briefing.</li>
-        <li>Learn your tank's size and gauge. If a head jams, stop pumping and call the base. Forcing it makes it worse.</li>
+        <li>Learn the tank's size and gauge. If a head jams, stop and call the base. Forcing it makes it worse.</li>
       </ul>
     </div>
   </section>
 
   <section class="block" id="boat-galley">
-    <header><span class="eyebrow">Kitchen</span><h2>Galley &amp; propane</h2></header>
+    <header><span class="eyebrow">Kitchen</span><h2>Galley, grill &amp; propane</h2></header>
     <div class="card">
       <ol class="steps">
         <li><strong>Gas on:</strong> switch on the propane solenoid at the panel. The tank valve in the gas locker is usually left open.</li>
@@ -727,45 +763,14 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     </div>
     <div class="callout bad">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
-      <div><b class="t">Smell gas?</b>Solenoid off. No flames, no switches. Open hatches and air out the boat. Propane is heavier than air and pools in the bilge. Call the base.</div>
+      <div><b class="t">Smell gas?</b>Solenoid off. No flames, no switches. Open hatches and air out the boat. Propane is heavier than air and pools low. Call the base.</div>
     </div>
     <ul>
-      <li>Know where the spare propane tank is and how to swap it. A tank usually lasts a week of normal cooking.</li>
-      <li>Fridge: open it briefly, pre-chill food, and keep drinks in a cooler with ice so the fridge stays shut. Latch the door before sailing.</li>
+      <li>The flybridge has an electric grill, a fridge and a wet bar. The grill and the convection microwave want the generator or shore power.</li>
+      <li>Know where the spare propane tank is and how to swap it.</li>
+      <li>Fridge: open it briefly, pre-chill food, keep drinks in the flybridge fridge or a cooler. Latch doors before running fast.</li>
       <li>Trash: compact and double-bag it. Drop it at marinas or restaurants (some charge a few dollars a bag). Nothing goes overboard, food scraps included.</li>
     </ul>
-  </section>
-
-  <section class="block" id="boat-sailing">
-    <header><span class="eyebrow">Christmas winds</span><h2>Sailing</h2>
-      <p class="lede">December trade winds blow E–NE at 15–25 knots, sometimes 25–30 for days, with squalls on top. Plan to reef early and often.</p></header>
-    <div class="card">
-      <h3>When to reef</h3>
-      <dl class="kv cat-only">
-        <dt>1st reef</dt><dd>Around 18–20 kn true, or gusts over 20</dd>
-        <dt>2nd reef</dt><dd>Around 25 kn</dd>
-        <dt>Rule</dt><dd>A cat won't heel to warn you, so watch the wind instrument. If you're wondering whether to reef, reef. Confirm the numbers for your boat at the briefing.</dd>
-      </dl>
-      <dl class="kv mono-only">
-        <dt>1st reef</dt><dd>Heel regularly past ~20°, or gusts over 18–20 kn</dd>
-        <dt>2nd reef</dt><dd>Around 25 kn</dd>
-        <dt>Rule</dt><dd>If you're wondering whether to reef, reef.</dd>
-      </dl>
-    </div>
-    <div class="card">
-      <h3>Good habits</h3>
-      <ul>
-        <li><strong>Raise the main head-to-wind</strong> under power. Ease the mainsheet and reef lines first, and watch for battens snagging the lazy jacks. Never force a winch.</li>
-        <li><strong>Jib:</strong> unroll with the furling line under control (a turn on a winch). Roll it in before it gets windy; a partly furled jib is a reef.</li>
-        <li><strong>Upwind:</strong> a cat sails poorly closer than ~50–60° to the wind. Motor-sail or motor the upwind legs and save sailing for reaches and runs.</li>
-        <li><strong>Downwind:</strong> avoid accidental gybes. Control the boom with the mainsheet.</li>
-        <li><strong>Squalls:</strong> you can see them coming (dark cloud, grey rain curtain). Before one hits: reef or furl, close hatches, life jackets on. Expect 15+ knots more wind for 10–20 minutes, then a lull.</li>
-        <li><strong>Ferries</strong> are fast and frequent between Road Town, West End, Jost Van Dyke and Virgin Gorda. Keep clear of them.</li>
-        <li><strong>Red right returning:</strong> the BVI uses the same buoy system as the US (IALA B). Red markers on your right when entering a harbor.</li>
-        <li><strong>Read the water:</strong> brown or dark patches are reef or rock, pale turquoise is shallow sand, deep blue is deep. Best between 10 AM and 2 PM with the sun behind you and polarized sunglasses on.</li>
-        <li>Never leave the helm unattended on autopilot.</li>
-      </ul>
-    </div>
   </section>
 
   <section class="block" id="boat-dinghy">
@@ -780,25 +785,24 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       </ol>
     </div>
     <ul>
+      <li>The dinghy rides on <strong>davits with an electric winch</strong>. Lift it before every passage; never tow it at speed.</li>
       <li><strong>Gasoline only.</strong> Fuel docks with a gas pump can refill the dinghy tank.</li>
       <li>Kill cord on the driver every time. <strong>Under-16s may not drive the outboard</strong> (Moorings rule).</li>
       <li>Kids wear life jackets in the dinghy, especially after dark. Carry a flashlight at night (you must be seen), a handheld VHF, paddles and the lock.</li>
-      <li><strong>Lock it</strong> to the dock ashore and to the boat at night. Dinghy theft happens. Cats: raise it on the davits overnight.</li>
-      <li>Towing: shorten the painter when maneuvering so it can't reach the props. On long or rough legs, lift it onto the davits.</li>
-      <li>Idle speed, no wake, in anchorages and near swimmers. Stay outside swim-zone buoys. Watch for snorkelers and dive flags.</li>
+      <li><strong>Lock it</strong> to the dock ashore. At night, raise it on the davits.</li>
+      <li>Idle speed, no wake, in anchorages and near swimmers. Stay outside swim-zone buoys.</li>
       <li>At The Baths and Devil's Bay, dinghies tie to the dinghy line and you swim in.</li>
-      <li><strong>Engines off, kill cord out</strong> whenever anyone is swimming near the boat or dinghy.</li>
+      <li><strong>Engines and generator off, kill cord out</strong> whenever anyone is swimming near the stern.</li>
     </ul>
   </section>
 
   <section class="block" id="boat-anchor">
     <header><span class="eyebrow">Ground tackle</span><h2>Anchor gear</h2></header>
     <ul>
-      <li>Windlass breaker or switch on at the panel, engine running, then use the remote (UP / DOWN).</li>
+      <li>Windlass breaker or switch on at the panel, engines running, then use the remote (UP / DOWN).</li>
       <li>Keep hands, feet, hair and loose clothing away from the chain and gypsy.</li>
       <li>Never use the windlass to pull the boat forward. Motor slowly toward the anchor while the bow crew points.</li>
-      <li class="cat-only">Catamaran bridle: once the anchor is set, hook the bridle onto the chain and let out more chain until the bridle takes the load. Remove the bridle before raising.</li>
-      <li class="mono-only">Use a snubber line on the chain so the windlass isn't carrying the load overnight.</li>
+      <li>Bridle: once the anchor is set, hook the bridle onto the chain and let out more chain until the bridle takes the load. Remove the bridle before raising.</li>
       <li>Ask how the chain is marked (often colored paint or tags every 25–30 ft).</li>
     </ul>
     <p><a href="#log-anchor">How to anchor, step by step →</a></p>
@@ -808,27 +812,28 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <header><span class="eyebrow">The short list</span><h2>Do's &amp; don'ts</h2></header>
     <div class="dd">
       <div class="card do"><h3>Do</h3><ul>
-        <li>Be on a mooring or anchored <strong>1 hour before sunset</strong> (sunset is ≈ 5:40–5:50 PM in December).</li>
-        <li>Check the wind and swell forecast every morning.</li>
-        <li>Do the engine check every morning and note engine hours.</li>
-        <li>Keep the VHF on channel 16 when under way.</li>
+        <li>Be on a mooring or anchored <strong>1 hour before sunset</strong> (≈ 4:45 PM during your week).</li>
+        <li>Check wind and swell every morning. Run into the waves early.</li>
+        <li>Check engines and generator every morning; write down engine hours and fuel.</li>
+        <li>Drop to no-wake well before mooring fields, anchorages, marinas, dinghies and swimmers.</li>
+        <li>Seat everyone and stow loose gear before running fast.</li>
+        <li>Keep a lookout ahead and the VHF on 16.</li>
         <li>Close hatches whenever you leave the boat (squalls).</li>
-        <li>Turn off the water pump and propane when not in use.</li>
         <li>Kids in life jackets on deck under way and in the dinghy.</li>
-        <li>Lock the dinghy, and raise it at night.</li>
-        <li>Use reef-safe (mineral) sunscreen. Drink lots of water.</li>
+        <li>Raise the dinghy at night. Use reef-safe sunscreen. Drink lots of water.</li>
       </ul></div>
       <div class="card dont"><h3>Don't</h3><ul>
-        <li>Sail at night (Moorings rule), or sail single-handed.</li>
+        <li>Run after dark (Moorings rule), or alone at the helm with nobody else aboard who can help.</li>
         <li>Go to Anegada without The Moorings' OK.</li>
+        <li>Throw a wake near other boats. You're responsible for the damage.</li>
+        <li>Run fast over shallow or reef water, or through fish-trap floats.</li>
+        <li>Let anyone swim near the props, stern or generator exhaust while engines or generator run.</li>
         <li>Stay overnight on a National Parks day mooring, or past its 90-minute limit.</li>
         <li>Anchor on coral or seagrass. Drop only in sand.</li>
-        <li>Moor or anchor in White Bay, Jost Van Dyke. It's closed to charter boats.</li>
+        <li>Moor or anchor in White Bay, Jost Van Dyke (reported closed to charter boats).</li>
         <li>Enter US Virgin Islands waters (St. John is next door) without clearing customs and charter permission.</li>
         <li>Put the boat in gear with lines in the water.</li>
-        <li>Swim near running engines or across dinghy traffic after dark.</li>
-        <li>Touch coral or turtles, or take shells and sea life.</li>
-        <li>Sit under manchineel trees. The sap and little green "apples" are toxic.</li>
+        <li>Touch coral or turtles. Sit under manchineel trees (toxic sap and fruit).</li>
       </ul></div>
     </div>
   </section>
@@ -872,19 +877,19 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
   </section>
 
   <section class="block" id="islands-plan">
-    <header><span class="eyebrow">East first, then ride the wind back</span><h2>Suggested 7-night plan</h2>
-      <p class="lede">Built for December: upwind legs early in the week while the crew is fresh, downwind days later, and a short last hop to the base. Every day has a bad-weather alternative.</p></header>
+    <header><span class="eyebrow">Sun Dec 13 → Sun Dec 20</span><h2>Suggested 7-night plan</h2>
+      <p class="lede">Built for a power cat in December: run into the waves early in the week and early in the day, then follow the seas back west, ending 30 minutes from the base for the 9 AM return. Times are at ~16 knots. Every day has a bad-weather alternative.</p></header>
     <div class="stack" id="plan-list"></div>
   </section>
 
   <section class="block" id="islands-legs">
     <header><span class="eyebrow">Planning numbers</span><h2>How far apart</h2>
-      <p class="lede">Approximate routed distances in nautical miles. Time assumes 6 knots average; add time on upwind legs.</p></header>
+      <p class="lede">Approximate routed distances in nautical miles, with running time at fast cruise (16 kn) and economy (7 kn). Add a few minutes for no-wake speed in and out of harbors.</p></header>
     <div class="table-wrap"><table>
-      <thead><tr><th>From → to</th><th>nm</th><th>Time</th><th>Wind</th></tr></thead>
+      <thead><tr><th>From → to</th><th>nm</th><th>16 kn</th><th>7 kn</th><th>Seas</th></tr></thead>
       <tbody id="legs-body"></tbody>
     </table></div>
-    <p class="small">"Upwind" means into December's E–NE trade wind: expect to motor-sail. Distances measured on the chart with detours around islands; your plotter will be more exact.</p>
+    <p class="small">"Head seas" means running into December's E–NE trade-wind chop: go early in the day and slow down if it's pounding. Distances measured on the chart with detours around islands; your plotter will be more exact.</p>
   </section>
 
   <section class="block" id="islands-stops">
@@ -897,21 +902,22 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <header><span class="eyebrow">Strategy</span><h2>Which way to go</h2></header>
     <div class="card">
       <ol class="steps">
-        <li><strong>Go east early.</strong> The trade wind blows from the east. Beat (or motor-sail) up to Cooper and Virgin Gorda in the first half of the week, then ride the wind back west to Jost Van Dyke.</li>
-        <li><strong>Start early, stop early.</strong> Leave by 8–9 AM, aim to pick up your mooring by 1–2 PM. In Christmas and New Year's weeks the popular mooring fields fill by early afternoon.</li>
-        <li><strong>Use the channel.</strong> Sir Francis Drake Channel, between Tortola and the southern islands, is sheltered from ocean swell. It's the main highway.</li>
+        <li><strong>Head east early in the week.</strong> The trade wind and its chop come from the east. Run up to Cooper, Virgin Gorda and Anegada in the first half, then follow the seas back west to Jost Van Dyke.</li>
+        <li><strong>Run into the waves in the morning.</strong> The wind usually builds through the day. Eastbound legs before 10 AM are noticeably smoother.</li>
+        <li><strong>Use your speed to arrive first.</strong> Leave by 8–9 AM and you'll have your pick of moorings by late morning. The popular fields fill by early afternoon.</li>
+        <li><strong>Use the channel.</strong> Sir Francis Drake Channel, between Tortola and the southern islands, is sheltered from ocean swell. Open runs (Anegada, Tortola's north shore) are rougher.</li>
         <li><strong>Check the north swell daily.</strong> Winter storms off the US send long swells into north-facing bays. When it's up, stay on the south side.</li>
-        <li><strong>Save Anegada for a calm day</strong> with The Moorings' OK. Leave mid-morning so the sun is high for spotting reef.</li>
-        <li><strong>Make the last night short.</strong> Norman or Peter Island are 5–7 miles from the base, an easy morning sail before the 11 AM return.</li>
+        <li><strong>Save Anegada for a calm day</strong> with The Moorings' OK. It's about an hour each way. Leave mid-morning so the sun is high for spotting reef, and idle in the channel.</li>
+        <li><strong>Make the last night close.</strong> You're due back at 9 AM Sunday. Norman or Peter Island are 30 minutes from the base.</li>
       </ol>
     </div>
     <div class="card">
       <h3>Passages to know</h3>
       <dl class="kv">
         <dt>The Narrows</dt><dd>Between Tortola and St. John (USVI). Current runs here, and the far side is US waters.</dd>
-        <dt>Thatch Island Cut</dt><dd>Between Little Thatch and Frenchman's Cay near West End. Strong current and ferry traffic.</dd>
-        <dt>North Sound entrance</dt><dd>Use the marked channel only. Colquhoun Reef and Cactus Reef flank it.</dd>
-        <dt>Anegada approach</dt><dd>Follow the buoyed channel into Setting Point exactly. Horseshoe Reef has wrecked hundreds of ships.</dd>
+        <dt>Thatch Island Cut</dt><dd>Between Little Thatch and Frenchman's Cay near West End. Strong current and ferry traffic. Slow down.</dd>
+        <dt>North Sound entrance</dt><dd>Use the marked channel only, at slow speed. Colquhoun Reef and Cactus Reef flank it.</dd>
+        <dt>Anegada approach</dt><dd>Follow the buoyed channel into Setting Point exactly, at idle. Horseshoe Reef has wrecked hundreds of ships.</dd>
         <dt>Cane Garden Bay</dt><dd>Enter through the buoyed gap in the reef.</dd>
       </dl>
     </div>
@@ -921,9 +927,10 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <header><span class="eyebrow">Stay out of trouble</span><h2>What to avoid</h2></header>
     <div class="card">
       <ul>
-        <li><span class="pill no">Never</span> Sailing after dark. Unlit moorings, reefs and boats.</li>
+        <li><span class="pill no">Never</span> Running after dark. Unlit moorings, reefs and boats.</li>
+        <li><span class="pill no">Never</span> Speed through mooring fields, anchorages or past swimmers and dinghies.</li>
         <li><span class="pill no">Never</span> Anegada without permission, in strong wind, big swell or poor light.</li>
-        <li><span class="pill no">Never</span> White Bay (JVD) with the big boat. Charter boats aren't allowed to moor or anchor there; go by taxi or on foot from Great Harbour.</li>
+        <li><span class="pill no">Never</span> White Bay (JVD) with the big boat. Practical Sailor reported in 2025 that charter boats can no longer moor or anchor there (some Moorings itinerary pages still list it, so ask). Go by taxi or on foot from Great Harbour.</li>
         <li><span class="pill no">Never</span> Overnight on National Parks moorings (The Indians, The Caves, the Rhone, The Baths, Monkey Point, and other dive and snorkel sites).</li>
         <li><span class="pill no">Never</span> Anchoring in the Rhone marine park or on any coral.</li>
         <li><span class="pill caution">Swell</span> North-facing spots in a north swell: Cane Garden Bay, Monkey Point, Diamond Cay and the Bubbly Pool, Sandy Spit, and the Anegada crossing.</li>
@@ -931,6 +938,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><span class="pill caution">Crowds</span> The Baths after ~10 AM when cruise ships are in. Go first thing.</li>
         <li><span class="pill caution">Border</span> US waters around St. John. Crossing requires customs clearance.</li>
         <li><span class="pill caution">Corners</span> Cutting close around reefs: Cooper's north end, Sandy Spit, Saba Rock shoals, and any dark patch you can't identify.</li>
+        <li><span class="pill caution">Floats</span> Fish-trap floats near shore. Their lines wrap props.</li>
       </ul>
     </div>
   </section>
@@ -963,10 +971,10 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <h3>The pickup</h3>
       <ol class="steps">
         <li><strong>Approach slowly into the wind</strong> (and current), aiming to stop with the ball just off the bow.</li>
-        <li><strong>Bow crew calls distance and direction</strong> with hand signals.<span class="cat-only"> On a cat the helm loses sight of the ball for the last 20 feet.</span></li>
+        <li><strong>Bow crew calls distance and direction</strong> with hand signals. From the inside helm you lose sight of the ball for the last 20 feet; use the flybridge.</li>
         <li><strong>Hook the pennant</strong> (the rope loop on top of the ball), not the ball itself, and lift the loop aboard.</li>
         <li><strong>Line 1:</strong> from the port bow cleat, through the pennant loop, back to the <em>same</em> port cleat.</li>
-        <li><strong>Line 2:</strong> starboard cleat, through the loop, back to the starboard cleat. Make both the same length so the ball sits centered ahead<span class="cat-only">, about 10–15 ft in front of the cross-beam</span>.</li>
+        <li><strong>Line 2:</strong> starboard cleat, through the loop, back to the starboard cleat. Make both the same length so the ball sits centered ahead, about 10–15 ft in front of the bows.</li>
         <li><strong>Neutral, let her fall back.</strong> Check the lines aren't chafing on the anchor or bow roller.</li>
         <li><strong>Pay.</strong> BoatyBall first-come balls (white, with a sticker and 3-letter ID) are paid in the app. Otherwise a collector comes by around dusk; pay cash and keep the receipt.</li>
       </ol>
@@ -1002,15 +1010,15 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><strong>Head into the wind</strong> and stop over your spot. Lower the anchor until it touches bottom.</li>
         <li><strong>Back slowly</strong> while paying out chain.</li>
         <li><strong>Scope:</strong> 5:1 in normal conditions, 7:1 when it's blowing. Example: 15 ft deep + 5 ft bow height = 20 ft × 5 = 100 ft of chain.</li>
-        <li><strong>Set it:</strong> gentle reverse, then build to ~1,500–2,000 rpm<span class="cat-only"> on both engines</span> for 30 seconds. Line up two objects on shore abeam. If they don't move, you're set.</li>
-        <li class="cat-only"><strong>Bridle on:</strong> hook the bridle to the chain and let out more chain until the bridle takes the load.</li>
+        <li><strong>Set it:</strong> gentle reverse, then build to ~1,500–2,000 rpm on both engines for 30 seconds. Line up two objects on shore abeam. If they don't move, you're set.</li>
+        <li><strong>Bridle on:</strong> hook the bridle to the chain and let out more chain until the bridle takes the load.</li>
         <li><strong>Check it:</strong> snorkel over the anchor (a great job for a kid with an adult). Set an anchor alarm on the plotter or a phone app.</li>
         <li><strong>At night:</strong> anchor light on.</li>
       </ol>
     </div>
     <div class="card">
       <h3>Raising it</h3>
-      <p>Engines on, windlass breaker on<span class="cat-only">, bridle off</span>. Motor gently toward the anchor while the bow crew points along the chain and calls "straight up" and "anchor up." Secure it before you speed up.</p>
+      <p>Engines on, windlass breaker on, bridle off. Motor gently toward the anchor while the bow crew points along the chain and calls "straight up" and "anchor up." Secure it before you speed up.</p>
     </div>
     <div class="callout warn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
@@ -1037,7 +1045,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
   <section class="block" id="log-fuel">
     <header><span class="eyebrow">Refills</span><h2>Fuel, water, ice &amp; trash</h2>
-      <p class="lede">Call ahead on VHF 16 or by phone. Fuel docks are busiest late afternoon, so go in the morning. Expect reduced hours on Christmas Day and Boxing Day.</p></header>
+      <p class="lede">With 370 gallons aboard you may never need a fuel dock, but top off if you drop below half. Call ahead on VHF 16 or by phone, and go in the morning when it's quieter.</p></header>
     <div class="table-wrap"><table>
       <thead><tr><th>Where</th><th>Diesel</th><th>Water</th><th>Ice</th><th>Notes</th></tr></thead>
       <tbody>
@@ -1063,13 +1071,10 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><strong>Moorings provisioning:</strong> order online at least 5 days before. It's delivered to the boat.</li>
         <li><strong>Road Town supermarkets</strong> (RiteWay, One Mart, Bobby's) are a short taxi from the base for top-ups and specific brands.</li>
         <li><strong>Along the way:</strong> small markets at Leverick Bay, Spanish Town, Soper's Hole and Jost Van Dyke. Prices run 1.5–2× US.</li>
+        <li><strong>Sunday start:</strong> Road Town shops may keep short Sunday hours, so shop Saturday if you sleep aboard, or pre-order.</li>
         <li><strong>Plan meals:</strong> breakfast and lunch aboard every day, dinner ashore 3–4 nights. Reserve dinner by VHF or phone by mid-afternoon in holiday weeks. Anegada lobster must be ordered by about 3 PM.</li>
         <li>Lots of water and drinks (more than you think), snacks for passages, and freezer treats for kids.</li>
       </ul>
-    </div>
-    <div class="callout warn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
-      <div><b class="t">Holiday closures</b>Christmas Day (Dec 25) and Boxing Day (Dec 26) are public holidays in the BVI. Many shops close. Provision before Dec 24.</div>
     </div>
   </section>
 
@@ -1078,6 +1083,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <div class="table-wrap"><table>
       <thead><tr><th>Item</th><th>Typical cost</th></tr></thead>
       <tbody>
+        <tr><td>Fuel (power charter)</td><td>Prepaid with The Moorings; ask the rate</td></tr>
         <tr><td>Mooring ball</td><td class="n">$40–55+ / night</td></tr>
         <tr><td>BVI entry levy</td><td class="n">$10 per person</td></tr>
         <tr><td>Ferry departure tax (leaving BVI)</td><td class="n">$20 per person</td></tr>
@@ -1101,8 +1107,9 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <div class="card">
       <h3>Moorings charter rules</h3>
       <ul>
-        <li>No sailing at night. Be moored or anchored at least 1 hour before sunset.</li>
-        <li>No single-handed sailing. Minimum two people sailing the boat.</li>
+        <li>No running at night. Be moored or anchored at least 1 hour before sunset.</li>
+        <li>No single-handed operation.</li>
+        <li>Power charters: back at the base by 9:00 AM on the last day for the exit briefing, off the boat by 10:00.</li>
         <li>Under-16s may not operate the outboard.</li>
         <li>Anegada only with The Moorings' permission.</li>
       </ul>
@@ -1115,7 +1122,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li>No fishing without a BVI fishing license. No spearfishing. Don't take shells, coral or live animals.</li>
         <li>No holding-tank discharge in anchorages or near reefs.</li>
         <li>No boats or dinghies inside swim-zone buoys.</li>
-        <li>White Bay, Jost Van Dyke: closed to charter boats.</li>
+        <li>White Bay, Jost Van Dyke: reported closed to charter boats (confirm at the briefing).</li>
         <li>Leaving the BVI by boat (for example to St. John) requires clearing customs at a port of entry and your charter company's OK.</li>
       </ul>
     </div>
@@ -1130,7 +1137,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <a class="chip" href="#more-checklists">Checklists</a>
     <a class="chip" href="#more-packing">Packing</a>
     <a class="chip" href="#more-kids">Kids &amp; crew</a>
-    <a class="chip" href="#more-holidays">Holidays</a>
+    <a class="chip" href="#more-holidays">Your week</a>
     <a class="chip" href="#more-glossary">Glossary</a>
     <a class="chip" href="#more-settings">Settings</a>
     <a class="chip" href="#more-about">About</a>
@@ -1146,8 +1153,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><strong>Throw flotation</strong> (Lifesling, horseshoe, cushion) right away.</li>
         <li><strong>One person points</strong> at them and never looks away.</li>
         <li><strong>Press MOB</strong> on the chartplotter.</li>
-        <li><strong>Drop sails if needed, check for lines in the water, start engines.</strong></li>
-        <li><strong>Return slowly</strong>, approaching from downwind. Shift to neutral as you come alongside. Props kill.</li>
+        <li><strong>Turn back right away</strong> and slow down. Check for lines in the water.</li>
+        <li><strong>Approach slowly</strong> from downwind so the boat drifts toward them. Both engines in neutral as you come alongside. Props kill.</li>
         <li><strong>Get them aboard</strong> at the swim ladder or stern steps. If you lose sight of them, call MAYDAY.</li>
       </ol>
     </div></details>
@@ -1157,6 +1164,14 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li>Engine: shut the engine down, don't open the hatch wide. Discharge the extinguisher through the access port or a crack.</li>
         <li>Everyone in life jackets, dinghy ready. If it isn't out within a minute: MAYDAY.</li>
         <li>Know where every extinguisher is (it's on the check-out list).</li>
+      </ul>
+    </div></details>
+    <details class="acc" id="safety-co"><summary>Carbon monoxide</summary><div class="acc-body">
+      <ul>
+        <li>Diesel engines and the generator make CO. It's invisible and odorless.</li>
+        <li>Nobody swims, sits on the swim steps or hangs off the stern while the generator or engines run.</li>
+        <li>Test the CO alarms on day 1. If one sounds: shut off the generator, open everything up, get everyone on deck.</li>
+        <li>Headache, dizziness or nausea in a cabin with the A/C on is a CO warning sign until proven otherwise.</li>
       </ul>
     </div></details>
     <details class="acc" id="safety-water"><summary>Taking on water</summary><div class="acc-body">
@@ -1189,8 +1204,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <details class="acc" id="safety-squall"><summary>Squalls &amp; storms</summary><div class="acc-body">
       <ul>
         <li>Watch upwind (east) for dark cloud and a grey rain curtain.</li>
-        <li>Reef or furl before it arrives, close hatches, life jackets on, slow down. Visibility drops in heavy rain.</li>
-        <li>Lightning: stay off the mast and rigging, unplug electronics if you can.</li>
+        <li>Slow down before it arrives, close hatches, everyone seated, life jackets on. Visibility drops in heavy rain; use the inside helm and the plotter.</li>
+        <li>Squalls usually pass in 10–20 minutes. If you're near a reef or harbor entrance, wait it out in open water.</li>
         <li>On a mooring or at anchor: closed hatches when you leave the boat. A squall can arrive while you're ashore.</li>
       </ul>
     </div></details>
@@ -1201,7 +1216,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <div class="grid2">
       <div class="tile"><div class="k">Wind</div><div class="v">E–NE 15–25</div><div class="d">knots; "Christmas winds" to 30</div></div>
       <div class="tile"><div class="k">Air / water</div><div class="v">78–84° / 80°</div><div class="d">°F in December</div></div>
-      <div class="tile"><div class="k">Sunset</div><div class="v">5:40–5:52</div><div class="d">PM AST, Dec 1–31</div></div>
+      <div class="tile"><div class="k">Sunset</div><div class="v">5:44–5:46</div><div class="d">PM AST, Dec 13–20</div></div>
       <div class="tile"><div class="k">Rain</div><div class="v">Squalls</div><div class="d">Short bursts, then sun</div></div>
     </div>
     <div class="card">
@@ -1213,7 +1228,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><strong>Morning chat at the base</strong> or with your neighbors in the mooring field.</li>
       </ul>
       <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
-      <div><b class="t">North swell rule of thumb</b>A north swell over ~4–5 ft with a long period (10+ seconds) makes north-facing bays rolly or unsafe: Cane Garden Bay, Monkey Point, Diamond Cay, the Anegada crossing. Head south-side.</div></div>
+      <div><b class="t">North swell rule of thumb</b>A north swell over ~4–5 ft with a long period (10+ seconds) makes north-facing bays rolly or unsafe: Cane Garden Bay, Monkey Point, Diamond Cay, the Anegada crossing. Head south-side. Wind over 20 knots means slower, wetter runs in open water.</div></div>
     </div>
     <div class="card">
       <h3>VHF radio</h3>
@@ -1247,6 +1262,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <dt>Line handler</dt><dd>Coils lines, keeps them out of the water near the props.</dd>
         <dt>Navigator</dt><dd>Tracks the route on the chart and calls out the next mark.</dd>
         <dt>Log keeper</dt><dd>Writes down engine hours, fuel and the day's miles.</dd>
+        <dt>Wake watcher</dt><dd>Calls "slow down" near other boats, swimmers and mooring fields.</dd>
         <dt>Radio officer</dt><dd>Makes the dinner reservation call on VHF (with a script).</dd>
         <dt>Snorkel buddy boss</dt><dd>Counts heads in and out of the water.</dd>
       </dl>
@@ -1268,20 +1284,21 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li>Turtles in the mooring field at Cooper Island and the Bight.</li>
         <li>Flamingos and rock iguanas on Anegada.</li>
         <li>Big tarpon under the dock lights in North Sound after dark.</li>
-        <li>Stargazing near the new moon (about Dec 9, 2026).</li>
+        <li>Stargazing on the dark early-week nights (new moon about Dec 9).</li>
       </ul>
     </div>
   </section>
 
   <section class="block" id="more-holidays">
-    <header><span class="eyebrow">December 2026</span><h2>Holidays &amp; crowds</h2></header>
+    <header><span class="eyebrow">Sun Dec 13 – Sun Dec 20, 2026</span><h2>Your week</h2></header>
     <div class="card">
       <dl class="kv">
-        <dt>~Dec 9</dt><dd>New moon. Darkest nights, best stars.</dd>
-        <dt>~Dec 24</dt><dd>Full moon. Trellis Bay has a famous full-moon party with fireballs (check if it's on).</dd>
-        <dt>Dec 25–26</dt><dd>Christmas Day and Boxing Day are public holidays. Shops and some services close.</dd>
-        <dt>Dec 20 – Jan 2</dt><dd>Peak season. Moorings fill by early afternoon; book BoatyBall at 7 AM and reserve dinners early.</dd>
-        <dt>Dec 31</dt><dd>Old Year's Night. Foxy's on Jost Van Dyke throws one of the Caribbean's biggest New Year's parties. Great Harbour is packed from Dec 30, so plan around it (or skip it with young kids).</dd>
+        <dt>Sat Dec 12</dt><dd>Fly in, ferry over, sleep aboard (if booked). Sunday ferries and shop hours are thinner.</dd>
+        <dt>Sun Dec 13</dt><dd>Charter day 1. Sunrise ~6:41 AM, sunset ~5:44 PM.</dd>
+        <dt>Moon</dt><dd>New moon ~Dec 9, so nights are dark early in the week (great stars, bring flashlights for dinghy rides). First quarter ~Dec 16–17, setting around midnight by week's end.</dd>
+        <dt>Crowds</dt><dd>The week before Christmas is busy but calmer than Dec 20 – Jan 2. You leave just as the peak arrives. Book BoatyBall at 7 AM anyway.</dd>
+        <dt>Holidays</dt><dd>No BVI public holidays during your charter. Christmas Day and Boxing Day (Dec 25–26) and the Trellis Bay full-moon party (~Dec 24) fall after you leave.</dd>
+        <dt>Sun Dec 20</dt><dd>Back at the base by 9:00 AM, off the boat by 10:00. Sunday ferry back to St. Thomas, then flights.</dd>
       </dl>
     </div>
   </section>
@@ -1300,16 +1317,15 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <div class="form">
         <div class="field"><label for="s-start">Charter day 1 (boarding day)</label><input id="s-start" name="start" type="date"></div>
         <div class="field"><label for="s-nights">Nights on the boat</label><input id="s-nights" name="nights" type="number" inputmode="numeric" min="1" max="21" value="7"></div>
-        <div class="field"><label for="s-boatType">Hull type</label><select id="s-boatType" name="boatType"><option value="cat">Catamaran</option><option value="mono">Monohull</option></select></div>
         <div class="field"><label for="s-boatName">Boat name</label><input id="s-boatName" name="boatName" type="text" placeholder="e.g. Sea Biscuit"></div>
-        <div class="field"><label for="s-boatModel">Model / description</label><input id="s-boatModel" name="boatModel" type="text" placeholder="e.g. Moorings 4000, white catamaran"></div>
+        <div class="field"><label for="s-boatModel">Model / description</label><input id="s-boatModel" name="boatModel" type="text" placeholder="e.g. Moorings 403PC, white power catamaran"></div>
         <div class="field"><label for="s-crew">People aboard</label><input id="s-crew" name="crew" type="number" inputmode="numeric" min="1" max="12" placeholder="e.g. 6"></div>
         <div class="field"><label for="s-fuelCap">Fuel tank (gal)</label><input id="s-fuelCap" name="fuelCap" type="number" inputmode="decimal" min="10" max="400"></div>
         <div class="field"><label for="s-waterCap">Water tanks (gal)</label><input id="s-waterCap" name="waterCap" type="number" inputmode="decimal" min="10" max="600"></div>
         <div class="field"><label for="s-mooringsPhone">Moorings base phone</label><input id="s-mooringsPhone" name="mooringsPhone" type="tel" placeholder="from your briefing packet"></div>
         <div class="field"><label for="s-mooringsEmerg">Moorings after-hours / breakdown</label><input id="s-mooringsEmerg" name="mooringsEmerg" type="tel" placeholder="from your briefing packet"></div>
-        <div class="field"><label for="s-ferryOut">Ferry out (STT → Road Town)</label><input id="s-ferryOut" name="ferryOut" type="text" placeholder="e.g. Sat 2:00 PM, Native Son"></div>
-        <div class="field"><label for="s-ferryBack">Ferry back</label><input id="s-ferryBack" name="ferryBack" type="text" placeholder="e.g. Sat 10:00 AM"></div>
+        <div class="field"><label for="s-ferryOut">Ferry out (STT → Road Town)</label><input id="s-ferryOut" name="ferryOut" type="text" placeholder="e.g. Sat Dec 12, 2:00 PM, Native Son"></div>
+        <div class="field"><label for="s-ferryBack">Ferry back</label><input id="s-ferryBack" name="ferryBack" type="text" placeholder="e.g. Sun Dec 20, 11:30 AM"></div>
         <div class="field"><label for="s-flightIn">Flight in</label><input id="s-flightIn" name="flightIn" type="text" placeholder="e.g. AA 1234, lands 12:40"></div>
         <div class="field"><label for="s-flightOut">Flight home</label><input id="s-flightOut" name="flightOut" type="text" placeholder="e.g. AA 5678, departs 4:15"></div>
         <div class="field wide"><label for="s-notes">Notes</label><textarea id="s-notes" name="notes" placeholder="Confirmation numbers, slip number, Wi-Fi password..."></textarea></div>
@@ -1413,10 +1429,19 @@ const store = {
 };
 
 /* ---------------- settings ---------------- */
-const BOAT_DEFAULTS = { cat: { fuelCap: 95, waterCap: 206 }, mono: { fuelCap: 53, waterCap: 120 } };
-const DEFAULTS = { start: '', nights: 7, boatType: 'cat', boatName: '', boatModel: '', crew: '', fuelCap: 95, waterCap: 206,
+const BOAT_DESC = 'Moorings 403PC power catamaran';
+const DEFAULTS = { v: 2, start: '2026-12-13', nights: 7, boatName: '', boatModel: '', crew: '', fuelCap: 370, waterCap: 170,
   mooringsPhone: '', mooringsEmerg: '', ferryOut: '', ferryBack: '', flightIn: '', flightOut: '', notes: '', theme: 'auto' };
-let S = Object.assign({}, DEFAULTS, store.get('settings', {}));
+let S = (function () {
+  const saved = store.get('settings', {});
+  if (saved.v !== 2) { // first version assumed a sailing cat with no dates
+    if (!saved.start) delete saved.start;
+    if (Number(saved.fuelCap) === 95) delete saved.fuelCap;
+    if (Number(saved.waterCap) === 206) delete saved.waterCap;
+    delete saved.boatType; saved.v = 2;
+  }
+  return Object.assign({}, DEFAULTS, saved);
+})();
 
 function applyTheme() {
   const root = document.documentElement;
@@ -1426,20 +1451,9 @@ function applyTheme() {
 }
 
 function applyBoat() {
-  document.body.classList.toggle('is-cat', S.boatType === 'cat');
-  document.body.classList.toggle('is-mono', S.boatType === 'mono');
-  $$('[data-boat]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.boat === S.boatType)));
   $$('[data-bind]').forEach(el => { const v = S[el.dataset.bind]; if (v !== '' && v != null) el.textContent = v; });
-  const eng = $('#fc-eng'); if (eng) { eng.value = S.boatType === 'cat' ? '2' : '1'; eng.disabled = S.boatType === 'mono'; }
-  const tank = $('#fc-tank'); if (tank) tank.value = S.fuelCap;
+  const tank = $('#fc-tank'); if (tank && S.fuelCap) tank.value = S.fuelCap;
   calcFuel();
-}
-
-function setBoatType(t) {
-  const old = BOAT_DEFAULTS[S.boatType];
-  if (Number(S.fuelCap) === old.fuelCap) S.fuelCap = BOAT_DEFAULTS[t].fuelCap;
-  if (Number(S.waterCap) === old.waterCap) S.waterCap = BOAT_DEFAULTS[t].waterCap;
-  S.boatType = t; store.set('settings', S); fillSettingsForm(); applyBoat(); renderToday(); renderMayday();
 }
 
 /* ---------------- dates, sun & moon ---------------- */
@@ -1481,8 +1495,8 @@ function moon(date) {
 const STOPS = [
   { id: 'base', name: 'The Moorings base', short: 'Moorings base', area: 'Road Town, Tortola', lat: 18.428, lon: -64.6125, kind: 'marina', lp: 'r',
     tags: ['Start & finish', 'Fuel', 'Water', 'Ice'],
-    what: 'Wickhams Cay II at the head of Road Harbour. Fuel dock, water, ice, provisioning, restaurant, pool and showers.',
-    moor: 'Your assigned slip. Call the base on VHF 12 about 30 minutes before you return.',
+    what: 'Wickhams Cay II at the head of Road Harbour. Fuel dock, water, ice, The Moorings Market & Deli, Charlie\u2019s Bar & Restaurant, coffee shop, pool, laundry and showers.',
+    moor: 'Your assigned slip. Call the base on VHF 12 about 15–20 minutes before you return; power charters are due back by 9 AM.',
     caution: 'Road Harbour has ferries and cruise ships. Stay clear of the ferry dock and cruise pier.' },
   { id: 'nanny', name: 'Nanny Cay', short: 'Nanny Cay', area: 'Tortola, south shore', lat: 18.3985, lon: -64.6365, kind: 'marina', lp: 'l',
     tags: ['Marina', 'Fuel', 'Restaurants'],
@@ -1558,7 +1572,7 @@ const STOPS = [
     moor: 'Moorings off Setting Point, reached by a buoyed channel through the reef. You need The Moorings’ OK before going.',
     food: 'Lobster dinners (order by ~3 PM, often cash): Anegada Reef Hotel, Potter’s by the Sea and others.',
     todo: 'Open-air taxi to Loblolly Bay and Cow Wreck Beach. Flamingos in the salt ponds.',
-    caution: 'Leave North Sound mid-morning for overhead sun. Follow the channel exactly. Don’t go in strong wind, big swell or poor visibility. No reliable fuel.' },
+    caution: 'Leave North Sound mid-morning for overhead sun. Cruise moderately on the way (open-water chop) and idle through the buoyed channel. Don\u2019t go in strong wind, big swell or poor visibility. No reliable fuel, so arrive with plenty.' },
   { id: 'marina_cay', name: 'Marina Cay', short: 'Marina Cay', area: 'Off Beef Island', lat: 18.461, lon: -64.529, kind: 'night', lp: 'r',
     tags: ['Overnight', 'BoatyBall', 'Snorkel'],
     what: 'Tiny island with a reef-protected mooring field off the north side of Beef Island.',
@@ -1568,7 +1582,7 @@ const STOPS = [
     caution: 'Reef on the north and east sides. Follow the chart in.' },
   { id: 'trellis', name: 'Trellis Bay', short: 'Trellis Bay', area: 'Beef Island', lat: 18.4465, lon: -64.533, kind: 'night', lp: 'b',
     tags: ['Overnight', 'Protected', 'Full moon'],
-    what: 'Very protected bay beside the Beef Island airport. Artists’ studios and casual cafes; a famous full-moon party with fireballs (full moon about Dec 24, 2026; check if it’s on).',
+    what: 'Very protected bay beside the Beef Island airport. Artists\u2019 studios and casual cafes. Its famous full-moon party (next one ~Dec 24) falls after your trip.',
     moor: 'Moorings and anchoring. Watch the shallows.',
     kids: 'Planes landing right overhead.' },
   { id: 'monkey', name: 'Monkey Point', short: 'Monkey Pt', area: 'Guana Island', lat: 18.463, lon: -64.5712, kind: 'day', lp: 't',
@@ -1599,11 +1613,11 @@ const STOPS = [
     what: 'Home of Foxy’s, a customs office, small shops and a fuel dock. Your base for White Bay.',
     moor: 'BoatyBall moorings. Deep anchoring.',
     todo: 'Taxi or walk over the hill (steep, ~20 min) to White Bay for the Soggy Dollar Bar, birthplace of the Painkiller.',
-    caution: 'Old Year’s Night (Dec 31) is a huge party; the harbor is jammed from Dec 30.' },
+    caution: 'Moorings fill by early afternoon; book BoatyBall at 7 AM. Slow down well before the mooring field.' },
   { id: 'white_bay', name: 'White Bay (by land or dinghy only)', short: 'White Bay', area: 'Jost Van Dyke', lat: 18.441, lon: -64.764, kind: 'day', lp: 'l',
     tags: ['No charter boats', 'Beach bars'],
     what: 'Gorgeous beach with the Soggy Dollar Bar and neighbors.',
-    moor: 'Closed to charter boats: no mooring or anchoring. Moor at Great Harbour and take a taxi or walk over.' },
+    moor: 'Reported closed to charter boats since 2024–25 (no mooring or anchoring), though some Moorings pages still list it. Moor at Great Harbour and take a taxi or walk over.' },
   { id: 'sopers', name: 'Soper’s Hole', short: 'Soper’s Hole', area: 'West End, Tortola', lat: 18.387, lon: -64.702, kind: 'night', lp: 'b',
     tags: ['Overnight', 'Marina', 'BoatyBall', 'Fuel'],
     what: 'Well-protected harbor with a marina, fuel dock, shops, Pusser’s Landing, a ferry dock and customs.',
@@ -1614,94 +1628,99 @@ const STOPS = [
 const STOP = Object.fromEntries(STOPS.map(s => [s.id, s]));
 
 const LEGS = [
-  ['Moorings base', 'Norman Island (Bight)', 7, 'Reach'],
-  ['Moorings base', 'Peter Island', 5, 'Reach'],
-  ['Moorings base', 'Cooper Island', 8, 'Upwind'],
+  ['Moorings base', 'Norman Island (Bight)', 7, 'Beam'],
+  ['Moorings base', 'Peter Island', 5, 'Beam'],
+  ['Moorings base', 'Cooper Island', 8, 'Head'],
   ['Norman (Bight)', 'The Indians', 1, '—'],
-  ['The Indians', 'RMS Rhone', 6, 'Upwind'],
+  ['The Indians', 'RMS Rhone', 6, 'Head'],
   ['RMS Rhone', 'Cooper Island', 1.5, '—'],
-  ['Norman (Bight)', 'Cooper Island', 8, 'Upwind'],
-  ['Cooper Island', 'The Baths', 5, 'Upwind'],
+  ['Norman (Bight)', 'Cooper Island', 8, 'Head'],
+  ['Cooper Island', 'The Baths', 5, 'Head'],
   ['The Baths', 'Spanish Town', 1.5, '—'],
-  ['The Baths', 'North Sound', 9, 'Upwind'],
-  ['North Sound', 'Anegada', 14, 'Reach'],
-  ['North Sound', 'Marina Cay', 10, 'Downwind'],
-  ['Anegada', 'Marina Cay', 18, 'Downwind'],
-  ['Anegada', 'Jost Van Dyke', 27, 'Downwind'],
-  ['Moorings base', 'Marina Cay / Trellis', 10, 'Upwind'],
+  ['The Baths', 'North Sound', 9, 'Head'],
+  ['North Sound', 'Anegada', 14, 'Beam'],
+  ['North Sound', 'Marina Cay', 10, 'Following'],
+  ['Anegada', 'Marina Cay', 18, 'Following'],
+  ['Anegada', 'Jost Van Dyke', 27, 'Following'],
+  ['Moorings base', 'Marina Cay / Trellis', 10, 'Head'],
   ['Marina Cay', 'Monkey Point', 2.5, '—'],
-  ['Monkey Point', 'Cane Garden Bay', 6, 'Downwind'],
-  ['Marina Cay', 'JVD Great Harbour', 13, 'Downwind'],
-  ['Cane Garden Bay', 'JVD Great Harbour', 5.5, 'Downwind'],
+  ['Monkey Point', 'Cane Garden Bay', 6, 'Following'],
+  ['Marina Cay', 'JVD Great Harbour', 13, 'Following'],
+  ['Cane Garden Bay', 'JVD Great Harbour', 5.5, 'Following'],
   ['JVD Great Harbour', 'JVD Little Harbour', 1.5, '—'],
   ['JVD Little Harbour', 'Sandy Cay', 1, '—'],
-  ['JVD Great Harbour', 'Soper’s Hole', 4.5, 'Reach'],
-  ['Soper’s Hole', 'Norman (Bight)', 6.5, 'Upwind'],
-  ['Soper’s Hole', 'Moorings base', 7, 'Upwind'],
-  ['JVD', 'Norman (Bight)', 11, 'Reach'],
-  ['Norman (Bight)', 'Moorings base', 7, 'Upwind'],
-  ['Nanny Cay', 'Moorings base', 3, 'Upwind']
+  ['JVD Great Harbour', 'Soper’s Hole', 4.5, 'Beam'],
+  ['Soper’s Hole', 'Norman (Bight)', 6.5, 'Head'],
+  ['Soper’s Hole', 'Moorings base', 7, 'Head'],
+  ['JVD', 'Norman (Bight)', 11, 'Beam'],
+  ['Norman (Bight)', 'Moorings base', 7, 'Head'],
+  ['Nanny Cay', 'Moorings base', 3, 'Head']
 ];
 
 const PLAN = [
-  { title: 'Shake-down sail to Norman Island', stops: ['base', 'bight'], nm: 7,
-    am: 'Chart and boat briefings, final provisioning, stow everything.',
-    pm: 'Off the dock by 1–2 PM. Practice reefing and twin-engine turns in open water. Pick up a mooring in the Bight.',
-    night: 'The Bight, Norman Island. Snorkel The Caves if there’s light; Pirates Bight or dinner aboard.',
-    alt: 'Late start or rough: Peter Island (5 nm) or a night at Nanny Cay.' },
+  { title: 'Settle in, short hop to Norman Island', stops: ['base', 'bight'], nm: 7,
+    am: 'Chart and boat briefings, provisioning, fuel prepayment sorted, everything stowed.',
+    pm: 'Off the dock by 1–2 PM. In open water, practice twin-engine turns and a stop-and-hold before your first mooring. The Bight is ~30 minutes.',
+    night: 'The Bight, Norman Island. Dinghy to The Caves to snorkel if there’s light; Pirates Bight or dinner aboard.',
+    alt: 'Late start or windy: Peter Island’s Little Harbour (5 nm) or a night at Nanny Cay marina.' },
   { title: 'Snorkel day: Indians, Rhone, Cooper', stops: ['bight', 'indians', 'rhone', 'cooper'], nm: 8.5,
-    am: 'The Indians at 8–8:30 AM (1 nm), National Parks day mooring, 90 minutes.',
-    pm: 'Motor-sail to the Rhone (6 nm), snorkel the stern. Then 1.5 nm to Cooper Island. Aim to be on a ball by 1–2 PM.',
+    am: 'The Indians by 8–8:30 AM (1 nm, idle over). National Parks day mooring, 90 minutes. Then the Rhone (6 nm, ~25 min) and snorkel the stern.',
+    pm: 'Cooper Island is 1.5 nm on. Book a BoatyBall at 7 AM; with your speed you can be on it by late morning.',
     night: 'Cooper Island, Manchioneel Bay. Dinner at the Beach Club.',
     alt: 'Cooper full: Trellis Bay (~6 nm north) or Peter Island.' },
   { title: 'The Baths, then North Sound', stops: ['cooper', 'baths', 'saba'], nm: 14,
-    am: 'Leave Cooper by 7:30. The Baths (5 nm, upwind): grab a day mooring, swim in, walk the trail to Devil’s Bay.',
-    pm: 'North along Virgin Gorda to North Sound (9 nm). Enter by the marked channel.',
+    am: 'Leave Cooper by 7:30 (5 nm, ~20 min into the waves). Grab a day mooring at The Baths, swim in, walk the trail to Devil’s Bay before the crowds.',
+    pm: 'Up Virgin Gorda’s west coast to North Sound (9 nm, ~35 min). Enter by the marked channel at slow speed. Top off fuel and water at Leverick Bay if you like.',
     night: 'Saba Rock, Bitter End or Leverick Bay.',
     alt: 'Red flag at The Baths: Spanish Town marina, then a taxi to The Baths by land.' },
   { title: 'Anegada (or a North Sound play day)', stops: ['saba', 'anegada'], nm: 14,
-    am: 'Only with The Moorings’ OK, settled weather and good light: leave about 9–10 AM, 14 nm (~2.5 h, beam reach). Follow the buoyed channel into Setting Point.',
-    pm: 'Order lobster by ~3 PM. Taxi to Loblolly Bay or Cow Wreck Beach.',
+    am: 'Only with The Moorings’ OK and settled weather: leave ~9:30–10 AM for overhead sun. 14 nm, about an hour. Idle through the buoyed channel into Setting Point.',
+    pm: 'Order lobster by ~3 PM. Taxi to Loblolly Bay or Cow Wreck Beach; look for flamingos in the salt ponds.',
     night: 'Anegada, Setting Point.',
-    alt: 'Too windy or swelly: stay in North Sound. Water sports at Bitter End, Prickly Pear beach, Leverick Bay pool. Refill fuel and water at Leverick.' },
-  { title: 'Back west to Marina Cay', stops: ['anegada', 'marina_cay'], nm: 18,
-    am: 'From Anegada: 18 nm downwind (~3 h), leave by 9. From North Sound: 10 nm.',
-    pm: 'Lunch and snorkel at Monkey Point if calm (2.5 nm on). Back to Marina Cay or Trellis Bay for the night.',
+    alt: 'Too windy or swelly: stay in North Sound. Water sports at Bitter End, beach at Prickly Pear, pool at Leverick Bay.' },
+  { title: 'Back southwest: Monkey Point & Marina Cay', stops: ['anegada', 'monkey', 'marina_cay'], nm: 20,
+    am: 'Leave Anegada ~9 AM with the seas behind you (~18 nm, ~1 h 15). Snorkel Monkey Point (or Diamond Reef off Great Camanoe) if it’s calm.',
+    pm: 'Short hop back to Marina Cay or Trellis Bay. Scrub Island marina is an option for a pool and shower night.',
     night: 'Marina Cay (BoatyBall) or Trellis Bay.',
     alt: 'Cane Garden Bay only if there’s no north swell.' },
-  { title: 'Jost Van Dyke', stops: ['marina_cay', 'monkey', 'sandy_cay', 'jvd_gh'], nm: 14,
-    am: 'Downwind along Tortola’s north shore (~13 nm). Book a BoatyBall at 7 AM.',
-    pm: 'Lunch stop at Sandy Cay or Sandy Spit on calm days. Then Great Harbour or Little Harbour.',
-    night: 'Great Harbour (Foxy’s) or Little Harbour. Taxi or walk to White Bay for the Soggy Dollar.',
-    alt: 'Big north swell: skip Sandy Spit and Diamond Cay. Little Harbour is usually calmer.' },
-  { title: 'Soper’s Hole, then a short last hop', stops: ['jvd_gh', 'sopers', 'bight'], nm: 11,
-    am: 'JVD to Soper’s Hole (4.5 nm): fuel, water, ice, shops, lunch.',
-    pm: 'On to Norman Island (6.5 nm) or Peter Island. Or go straight to the base (7 nm) if you’re returning tonight.',
-    night: 'The Bight or Peter Island, or the Moorings base.',
-    alt: 'Strong wind on the nose: Nanny Cay marina for the last night (3 nm from base).' },
+  { title: 'Jost Van Dyke', stops: ['marina_cay', 'sandy_cay', 'jvd_gh'], nm: 14,
+    am: 'Follow the seas along Tortola’s north shore (~13 nm, ~50 min). Book a BoatyBall at 7 AM. Swim stop at Sandy Cay or Sandy Spit on a calm day.',
+    pm: 'Great Harbour or Little Harbour. Taxi or walk over the hill to White Bay and the Soggy Dollar. Bubbly Pool hike if conditions are right.',
+    night: 'Great Harbour (Foxy’s) or Little Harbour.',
+    alt: 'Big north swell: skip Sandy Spit and Diamond Cay; Little Harbour is usually calmer.' },
+  { title: 'Soper’s Hole, then the last night close to base', stops: ['jvd_gh', 'sopers', 'bight'], nm: 11,
+    am: 'JVD to Soper’s Hole (4.5 nm, ~20 min): shops, ice, lunch, fuel top-off if The Moorings wants the tank full.',
+    pm: 'Norman Island (6.5 nm, ~25 min) for one more snorkel at The Caves, or Peter Island. Pack tonight.',
+    night: 'The Bight or Peter Island, ~30 minutes from the base.',
+    alt: 'Windy: Nanny Cay marina (3 nm from the base), or return to the base Saturday evening.' },
   { title: 'Return to base', stops: ['bight', 'base'], nm: 7,
-    am: 'Leave by 8:30 AM (7 nm, upwind, ~1.5 h). Pump out offshore. Call The Moorings on VHF 12 about 30 minutes out.',
-    pm: 'Charter ends 11:00 AM. Check out, then taxi to the ferry.',
-    night: 'Home, or a hotel night in Road Town or St. Thomas.',
+    am: 'Leave by 7:45 AM (7 nm, ~30 min). Pump out offshore. Call The Moorings on VHF 12 about 15–20 minutes out. Back by 9:00 AM for the exit briefing.',
+    pm: 'Off the boat by 10:00 AM. Taxi to the Road Town ferry (check Sunday times).',
+    night: 'Home, or a hotel night in St. Thomas.',
     alt: '' }
 ];
 
 const GLOSSARY = [
   ['Port / starboard', 'Left / right when facing the front of the boat. Port has four letters, like "left".'],
   ['Bow / stern', 'Front / back.'], ['Windward / leeward', 'The side the wind comes from / the side it blows toward.'],
-  ['Helm', 'The steering station.'], ['Cleat', 'Metal fitting you tie lines to.'],
-  ['Pennant', 'The rope loop on top of a mooring ball that you pick up.'], ['Painter', 'The dinghy’s towing and tie-up line.'],
-  ['Bridle', 'A V of lines from both hulls of a catamaran to the anchor chain.'], ['Scope', 'Length of anchor chain out compared with the water depth.'],
+  ['Helm', 'The steering station. Your boat has two: the flybridge and the inside (lower) helm.'],
+  ['Flybridge', 'The upper deck with the outside helm and the best view.'],
+  ['Station transfer', 'Switching which helm has control of the electronic throttles.'],
+  ['Head seas / following seas', 'Waves coming at the bow / from behind.'],
+  ['Wake', 'The waves your boat makes. Big at speed; you’re responsible for damage it causes.'],
+  ['No wake', 'Idle speed, slow enough that you leave no wave behind.'], ['Bow thruster', 'A small sideways propeller in the bow for docking (if fitted).'],
+  ['Cleat', 'Metal fitting you tie lines to.'],
+  ['Pennant', 'The rope loop on top of a mooring ball that you pick up.'], ['Painter', 'The dinghy’s tie-up line.'],
+  ['Bridle', 'A V of lines from both hulls to the anchor chain.'], ['Scope', 'Length of anchor chain out compared with the water depth.'],
   ['Rode', 'Anchor chain and/or rope.'], ['Windlass', 'Electric winch that raises and lowers the anchor.'],
-  ['Reef (sail)', 'Making a sail smaller for strong wind.'], ['Reef (coral)', 'Shallow coral. Avoid hitting it.'],
-  ['Furl', 'Roll up a sail (the jib rolls around its forestay).'], ['Sheet / halyard', 'Line that trims a sail / line that hoists it.'],
-  ['Tack / gybe', 'Turning the bow / the stern through the wind.'], ['Heel', 'The lean of a monohull under sail.'],
+  ['Reef', 'Shallow coral. Avoid hitting it.'],
   ['Knot / nm', 'One nautical mile per hour / nautical mile (1.15 statute miles).'],
   ['Davits', 'Arms at the stern that lift the dinghy out of the water.'], ['Dinghy / tender', 'The small inflatable boat.'],
+  ['Generator', 'A small diesel engine that makes 110 V power, mainly for the A/C.'],
+  ['Watermaker', 'Turns sea water into fresh water.'],
   ['Head', 'Toilet.'], ['Galley', 'Kitchen.'], ['Holding tank', 'Sewage tank under the head.'],
-  ['Y-valve', 'Switches the head between the holding tank and overboard.'], ['Seacock', 'A valve on a hole through the hull.'],
-  ['Raw water', 'Sea water pumped in to cool the engine.'], ['Impeller', 'Rubber pump wheel that moves cooling water. It fails if run dry.'],
-  ['Lazy jacks / stack pack', 'Lines and a zippered bag along the boom that catch the mainsail.'],
+  ['Seacock', 'A valve on a hole through the hull.'],
+  ['Raw water', 'Sea water pumped in to cool the engines and generator.'], ['Impeller', 'Rubber pump wheel that moves cooling water. It fails if run dry.'],
   ['MOB', 'Man (person) overboard. Also the button on the chartplotter.'], ['PFD', 'Personal flotation device: a life jacket.'],
   ['VHF', 'The marine radio. Channel 16 is for calling and emergencies.'], ['BoatyBall', 'App for booking and paying for mooring balls.'],
   ['NPT', 'National Parks Trust of the Virgin Islands. Runs the day-use moorings.'],
@@ -1710,35 +1729,39 @@ const GLOSSARY = [
 
 const CHECKLISTS = [
   { id: 'pretrip', title: 'Before you fly', items: [
-    'Passports for everyone (valid well past the trip)', 'BVI ED card done online for each person; QR codes saved', 'Ferry tickets booked (round trip)',
-    'Moorings paperwork, sailing résumé approved, crew list sent', 'Provisioning order in (5 days ahead)', 'Kids’ life jackets requested or packed',
+    'Passports for everyone (valid well past the trip)', 'BVI ED card done online for each person; QR codes saved', 'Ferry tickets booked for Sat Dec 12 (round trip)',
+    'Sleep-aboard night requested for Sat Dec 12', 'Moorings paperwork and crew list sent', 'Fuel prepayment arranged with The Moorings',
+    'Provisioning order in (5 days ahead)', 'Kids’ life jackets requested or packed',
     'BoatyBall app installed with payment set up', 'Chart app with BVI offline; offline Google Maps', 'Phone travel plan turned on (BVI = roaming)',
     'Cash in small bills', 'This app opened from the home screen (offline ready)'] },
   { id: 'checkout', title: 'Boat check-out at the base', items: [
-    'Note fuel and water levels; photo of engine-hour meters', 'Photos/video of existing damage, including the dinghy',
-    'Find: life jackets (count them), throwable/Lifesling, flares, first-aid kit, fire extinguishers', 'Find: seacocks, bilge-pump switches, manual pump handle, softwood plugs',
-    'Learn: engine start/stop, battery switches, battery monitor', 'Learn: propane solenoid, spare tank swap', 'Learn: head operation, Y-valve, holding-tank gauge',
-    'Learn: windlass breaker, remote, chain marks, bridle', 'Learn: reefing system and furler', 'Learn: chartplotter, depth, autopilot, VHF (USA mode)',
-    'Learn: outboard start, kill cord, dinghy lock', 'Ask: Anegada OK? Refuel policy? Return time and place?', 'Save Moorings phone numbers in Settings'] },
-  { id: 'engine', title: 'Morning engine check', items: [
-    'Oil between the marks (each engine)', 'Coolant visible in the overflow tank', 'Raw-water strainer clear, seacock open', 'Belt tight, no fraying',
-    'Bilge dry; no fuel or oil smell', 'Engine hours written down', 'After start: water from the exhaust', 'Battery voltage rising (charging)'] },
+    'Note fuel (both tanks) and water levels; photo of engine-hour meters', 'Photos/video of existing damage, including the dinghy',
+    'Find: life jackets (count them), throwable ring, flares, first-aid kit, fire extinguishers', 'Find: seacocks, bilge-pump switches, CO alarms (test them)',
+    'Learn: engine start/stop and the engine display', 'Learn: switching helms (flybridge / inside); bow thruster if fitted', 'Learn: which tank feeds which engine and the generator',
+    'Learn: generator, A/C and watermaker', 'Learn: battery switches, inverter, shore power', 'Learn: propane solenoid, spare tank swap',
+    'Learn: head operation and holding tank', 'Learn: windlass, chain marks, bridle', 'Learn: chartplotter, depth, VHF (USA mode), cameras',
+    'Learn: davit winch, outboard start, kill cord, dinghy lock', 'Ask: Anegada OK? Recommended cruise rpm? Fuel prepayment terms?', 'Save Moorings phone numbers in Settings'] },
+  { id: 'engine', title: 'Morning engine & generator check', items: [
+    'Oil between the marks (both engines)', 'Coolant visible in the overflow tanks', 'Raw-water strainers clear, seacocks open', 'Belts tight, no fraying',
+    'Engine rooms dry; no fuel or oil smell', 'Generator: oil, coolant, strainer', 'Engine hours and fuel gauge written down',
+    'After start: water from every exhaust', 'Engine display: oil pressure, temperature and charging normal'] },
   { id: 'underway', title: 'Before getting under way', items: [
-    'Weather and swell checked; destination and Plan B agreed', 'Hatches and ports closed', 'Galley and cabins stowed; fridge latched',
-    'Dinghy on davits and secured, or painter shortened', 'Instruments and VHF (channel 16) on', 'Kids in life jackets; everyone knows their job',
-    'Engines warm; no lines in the water', 'Windlass breaker on (if anchored); bridle off', 'Mooring lines ready to slip'] },
+    'Weather and swell checked; destination and Plan B agreed', 'Hatches, windows and doors closed', 'Galley, cabins and flybridge stowed; fridge latched',
+    'Dinghy up on the davits and secured', 'Helm station selected; instruments and VHF (channel 16) on', 'Kids in life jackets; everyone knows their job',
+    'Engines warmed up; no lines or swimmers in the water', 'Windlass breaker on (if anchored); bridle off', 'Mooring lines ready to slip'] },
   { id: 'mooring', title: 'Mooring pickup prep', items: [
-    'Two lines led from the bow cleats', 'Boathook ready', 'Hand signals agreed', 'Fenders in (they snag the pennant)', 'Approach into the wind, slow',
+    'Driving from the flybridge', 'Two lines led from the bow cleats', 'Boathook ready', 'Hand signals agreed', 'Approach into the wind at idle',
     'Reserved-ball check (orange BoatyBall = reserved)'] },
   { id: 'ashore', title: 'Leaving the boat', items: [
-    'Hatches closed (squalls)', 'Propane solenoid off', 'Water pump off', 'Valuables locked away', 'Flashlight and handheld VHF in the dinghy',
-    'Dinghy lock and key', 'Anchor light on if back after dark', 'Phone and cash in a dry bag'] },
+    'Hatches closed (squalls)', 'Generator off (or A/C off) unless someone stays aboard', 'Propane solenoid off', 'Water pump off', 'Valuables locked away',
+    'Flashlight and handheld VHF in the dinghy', 'Dinghy lock and key', 'Anchor light on if back after dark', 'Phone and cash in a dry bag'] },
   { id: 'night', title: 'Bedtime aboard', items: [
-    'Anchor light on', 'Dinghy raised or locked to the boat', 'Mooring lines or bridle checked for chafe', 'Hatches mostly closed if squalls are around',
-    'Propane off', 'Cockpit cushions and towels stowed or tied', 'Battery voltage checked', 'Anchor alarm set (if anchored)'] },
-  { id: 'return', title: 'Return to base', items: [
-    'Fuel per Moorings’ instructions', 'Holding tank pumped out offshore', 'Call Moorings on VHF 12 (~30 min out)', 'Fenders and lines ready both sides',
-    'Pack bags; strip beds if asked', 'List anything broken or not working', 'Snorkel gear, towels and boat items back in place', 'Hand back keys and kill cord'] }
+    'Anchor light on', 'Dinghy raised on the davits', 'Mooring lines or bridle checked for chafe', 'Hatches mostly closed if squalls are around',
+    'CO alarms on if the generator runs overnight', 'Propane off', 'Cockpit cushions and towels stowed', 'Anchor alarm set (if anchored)'] },
+  { id: 'return', title: 'Return to base (Sun Dec 20)', items: [
+    'Bags packed the night before', 'Fuel per Moorings’ instructions', 'Holding tank pumped out offshore', 'Leave the last anchorage by ~7:45 AM',
+    'Call Moorings on VHF 12 (~15–20 min out)', 'Fenders and lines ready both sides', 'At the base by 9:00 AM for the exit briefing',
+    'List anything broken or not working', 'Hand back keys and kill cord; off the boat by 10:00'] }
 ];
 
 const PACKING = [
@@ -1769,9 +1792,10 @@ function renderStops() {
   }).join('');
 }
 
-function fmtHrs(nm) { const m = Math.round(nm / 6 * 60 / 5) * 5; const h = Math.floor(m / 60); return (h ? h + ' h ' : '') + (m % 60 ? (m % 60) + ' m' : (h ? '' : '0 m')); }
+function fmtHrs(nm, kn) { const m = Math.max(5, Math.round(nm / kn * 60 / 5) * 5); const h = Math.floor(m / 60); return (h ? h + ' h ' : '') + (m % 60 ? (m % 60) + ' m' : ''); }
 function renderLegs() {
-  $('#legs-body').innerHTML = LEGS.map(l => '<tr><td>' + esc(l[0]) + ' → ' + esc(l[1]) + '</td><td class="n">' + l[2] + '</td><td class="n">' + fmtHrs(l[2]) + '</td><td>' + (l[3] === 'Upwind' ? '<span class="pill caution">Upwind</span>' : esc(l[3])) + '</td></tr>').join('');
+  $('#legs-body').innerHTML = LEGS.map(l => '<tr><td>' + esc(l[0]) + ' → ' + esc(l[1]) + '</td><td class="n">' + l[2] + '</td><td class="n">' + fmtHrs(l[2], 16) + '</td><td class="n">' + fmtHrs(l[2], 7) + '</td><td>' +
+    (l[3] === 'Head' ? '<span class="pill caution">Head seas</span>' : l[3] === '—' ? '—' : esc(l[3]) + ' seas') + '</td></tr>').join('');
 }
 
 function planDate(i) { const st = parseDate(S.start); return st ? addDays(st, i) : null; }
@@ -1821,7 +1845,7 @@ function renderToday() {
       const last = i === nights;
       eyebrow.textContent = 'Day ' + (i + 1) + ' of ' + (nights + 1) + ' · ' + fmtDate(today, { weekday: 'long', month: 'short', day: 'numeric' });
       title.textContent = last ? 'Return to base' : (i < PLAN.length ? p.title : 'Your call today');
-      text.textContent = last ? 'Charter ends 11:00 AM. Call The Moorings on VHF 12 about 30 minutes out.' : 'Check the weather and swell, do the engine check, and be on a mooring by the time below.';
+      text.textContent = last ? 'Back at the base by 9:00 AM for the exit briefing, off the boat by 10:00. Call The Moorings on VHF 12 about 15–20 minutes out.' : 'Check the weather and swell, do the engine check, and be on a mooring by the time below.';
       btn.textContent = 'Morning engine check'; btn.setAttribute('href', '#cl-engine'); btn.hidden = false;
       if (i < PLAN.length) planHtml = dayCard(PLAN[last ? PLAN.length - 1 : i], last ? PLAN.length - 1 : i, true).replace('class="card day today"', 'class="day"').replace(/id="plan-d(\d+)"/, 'id="today-d$1"').replace(/id="note-d(\d+)"/, 'id="today-note-d$1"').replace(/for="note-d(\d+)"/, 'for="today-note-d$1"');
     } else {
@@ -1845,7 +1869,7 @@ function renderToday() {
 function renderTripCard() {
   const st = parseDate(S.start);
   const rows = [
-    ['Boat', [S.boatName, S.boatModel].filter(Boolean).join(' · ') || (S.boatType === 'cat' ? '40 ft catamaran' : '40 ft monohull')],
+    ['Boat', [S.boatName, S.boatModel || BOAT_DESC].filter(Boolean).join(' · ')],
     ['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, Math.max(1, Number(S.nights) || 7))) + ' (' + (Number(S.nights) || 7) + ' nights)' : ''],
     ['Ferry out', S.ferryOut], ['Ferry back', S.ferryBack], ['Flight in', S.flightIn], ['Flight home', S.flightOut],
     ['Moorings base', S.mooringsPhone ? '<a href="tel:' + esc(S.mooringsPhone.replace(/[^\d+]/g, '')) + '">' + esc(S.mooringsPhone) + '</a> · VHF 12' : 'VHF 12'],
@@ -1857,7 +1881,7 @@ function renderTripCard() {
 
 function renderMayday() {
   const name = S.boatName ? esc(S.boatName) : '[boat name]';
-  const desc = S.boatModel ? esc(S.boatModel) : (S.boatType === 'cat' ? '40-foot white catamaran' : '40-foot white sailboat');
+  const desc = S.boatModel ? esc(S.boatModel) : '40-foot white power catamaran';
   const crew = S.crew ? esc(S.crew) : '[number]';
   const pos = lastPos ? esc(lastPos) : '[position, or e.g. “one mile north of Cooper Island”]';
   $('#mayday-script').innerHTML =
@@ -1902,25 +1926,23 @@ function updateCounts() {
 function renderGlossary() { $('#glossary').innerHTML = GLOSSARY.map(g => '<dt>' + esc(g[0]) + '</dt><dd>' + esc(g[1]) + '</dd>').join(''); }
 
 /* ---------------- fuel calculator ---------------- */
-const BURN = { cat: { idle: 0.2, slow: 0.35, cruise: 0.55, fast: 0.85 }, mono: { idle: 0.25, slow: 0.45, cruise: 0.7, fast: 1.0 } };
+const NM_PER_GAL = { fast: 0.8, slow: 4 }, GEN_GPH = 0.7;
 function calcFuel() {
-  if (!$('#fc-hrs')) return;
-  const t = S.boatType, b = BURN[t];
-  const eng = t === 'cat' ? Number($('#fc-eng').value) : 1;
-  const engAll = t === 'cat' ? 2 : 1;
-  const hrs = Math.max(0, Number($('#fc-hrs').value) || 0), chg = Math.max(0, Number($('#fc-chg').value) || 0);
-  const gen = Math.max(0, Number($('#fc-gen').value) || 0), days = Math.max(1, Number($('#fc-days').value) || 1);
-  const tank = Math.max(1, Number($('#fc-tank').value) || 1), startFrac = Number($('#fc-start').value) || 1;
-  const perDay = hrs * eng * b[$('#fc-rpm').value] + chg * engAll * b.idle + gen * 0.5;
+  if (!$('#fc-fast')) return;
+  const num = id => Math.max(0, Number($(id).value) || 0);
+  const fast = num('#fc-fast'), slow = num('#fc-slow'), gen = num('#fc-gen'), days = Math.max(1, num('#fc-days'));
+  const tank = Math.max(1, num('#fc-tank')), startFrac = Number($('#fc-start').value) || 1, price = num('#fc-price');
+  const perDay = fast / NM_PER_GAL.fast + slow / NM_PER_GAL.slow + gen * GEN_GPH;
   const trip = perDay * days, startGal = tank * startFrac, left = startGal - trip, pct = Math.max(0, left / tank);
-  $('#fc-day').textContent = perDay.toFixed(1); $('#fc-trip').textContent = trip.toFixed(0);
+  $('#fc-day').textContent = perDay.toFixed(0); $('#fc-trip').textContent = trip.toFixed(0);
+  $('#fc-cost').textContent = price ? 'gallons · ≈ $' + Math.round(trip * price).toLocaleString('en-US') : 'gallons';
   $('#fc-left').textContent = Math.round(pct * 100) + '%';
   $('#fc-left-d').textContent = left > 0 ? '≈ ' + Math.round(left) + ' gal of ' + tank : 'You’d run dry';
   const g = $('#fc-gauge'); g.firstElementChild.style.width = Math.round(pct * 100) + '%';
   g.className = 'gauge' + (pct < 0.15 ? ' empty' : pct < 0.4 ? ' low' : '');
-  $('#fc-advice').textContent = left <= 0 ? 'Plan a mid-week fuel stop (Leverick Bay, Spanish Town or Soper’s Hole), or motor less and sail more.'
-    : pct < 0.4 ? 'Top off mid-week. Leverick Bay (North Sound) is a convenient fuel dock before Anegada.'
-    : 'Plenty of margin. You probably won’t need fuel until the return, but top off if you’re under half before Anegada.';
+  $('#fc-advice').textContent = left <= 0 ? 'You’d need a fuel stop: Leverick Bay, Spanish Town or Soper’s Hole. Running at 7 knots instead of 17 roughly halves the fuel per mile.'
+    : pct < 0.4 ? 'Plan a top-off mid-week. Leverick Bay (North Sound) is a convenient fuel dock before Anegada.'
+    : 'Plenty of margin. You probably won’t need a fuel dock, but top off if you drop below half.';
 }
 
 /* ---------------- map ---------------- */
@@ -2103,7 +2125,7 @@ function show(view, targetId) {
   $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === view ? 'page' : 'false'));
   const sec = $('#' + view);
   $('#view-title').textContent = sec.dataset.title;
-  if (view !== 'today') $('#view-sub').textContent = { travel: 'STT → ferry → Road Town → base', boat: S.boatName || (S.boatType === 'cat' ? '40 ft catamaran' : '40 ft monohull'), islands: 'Chart, plan, distances, stops', logistics: 'Moorings, anchoring, fuel, money', more: 'Safety, weather, checklists, settings' }[view];
+  if (view !== 'today') $('#view-sub').textContent = { travel: 'STT → ferry → Road Town → base', boat: S.boatName ? S.boatName + ' · Moorings 403PC' : 'Moorings 403PC power catamaran', islands: 'Chart, plan, distances, stops', logistics: 'Moorings, anchoring, fuel, money', more: 'Safety, weather, checklists, settings' }[view];
   else renderToday();
   if (view === 'islands') { initMap(); requestAnimationFrame(drawMarks); }
   const changed = current !== view; current = view; store.set('view', view);
@@ -2211,7 +2233,6 @@ function bind() {
     }
     const rb = e.target.closest('[data-reset]');
     if (rb) { const id = rb.dataset.reset; Object.keys(checks).forEach(k => { if (k.indexOf(id + '.') === 0) delete checks[k]; }); store.set('checks', checks); $$('input[data-check^="' + id + '."]').forEach(i => { i.checked = false; }); updateCounts(); }
-    const bb = e.target.closest('[data-boat]'); if (bb) setBoatType(bb.dataset.boat);
     if (e.target.closest('[data-open-sos]')) openSheet('sos');
   });
   document.addEventListener('change', e => {
@@ -2233,11 +2254,10 @@ function bind() {
   $('#pos-btn').addEventListener('click', getPos);
   $('#settings-form').addEventListener('submit', e => {
     e.preventDefault();
-    const f = e.target; const prevType = S.boatType;
+    const f = e.target;
     Object.keys(DEFAULTS).forEach(k => { const i = f.elements[k]; if (i) S[k] = i.type === 'number' ? (i.value === '' ? '' : Number(i.value)) : i.value; });
-    if (!S.fuelCap) S.fuelCap = BOAT_DEFAULTS[S.boatType].fuelCap;
-    if (!S.waterCap) S.waterCap = BOAT_DEFAULTS[S.boatType].waterCap;
-    if (prevType !== S.boatType) { const t = S.boatType; S.boatType = prevType; setBoatType(t); }
+    if (!S.fuelCap) S.fuelCap = DEFAULTS.fuelCap;
+    if (!S.waterCap) S.waterCap = DEFAULTS.waterCap;
     store.set('settings', S); applyTheme(); applyBoat(); renderPlan(); renderToday(); renderMayday();
     const m = $('#settings-saved'); m.textContent = 'Saved.'; setTimeout(() => { m.textContent = ''; }, 2500);
   });

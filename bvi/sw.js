@@ -1,6 +1,6 @@
 // Offline cache for the BVI Charter Guide.
 // Bump VERSION whenever any file below changes so phones pick up the update.
-const VERSION = 'bvi-guide-v1';
+const VERSION = 'bvi-guide-v2';
 const FILES = [
   './',
   './index.html',
