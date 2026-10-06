@@ -1,0 +1,2268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BVI Charter Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Offline day-to-day guide for a Moorings bareboat charter in the British Virgin Islands.">
+<meta name="theme-color" content="#F3F7FA" id="meta-theme">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BVI Charter">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-600.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-700.woff2) format("woff2"); }
+
+/* Layout: native-feeling phone shell (sticky title bar, scrolling stack, bottom tab bar).
+   Palette borrowed from a nautical chart: white-blue deep water, buff land, chart magenta for routes and actions. */
+:root {
+  --bg: #F3F7FA;
+  --surface: #FFFFFF;
+  --surface-2: #E4EEF6;
+  --ink: #0F2233;
+  --ink-2: #4A5D6E;
+  --line: #D3DEE7;
+  --accent: #B0125F;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #F8E3EE;
+  --land: #EFE0B4;
+  --land-edge: #A88F55;
+  --water: #DCEBF6;
+  --ok: #1D7A4C;  --ok-soft: #DDF2E6;
+  --warn: #9A5300; --warn-soft: #FDEFD6;
+  --bad: #BF232B;  --bad-soft: #FBE1E2;
+  --sos: #C21F2A;  --sos-ink: #FFFFFF;
+  --shadow: 0 1px 2px rgba(15,34,51,.06), 0 4px 14px rgba(15,34,51,.06);
+  --font-display: "Barlow Condensed", "Avenir Next Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 14px;
+  --bar-h: 56px;
+  --tab-h: 58px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #08131D; --surface: #0F202E; --surface-2: #163049; --ink: #E6EEF5; --ink-2: #9CB0C2; --line: #223A50;
+    --accent: #FF6DAE; --accent-ink: #22040F; --accent-soft: #3A1729; --land: #3B3626; --land-edge: #857349; --water: #0D2232;
+    --ok: #62D29C; --ok-soft: #12352A; --warn: #F2B35B; --warn-soft: #382A12; --bad: #FF7E84; --bad-soft: #3E181C;
+    --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #08131D; --surface: #0F202E; --surface-2: #163049; --ink: #E6EEF5; --ink-2: #9CB0C2; --line: #223A50;
+  --accent: #FF6DAE; --accent-ink: #22040F; --accent-soft: #3A1729; --land: #3B3626; --land-edge: #857349; --water: #0D2232;
+  --ok: #62D29C; --ok-soft: #12352A; --warn: #F2B35B; --warn-soft: #382A12; --bad: #FF7E84; --bad-soft: #3E181C;
+  --shadow: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 52px); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 8px;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height: 1.1; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.2em; }
+li + li { margin-top: .35em; }
+strong { font-weight: 650; }
+small, .small { font-size: .85rem; color: var(--ink-2); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- App bar ---------- */
+.appbar {
+  position: sticky; top: 0; z-index: 30;
+  padding: env(safe-area-inset-top, 0px) 16px 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.appbar-row { height: var(--bar-h); display: flex; align-items: center; gap: 10px; max-width: 760px; margin: 0 auto; }
+.appbar-title { flex: 1; min-width: 0; }
+.appbar-title h1 { font-size: 1.55rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appbar-title .sub { font-size: .78rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.icon-btn svg { width: 20px; height: 20px; }
+.sos-btn {
+  height: 40px; padding: 0 14px; border-radius: 20px; border: 0; cursor: pointer;
+  background: var(--sos); color: var(--sos-ink); font: 700 1.05rem/1 var(--font-display); letter-spacing: .08em;
+}
+
+/* ---------- Main + views ---------- */
+main { max-width: 760px; margin: 0 auto; padding: 0 16px calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 28px); }
+.view { display: flex; flex-direction: column; gap: 22px; padding-top: 14px; }
+.subnav {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 1px); z-index: 20;
+  margin: -14px -16px 0; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.subnav::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink); text-decoration: none; font-size: .88rem; font-weight: 550; white-space: nowrap;
+}
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.block { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 60px); }
+.block > header { display: flex; flex-direction: column; gap: 4px; }
+.eyebrow { font: 700 .8rem/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.lede { color: var(--ink-2); max-width: 62ch; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.card > * + * { margin-top: 10px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.tile .k { font: 700 .75rem/1.2 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.tile .v { font: 700 1.7rem/1.15 var(--font-display); font-variant-numeric: tabular-nums; }
+.tile .d { font-size: .8rem; color: var(--ink-2); }
+
+/* Steps: real sequences only */
+ol.steps { list-style: none; padding: 0; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+ol.steps > li { counter-increment: s; position: relative; padding-left: 42px; margin: 0; }
+ol.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: -1px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font: 700 1.05rem/30px var(--font-display); text-align: center;
+}
+
+/* Callouts */
+.callout { border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+.callout svg { flex: none; width: 20px; height: 20px; margin-top: 2px; }
+.callout > div { min-width: 0; }
+.callout.info { background: var(--surface-2); }
+.callout.warn { background: var(--warn-soft); color: var(--ink); }
+.callout.warn svg { color: var(--warn); }
+.callout.bad { background: var(--bad-soft); }
+.callout.bad svg { color: var(--bad); }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok svg { color: var(--ok); }
+.callout b.t { display: block; font-family: var(--font-display); font-size: 1.05rem; letter-spacing: .02em; }
+
+/* Key/value rows */
+.kv { display: grid; grid-template-columns: minmax(84px, 30%) 1fr; gap: 8px 14px; margin: 0; }
+.kv dt { color: var(--ink-2); font-size: .9rem; }
+.kv dd { margin: 0; min-width: 0; }
+
+/* Pills */
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: .74rem; font-weight: 650; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--ink); letter-spacing: .01em; }
+.pill.night { background: var(--accent-soft); color: var(--accent); }
+.pill.day { background: var(--surface-2); }
+.pill.marina { background: var(--ok-soft); color: var(--ok); }
+.pill.caution { background: var(--warn-soft); color: var(--warn); }
+.pill.no { background: var(--bad-soft); color: var(--bad); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Accordions */
+details.acc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+details.acc > summary {
+  list-style: none; cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+  font: 700 1.15rem/1.2 var(--font-display); letter-spacing: .01em;
+}
+details.acc > summary::-webkit-details-marker { display: none; }
+details.acc > summary::after { content: ""; margin-left: auto; width: 9px; height: 9px; border-right: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2); transform: rotate(45deg); transition: transform .2s; flex: none; }
+details.acc[open] > summary::after { transform: rotate(-135deg); }
+details.acc > .acc-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* Checklists */
+.checks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.checks li { margin: 0; border-top: 1px solid var(--line); }
+.checks li:first-child { border-top: 0; }
+.checks label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; cursor: pointer; }
+.checks input { appearance: none; -webkit-appearance: none; flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--ink-2); margin: 1px 0 0; display: grid; place-items: center; background: var(--surface); cursor: pointer; }
+.checks input:checked { background: var(--ok); border-color: var(--ok); }
+.checks input:checked::after { content: ""; width: 6px; height: 11px; border: solid var(--surface); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+.checks input:checked + span { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--line); }
+.checks .cat { padding: 12px 2px 4px; font: 700 .8rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); border-top: 0; }
+
+/* Buttons + forms */
+.btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 14px; font: 600 .95rem/1.2 var(--font-body); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.small { padding: 6px 10px; font-size: .85rem; border-radius: 10px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg { display: inline-flex; background: var(--surface-2); padding: 3px; border-radius: 12px; gap: 3px; }
+.seg button { border: 0; background: transparent; color: var(--ink); padding: 8px 14px; border-radius: 9px; font: 600 .92rem/1 var(--font-body); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); box-shadow: var(--shadow); color: var(--accent); }
+.form { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .form { grid-template-columns: 1fr 1fr; } .form .wide { grid-column: 1 / -1; } }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field label { font-size: .82rem; font-weight: 600; color: var(--ink-2); }
+.field input, .field select, .field textarea {
+  font: 16px/1.3 var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 11px; width: 100%; min-width: 0;
+}
+.field textarea { min-height: 84px; resize: vertical; }
+.calc-out { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.gauge { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.gauge > i { display: block; height: 100%; background: var(--ok); border-radius: 6px; transition: width .3s; }
+.gauge.low > i { background: var(--warn); }
+.gauge.empty > i { background: var(--bad); }
+
+/* Two-column lists (do / don't) */
+.dd { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 620px) { .dd { grid-template-columns: 1fr 1fr; } }
+.dd ul { list-style: none; padding: 0; }
+.dd li { padding-left: 26px; position: relative; }
+.dd li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+.dd .do li::before { content: "✓"; color: var(--ok); }
+.dd .dont li::before { content: "✕"; color: var(--bad); }
+
+/* Today hero */
+.hero { background: var(--ink); color: var(--bg); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+.hero .eyebrow { color: color-mix(in srgb, var(--accent) 55%, var(--bg)); }
+.hero h2 { font-size: 2.2rem; }
+.hero p { color: color-mix(in srgb, var(--bg) 78%, var(--ink)); }
+.hero .btn { align-self: flex-start; background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 40%, var(--ink)); }
+.hero svg.compass { position: absolute; right: -28px; bottom: -28px; width: 150px; height: 150px; opacity: .14; color: var(--bg); pointer-events: none; }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.quick a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--ink); text-decoration: none; }
+.quick a b { font: 700 1.08rem/1.15 var(--font-display); }
+.quick a span { font-size: .8rem; color: var(--ink-2); }
+
+/* Plan */
+.day { display: flex; flex-direction: column; gap: 10px; }
+.day-head { display: flex; gap: 12px; align-items: baseline; }
+.day-no { flex: none; font: 700 2rem/1 var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; min-width: 44px; }
+.day-head h3 { font-size: 1.3rem; }
+.day-head .date { font-size: .82rem; color: var(--ink-2); }
+.day.today { outline: 2px solid var(--accent); outline-offset: 0; }
+.legline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .9rem; }
+.legline .nm { font-variant-numeric: tabular-nums; font-weight: 650; }
+
+/* Stops */
+.stop h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stop .area { font: 500 .85rem/1.2 var(--font-body); color: var(--ink-2); }
+
+/* Map */
+.map-card { padding: 0; overflow: hidden; }
+.map-wrap { position: relative; height: clamp(320px, 100vw, 560px); background: var(--water); touch-action: none; user-select: none; -webkit-user-select: none; }
+.map-wrap svg { width: 100%; height: 100%; display: block; }
+.map-tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.map-tools button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 700 1.2rem/1 var(--font-body); cursor: pointer; }
+.map-scale { position: absolute; left: 10px; bottom: 10px; font: 600 .72rem/1 var(--font-body); color: var(--ink); display: flex; flex-direction: column; gap: 3px; }
+.map-scale i { display: block; height: 6px; border: 2px solid var(--ink); border-top: 0; }
+.map-nfn { position: absolute; right: 10px; bottom: 10px; font: 700 .68rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); background: color-mix(in srgb, var(--water) 80%, transparent); padding: 3px 6px; border-radius: 6px; }
+.map-regions { display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px; border-top: 1px solid var(--line); scrollbar-width: none; }
+.map-regions::-webkit-scrollbar { display: none; }
+.map-info { padding: 12px 16px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .78rem; color: var(--ink-2); padding: 0 16px 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.legend i.n { background: var(--accent); }
+.legend i.d { background: var(--surface); border: 2px solid var(--accent); }
+.legend i.m { background: var(--ok); }
+.legend i.r { width: 18px; height: 0; border-top: 2px dashed var(--accent); border-radius: 0; }
+.map-label { font-family: var(--font-display); font-weight: 700; fill: var(--ink); paint-order: stroke; stroke: var(--water); stroke-linejoin: round; }
+.land-label { font-family: var(--font-display); font-weight: 600; fill: var(--land-edge); letter-spacing: .14em; }
+.water-label { font-family: Georgia, "Times New Roman", serif; font-style: italic; fill: var(--ink-2); opacity: .8; }
+
+/* Tab bar */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  padding: 0 4px env(safe-area-inset-bottom, 0px);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px);
+  border-top: 1px solid var(--line);
+}
+.tabbar-row { display: grid; grid-template-columns: repeat(6, 1fr); max-width: 760px; margin: 0 auto; height: var(--tab-h); }
+.tab { border: 0; background: none; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font: 600 .68rem/1 var(--font-body); cursor: pointer; padding: 6px 0; text-decoration: none; min-width: 0; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--accent); }
+
+/* Sheets (SOS, search) */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(5,12,20,.45); z-index: 60; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; max-height: 92vh; overflow-y: auto;
+  background: var(--bg); border-radius: 20px 20px 0 0; padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.25); max-width: 760px; margin: 0 auto;
+}
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 4px auto 12px; }
+.sheet-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.sheet-head h2 { flex: 1; }
+.sheet .stack { gap: 14px; }
+.emerg { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.emerg a, .emerg div.row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none;
+}
+.emerg a.hot { background: var(--sos); border-color: var(--sos); color: var(--sos-ink); }
+.emerg b { font: 700 1.15rem/1.15 var(--font-display); }
+.emerg .n { font: 700 1.3rem/1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.script { font-size: 1.02rem; line-height: 1.6; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.script mark { background: var(--accent-soft); color: var(--ink); padding: 0 3px; border-radius: 4px; }
+.search-input { width: 100%; font: 17px/1.3 var(--font-body); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.results { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.results li { margin: 0; }
+.results a { display: block; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.results a b { display: block; font: 700 1.05rem/1.2 var(--font-display); }
+.results a span { font-size: .82rem; color: var(--ink-2); }
+
+.install { border: 1px dashed var(--accent); background: var(--accent-soft); }
+.status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--warn); margin-right: 6px; vertical-align: 1px; }
+.status-dot.ok { background: var(--ok); }
+.cat-only, .mono-only { }
+body.is-cat .mono-only, body.is-mono .cat-only { display: none !important; }
+footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+@media (min-width: 760px) { .appbar, .subnav { padding-left: max(16px, calc((100vw - 760px) / 2 + 16px)); } }
+</style>
+</head>
+<body class="is-cat">
+
+<header class="appbar">
+  <div class="appbar-row">
+    <div class="appbar-title">
+      <h1 id="view-title">Today</h1>
+      <div class="sub" id="view-sub">BVI charter · Moorings, Tortola</div>
+    </div>
+    <button class="icon-btn" id="search-open" aria-label="Search the guide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="sos-btn" id="sos-open" aria-label="Emergency information">SOS</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======================= TODAY ======================= -->
+<section class="view" id="today" data-title="Today">
+  <div class="hero" id="today-hero">
+    <svg class="compass" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="36"/><path d="M50 4v92M4 50h92M50 14l7 36-7 36-7-36z" /></svg>
+    <span class="eyebrow" id="hero-eyebrow">December 2026</span>
+    <h2 id="hero-title">Set your charter dates</h2>
+    <p id="hero-text">Add your dates in Settings and this screen becomes your daily briefing: the day's plan, sunset, and when to be on a mooring.</p>
+    <a class="btn" id="hero-btn" href="#more-settings">Open settings</a>
+  </div>
+
+  <div class="card install" id="install-card" hidden>
+    <h3>Install it for offline use</h3>
+    <ol class="steps">
+      <li>Open this page in <strong>Safari</strong> on your iPhone or iPad.</li>
+      <li>Tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</li>
+      <li>Open it once from the home screen while you still have Wi-Fi. After that it works with no signal.</li>
+    </ol>
+  </div>
+
+  <div class="grid2" id="sun-tiles">
+    <div class="tile"><div class="k">Sunrise</div><div class="v" id="t-rise">6:40</div><div class="d" id="t-date">Road Town</div></div>
+    <div class="tile"><div class="k">Sunset</div><div class="v" id="t-set">5:45</div><div class="d">AST (UTC−4)</div></div>
+    <div class="tile"><div class="k">Be moored by</div><div class="v" id="t-moor">4:45</div><div class="d">1 hour before sunset</div></div>
+    <div class="tile"><div class="k">Moon</div><div class="v" id="t-moon">—</div><div class="d" id="t-moon-d"></div></div>
+  </div>
+
+  <div class="card" id="today-plan">
+    <span class="eyebrow">Today's plan</span>
+    <div id="today-plan-body"><p class="small">Your day-by-day plan appears here during the trip.</p></div>
+  </div>
+
+  <div class="block" id="today-quick">
+    <header><h2>Quick help</h2></header>
+    <div class="quick">
+      <a href="#log-mooring"><b>Pick up a mooring</b><span>Step by step, with the two-line method</span></a>
+      <a href="#log-anchor"><b>Anchor the boat</b><span>Sand, scope, set it, check it</span></a>
+      <a href="#cl-engine"><b>Morning engine check</b><span>Oil, water, belts, strainer</span></a>
+      <a href="#more-weather"><b>Weather &amp; VHF</b><span>Forecasts, channels, how to call</span></a>
+      <a href="#islands-map"><b>Chart &amp; route</b><span>Where everything is, how far</span></a>
+      <a href="#log-fuel"><b>Fuel, water &amp; ice</b><span>Where to fill up</span></a>
+      <a href="#boat-fuel"><b>Fuel calculator</b><span>How much you'll burn</span></a>
+      <a href="#more-safety"><b>Emergencies</b><span>MOB, fire, dragging, medical</span></a>
+    </div>
+  </div>
+
+  <div class="card" id="trip-card">
+    <div style="display:flex;align-items:center;gap:10px"><h3 style="flex:1">Our trip</h3><a class="btn small" href="#more-settings">Edit</a></div>
+    <dl class="kv" id="trip-kv"></dl>
+  </div>
+</section>
+
+<!-- ======================= TRAVEL ======================= -->
+<section class="view" id="travel" data-title="Getting there" hidden>
+  <nav class="subnav" aria-label="Travel sections">
+    <a class="chip" href="#travel-docs">Before you fly</a>
+    <a class="chip" href="#travel-stt">STT → ferry</a>
+    <a class="chip" href="#travel-ferry">Ferry → base</a>
+    <a class="chip" href="#travel-base">At the base</a>
+    <a class="chip" href="#travel-home">Going home</a>
+  </nav>
+
+  <section class="block" id="travel-docs">
+    <header><span class="eyebrow">Step 0</span><h2>Before you fly</h2>
+      <p class="lede">The BVI is a separate country (a British Overseas Territory). St. Thomas is US soil, so you cross a border on the ferry.</p></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Passports for everyone, kids included.</strong> Check they're valid well past your return date.</li>
+        <li><strong>BVI entry card (ED card) online.</strong> Fill it in at <a href="https://bviedcard.gov.vg" target="_blank" rel="noopener">bviedcard.gov.vg</a> within 72 hours before you arrive (The Moorings suggests 36–72 hours). You get an email with a QR code. Screenshot it for each traveler.</li>
+        <li><strong>Book the ferry.</strong> Buy round-trip tickets from Charlotte Amalie to Road Town in advance (it's cheaper and guarantees seats in holiday weeks).</li>
+        <li><strong>Charter paperwork.</strong> Moorings confirmation, approved sailing résumé, crew list, and the credit card used for the security deposit.</li>
+        <li><strong>Provisioning order</strong> (if using Moorings provisioning) is due 5 days before your charter starts.</li>
+        <li><strong>Request kid-sized life jackets</strong> when you confirm the boat, or bring your own US Coast Guard–approved ones.</li>
+        <li><strong>Download for offline:</strong> this app, a chart app with the BVI saved offline (Navionics or similar), offline Google Maps of St. Thomas and Tortola, and your entertainment.</li>
+      </ol>
+    </div>
+    <div class="grid2">
+      <div class="tile"><div class="k">BVI entry levy</div><div class="v">$10</div><div class="d">per person, paid on arrival</div></div>
+      <div class="tile"><div class="k">Ferry departure tax</div><div class="v">$20</div><div class="d">per person, leaving the BVI</div></div>
+      <div class="tile"><div class="k">Currency</div><div class="v">US$</div><div class="d">Bring small bills for taxis &amp; moorings</div></div>
+      <div class="tile"><div class="k">Time zone</div><div class="v">AST</div><div class="d">1 hr ahead of New York in Dec</div></div>
+    </div>
+    <div class="callout info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Phones</b>St. Thomas is domestic for US plans. The BVI is international roaming, so turn on your carrier's travel pass or plan to live on Wi-Fi. This app needs no signal.</div>
+    </div>
+  </section>
+
+  <section class="block" id="travel-stt">
+    <header><span class="eyebrow">Leg 1</span><h2>St. Thomas airport → ferry</h2>
+      <p class="lede">Cyril E. King Airport (STT) to the Charlotte Amalie ferry terminal is a 10–15 minute taxi ride.</p></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Collect bags and head outside to the taxi stand.</strong> Arriving from the mainland US there's no customs.</li>
+        <li><strong>Ask for "the Charlotte Amalie ferry terminal, BVI ferry to Road Town."</strong> It's the Edward Wilmoth Blyden Marine Terminal on the downtown waterfront.</li>
+        <li><strong>Agree the fare before loading.</strong> Taxis are shared vans or open-air "safaris" with set per-person rates: about $12–15 per person plus a few dollars per bag. Cash is easiest; tip 10–15%.</li>
+        <li><strong>Check in at your ferry company's counter</strong> at least 60 minutes before departure. Passports are checked; port fees and luggage charges may be collected here.</li>
+        <li><strong>Ride time is about 45–60 minutes</strong> to Road Town. December trade winds can make it bumpy, so take seasickness medicine an hour before and sit outside at the back.</li>
+      </ol>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th colspan="2">Ferry: Charlotte Amalie → Road Town</th></tr></thead>
+      <tbody>
+        <tr><td>Operators</td><td>Road Town Fast Ferry, Native Son, Smith's Ferry (they alternate days)</td></tr>
+        <tr><td>Typical departures</td><td class="num">≈ 9:00 AM, 2:00 PM, 4:00 PM, 5:30 PM <br><small>Schedules change, so confirm with the operator.</small></td></tr>
+        <tr><td>Fares (2026)</td><td>Adult ≈ $60 one way / $100 round trip; child ≈ $50 / $85–90; plus port fees and taxes</td></tr>
+        <tr><td>Door to door</td><td>Allow 2.5–3 hours including immigration</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout warn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">If you'll miss the last ferry</b>Stay the night near the Charlotte Amalie waterfront and take the morning boat, or pre-book a private water taxi (they clear you in at a BVI port of entry, and cost far more). Ferries from Red Hook mostly go to West End, not Road Town. From West End it's a ~30 minute taxi to the base (Wheatley's shared ≈ $16 per person).</div>
+    </div>
+    <p class="small">They drive on the <strong>left</strong> in both the USVI and the BVI. Look right first when you cross a street.</p>
+  </section>
+
+  <section class="block" id="travel-ferry">
+    <header><span class="eyebrow">Leg 2</span><h2>Road Town ferry → Moorings base</h2>
+      <p class="lede">The Moorings is at Wickhams Cay II, at the head of Road Harbour. It's about 1.5 miles and 5–10 minutes by taxi from the ferry dock.</p></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Immigration first.</strong> Have passports and each person's ED-card QR code ready. Pay the $10 per person levy if asked.</li>
+        <li><strong>Customs next.</strong> Bags may be opened. Declare anything you're unsure about.</li>
+        <li><strong>Taxi to "The Moorings, Wickhams Cay II."</strong> The Moorings' transfer partner Wheatley's can be pre-booked through The Moorings, and a van with a Moorings sign will be waiting.</li>
+        <li><strong>Check in at Moorings reception.</strong> Base hours are 7 AM–11 PM.</li>
+      </ol>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Wheatley's transfer to the base</th><th>Shared</th><th>Private (1–2)</th></tr></thead>
+      <tbody>
+        <tr><td>Road Town ferry dock</td><td class="n">$8 pp</td><td class="n">$19 pp</td></tr>
+        <tr><td>West End ferry dock</td><td class="n">$16 pp</td><td class="n">$25 pp</td></tr>
+        <tr><td>Beef Island airport (EIS)</td><td class="n">$16 pp</td><td class="n">$50 pp</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">Rates from The Moorings' BVI travel page. Confirm when you book.</p>
+  </section>
+
+  <section class="block" id="travel-base">
+    <header><span class="eyebrow">Leg 3</span><h2>At the base</h2>
+      <p class="lede">You'll get a chart briefing (where to go and what to avoid) and a boat briefing on the dock. Take notes and video the boat walk-through on your phone.</p></header>
+    <div class="grid2">
+      <div class="tile"><div class="k">Standard boarding</div><div class="v num">12:00</div><div class="d">noon on charter day 1</div></div>
+      <div class="tile"><div class="k">Sleep-aboard</div><div class="v num">6:00 PM</div><div class="d">night before, if booked</div></div>
+      <div class="tile"><div class="k">Chart briefings</div><div class="v num">9:30 · 12 · 4</div><div class="d">daily, mandatory</div></div>
+      <div class="tile"><div class="k">Charter ends</div><div class="v num">11:00 AM</div><div class="d">sailing yachts</div></div>
+    </div>
+    <div class="card">
+      <h3>Ask these at the briefing</h3>
+      <ul>
+        <li><strong>Anegada:</strong> may we go? (You need The Moorings' OK.)</li>
+        <li>Emergency and breakdown phone numbers, and the VHF channel (base uses <strong>channel 12</strong>). Save them in Settings.</li>
+        <li>Fuel policy on return: refuel yourselves, or they top off and charge you?</li>
+        <li>Holding-tank rules and where to pump out.</li>
+        <li>Battery routine: how long to run engines (or generator) each day.</li>
+        <li>What's included: snorkel gear, towels, Wi-Fi, paddleboard, BoatyBall?</li>
+        <li>Where and when to bring the boat back, and whether to return the night before.</li>
+      </ul>
+      <p><a href="#cl-checkout">Open the boat check-out checklist →</a></p>
+    </div>
+    <div class="callout info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Luggage</b>Soft-sided bags fold away on board. The base can store extras until you're back.</div>
+    </div>
+  </section>
+
+  <section class="block" id="travel-home">
+    <header><span class="eyebrow">The way back</span><h2>Going home</h2>
+      <p class="lede">Leave a buffer of 4–5 hours between the ferry and your flight. Holiday Saturdays are the busiest.</p></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Return the boat.</strong> Charter ends at 11:00 AM. Many crews come back the afternoon before to fuel, pack, and shower.</li>
+        <li><strong>Call The Moorings on VHF 12</strong> about 30 minutes out for docking instructions. Fenders and lines ready. They often send a dock hand.</li>
+        <li><strong>Pump out the holding tank</strong> offshore (or as instructed) before entering Road Harbour.</li>
+        <li><strong>Check out.</strong> Report any damage or breakage, hand back keys and the outboard kill cord.</li>
+        <li><strong>Ferry back to Charlotte Amalie.</strong> Typical departures from Road Town ≈ 7:30 AM, 10:00 AM, 11:30 AM and 3:30 PM (confirm). Arrive 60–90 minutes early and pay the $20 per person departure tax.</li>
+        <li><strong>US Customs (CBP) at the Charlotte Amalie terminal.</strong> Passports out.</li>
+        <li><strong>Taxi to STT</strong> (≈ $12–15 per person). There is an extra US Customs check at STT before airport security for flights to the mainland. Allow 2–3 hours at the airport.</li>
+      </ol>
+    </div>
+    <p><a href="#cl-return">Open the return-to-base checklist →</a></p>
+  </section>
+</section>
+
+<!-- ======================= BOAT ======================= -->
+<section class="view" id="boat" data-title="The boat" hidden>
+  <nav class="subnav" aria-label="Boat sections">
+    <a class="chip" href="#boat-specs">Your boat</a>
+    <a class="chip" href="#boat-fuel">Fuel</a>
+    <a class="chip" href="#boat-engines">Engines</a>
+    <a class="chip" href="#boat-power">Power</a>
+    <a class="chip" href="#boat-water">Water &amp; heads</a>
+    <a class="chip" href="#boat-galley">Galley</a>
+    <a class="chip" href="#boat-sailing">Sailing</a>
+    <a class="chip" href="#boat-dinghy">Dinghy</a>
+    <a class="chip" href="#boat-anchor">Anchor gear</a>
+    <a class="chip" href="#boat-rules">Do's &amp; don'ts</a>
+  </nav>
+
+  <section class="block" id="boat-specs">
+    <header><span class="eyebrow">40 ft Moorings yacht</span><h2>Your boat</h2>
+      <p class="lede">Pick the hull type. Numbers below are typical for Moorings' 40-foot boats; correct them in Settings from your boat briefing.</p></header>
+    <div class="seg" role="group" aria-label="Boat type">
+      <button type="button" data-boat="cat" aria-pressed="true">Catamaran</button>
+      <button type="button" data-boat="mono" aria-pressed="false">Monohull</button>
+    </div>
+    <div class="card">
+      <dl class="kv cat-only">
+        <dt>Typical model</dt><dd>Moorings 4000 (Leopard 40 hull), 39′ 4″</dd>
+        <dt>Beam / draft</dt><dd>≈ 20′ wide · ≈ 4′ draft</dd>
+        <dt>Engines</dt><dd>2 × ~29–30 hp Yanmar diesels</dd>
+        <dt>Fuel</dt><dd><span class="num" data-bind="fuelCap">95</span> gal (diesel)</dd>
+        <dt>Water</dt><dd><span class="num" data-bind="waterCap">206</span> gal</dd>
+        <dt>Layout</dt><dd>3–4 cabins, 2+ heads</dd>
+      </dl>
+      <dl class="kv mono-only">
+        <dt>Typical model</dt><dd>Moorings 41.3 / 42.3 (Beneteau Oceanis class)</dd>
+        <dt>Beam / draft</dt><dd>≈ 13′ wide · 5′–6′3″ draft</dd>
+        <dt>Engine</dt><dd>1 × ~40 hp Yanmar diesel</dd>
+        <dt>Fuel</dt><dd><span class="num" data-bind="fuelCap">53</span> gal (diesel)</dd>
+        <dt>Water</dt><dd><span class="num" data-bind="waterCap">120</span> gal</dd>
+        <dt>Layout</dt><dd>3 cabins, 2 heads</dd>
+      </dl>
+    </div>
+    <div class="callout info cat-only">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Cat quirks</b>Catamarans don't heel, so the boat won't warn you it's over-canvassed. Reef by wind speed. From the helm you can't see the bow close up, so bow crew and hand signals matter. Twin engines let you spin in place.</div>
+    </div>
+    <div class="callout info mono-only">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Monohull quirks</b>She'll heel in gusts; reef when you're regularly past ~20°. In reverse, prop walk kicks the stern (usually to port). Stow everything before you leave the mooring.</div>
+    </div>
+  </section>
+
+  <section class="block" id="boat-fuel">
+    <header><span class="eyebrow">Diesel</span><h2>Fuel burn</h2>
+      <p class="lede">Fuel gauges on charter boats are unreliable. Log engine hours each morning and multiply by the burn rate.</p></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Engine speed</th><th>Per engine</th><th>Boat speed (flat water)</th></tr></thead>
+      <tbody class="cat-only">
+        <tr><td>Idle / charging (~1,200 rpm)</td><td class="n">≈ 0.2 gal/h</td><td>0</td></tr>
+        <tr><td>Slow cruise (~2,000 rpm)</td><td class="n">≈ 0.35 gal/h</td><td class="n">5–6 kn on both</td></tr>
+        <tr><td>Cruise (2,400–2,600 rpm)</td><td class="n">≈ 0.55 gal/h</td><td class="n">6.5–7.5 kn on both · 5–5.5 on one</td></tr>
+        <tr><td>Fast (2,800+ rpm)</td><td class="n">≈ 0.8+ gal/h</td><td>Little extra speed</td></tr>
+      </tbody>
+      <tbody class="mono-only">
+        <tr><td>Idle / charging (~1,200 rpm)</td><td class="n">≈ 0.25 gal/h</td><td>0</td></tr>
+        <tr><td>Slow cruise (~2,000 rpm)</td><td class="n">≈ 0.45 gal/h</td><td class="n">5–5.5 kn</td></tr>
+        <tr><td>Cruise (2,200–2,400 rpm)</td><td class="n">≈ 0.7 gal/h</td><td class="n">6–6.5 kn</td></tr>
+        <tr><td>Fast (2,800+ rpm)</td><td class="n">≈ 1.0+ gal/h</td><td>Little extra speed</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">Estimates from engine size and typical prop loads. Your Moorings tech will know the real numbers for your boat. Ask at the briefing.</p>
+
+    <div class="card" id="fuel-calc">
+      <h3>Fuel calculator</h3>
+      <div class="form">
+        <div class="field"><label for="fc-eng">Engines running</label>
+          <select id="fc-eng"><option value="2">Both engines</option><option value="1">One engine</option></select></div>
+        <div class="field"><label for="fc-rpm">Typical speed</label>
+          <select id="fc-rpm"><option value="slow">Slow cruise (~2,000 rpm)</option><option value="cruise" selected>Cruise (~2,400 rpm)</option><option value="fast">Fast (2,800+ rpm)</option></select></div>
+        <div class="field"><label for="fc-hrs">Motoring hours per day</label><input id="fc-hrs" type="number" inputmode="decimal" min="0" max="12" step="0.5" value="2.5"></div>
+        <div class="field"><label for="fc-chg">Charging-only hours per day</label><input id="fc-chg" type="number" inputmode="decimal" min="0" max="12" step="0.5" value="1"></div>
+        <div class="field"><label for="fc-gen">Generator hours per day (if fitted)</label><input id="fc-gen" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="0"></div>
+        <div class="field"><label for="fc-days">Days</label><input id="fc-days" type="number" inputmode="numeric" min="1" max="14" step="1" value="7"></div>
+        <div class="field"><label for="fc-tank">Tank size (gal)</label><input id="fc-tank" type="number" inputmode="decimal" min="10" max="400" step="1" value="95"></div>
+        <div class="field"><label for="fc-start">Starting level</label>
+          <select id="fc-start"><option value="1">Full</option><option value="0.75">3/4</option><option value="0.5">1/2</option></select></div>
+      </div>
+      <div class="calc-out">
+        <div class="tile"><div class="k">Per day</div><div class="v" id="fc-day">—</div><div class="d">gallons</div></div>
+        <div class="tile"><div class="k">Whole trip</div><div class="v" id="fc-trip">—</div><div class="d">gallons</div></div>
+        <div class="tile"><div class="k">Left at the end</div><div class="v" id="fc-left">—</div><div class="d" id="fc-left-d">of tank</div></div>
+      </div>
+      <div class="gauge" id="fc-gauge"><i style="width:60%"></i></div>
+      <p class="small" id="fc-advice"></p>
+    </div>
+    <div class="callout bad">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Read the deck-fill cap every time</b>Caps are labeled <strong>DIESEL</strong>, <strong>WATER</strong> and <strong>WASTE</strong>. Diesel in the water tank ends the vacation. The dinghy outboard takes <strong>gasoline</strong>, never diesel.</div>
+    </div>
+    <ul>
+      <li>Most efficient: one engine at moderate rpm, or both at ~2,200. Above ~2,600 rpm you burn a lot more for very little speed.</li>
+      <li>A typical week burns roughly <strong class="cat-only">25–45 gal</strong><strong class="mono-only">15–30 gal</strong>. Top off mid-week if you're under half, and always before Anegada.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="boat-engines">
+    <header><span class="eyebrow">Every morning</span><h2>Engines</h2></header>
+    <div class="card">
+      <h3>Daily check (each engine, before first start)</h3>
+      <ol class="steps">
+        <li><strong>Oil:</strong> dipstick between the marks.</li>
+        <li><strong>Coolant:</strong> level visible in the overflow/expansion tank.</li>
+        <li><strong>Raw-water strainer:</strong> clear of weed or plastic, seacock open.</li>
+        <li><strong>Belt:</strong> tight, not frayed or shedding black dust.</li>
+        <li><strong>Bilge and engine bay:</strong> dry, no fuel or oil smell, no new drips.</li>
+        <li><strong>After starting:</strong> water spitting from the exhaust within 30 seconds. If not, shut down and check the seacock, strainer and impeller.</li>
+      </ol>
+      <p><a href="#cl-engine">Use the tick-box version →</a></p>
+    </div>
+    <div class="card">
+      <h3>Start and stop (typical Yanmar panel)</h3>
+      <ul>
+        <li><strong>Start:</strong> throttle in neutral, key on (alarm beeps), preheat ~10 s if your panel has it, press start until it catches (no more than 10 s at a time).</li>
+        <li><strong>Stop:</strong> press the stop button until the engine stops, <em>then</em> turn the key off. Turning the key off with the engine running can damage the alternator.</li>
+        <li><strong>Before shifting into gear:</strong> look behind for lines in the water (dinghy painter, mooring lines, swim-ladder ropes). A line around the prop is the most common charter breakdown.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Alarms</h3>
+      <dl class="kv">
+        <dt>Overheat</dt><dd>Throttle back, neutral, shut down. Check raw-water flow (seacock, strainer, impeller), belt and coolant. Call the base.</dd>
+        <dt>Oil pressure</dt><dd>Shut down immediately and call the base.</dd>
+        <dt>Charging light</dt><dd>Usually a belt. Check it, then call the base.</dd>
+      </dl>
+    </div>
+    <div class="callout info cat-only">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Twin-engine steering</b>At low speed, steer with the throttles. One forward and one reverse spins the boat in its own length. Practice in open water on day 1 before your first mooring.</div>
+    </div>
+  </section>
+
+  <section class="block" id="boat-power">
+    <header><span class="eyebrow">12-volt life</span><h2>Batteries &amp; power</h2>
+      <p class="lede">The fridge is the big draw. On a mooring you make power by running the engines, the generator (if fitted) or solar.</p></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>House battery (at rest)</th><th>Charge</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td class="n">12.7 V</td><td>Full</td><td>All good</td></tr>
+        <tr><td class="n">12.4 V</td><td>≈ 75%</td><td>Fine for the night</td></tr>
+        <tr><td class="n">12.2 V</td><td>≈ 50%</td><td>Charge now (run engines ~1 h)</td></tr>
+        <tr><td class="n">below 12.0 V</td><td>Low</td><td>Cut non-essentials, charge, call base if it won't hold</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>Leave battery switches as set at the briefing. Start batteries are kept separate so you can always start the engines.</li>
+      <li>Run the engine(s) whenever you use the anchor windlass.</li>
+      <li>The inverter powers the 110 V (US-style) outlets. Use it for phones and laptops, and turn it off when not needed. No hair dryers.</li>
+      <li>Shore power at a marina: plug the cable into the boat first, then the dock. Reverse to unplug.</li>
+      <li>Generator and air-con (if fitted): A/C only runs on the generator or shore power. Check for cooling water at the genset exhaust. Close hatches when the A/C is on.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="boat-water">
+    <header><span class="eyebrow">Fresh water &amp; toilets</span><h2>Water &amp; heads</h2></header>
+    <div class="card">
+      <h3>Fresh water</h3>
+      <ul>
+        <li>Tanks hold about <strong><span class="num" data-bind="waterCap">206</span> gal</strong>. A careful family uses 20–35 gal a day. Showers are the big user.</li>
+        <li>Navy showers: wet down, water off, soap up, quick rinse. Rinse snorkel gear in a bucket of sea water first, then a splash of fresh.</li>
+        <li>Turn the <strong>water-pump breaker off</strong> at night and when you leave the boat. If the pump runs with no tap open, a tank is empty or something is leaking.</li>
+        <li>Refill at marinas for roughly 15–25¢ a gallon. See <a href="#log-fuel">where to fill up</a>.</li>
+        <li>Watermaker (if fitted): run only in clean, clear water away from marinas and silty bays.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Marine toilets ("heads")</h3>
+      <p><strong>Nothing goes in the head unless you ate it first</strong>, plus a little toilet paper (ask whether your boat allows paper at all). No wipes, tampons, paper towels or hair.</p>
+      <ul>
+        <li>Manual heads: pump 10–15 extra strokes after the bowl is clear to flush the hose. Electric: hold until clear.</li>
+        <li>In anchorages, marinas and near reefs, use the <strong>holding tank</strong>. Empty it only in open water well offshore, or at a pump-out, following your briefing.</li>
+        <li>Learn your tank's size and gauge. If a head jams, stop pumping and call the base. Forcing it makes it worse.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="boat-galley">
+    <header><span class="eyebrow">Kitchen</span><h2>Galley &amp; propane</h2></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Gas on:</strong> switch on the propane solenoid at the panel. The tank valve in the gas locker is usually left open.</li>
+        <li><strong>Light:</strong> push and turn the knob, light it, and keep the knob pressed 5–10 seconds so the flame-safety holds.</li>
+        <li><strong>Gas off:</strong> turn the solenoid off first and let the flame burn out the line, then turn the knobs off.</li>
+      </ol>
+    </div>
+    <div class="callout bad">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Smell gas?</b>Solenoid off. No flames, no switches. Open hatches and air out the boat. Propane is heavier than air and pools in the bilge. Call the base.</div>
+    </div>
+    <ul>
+      <li>Know where the spare propane tank is and how to swap it. A tank usually lasts a week of normal cooking.</li>
+      <li>Fridge: open it briefly, pre-chill food, and keep drinks in a cooler with ice so the fridge stays shut. Latch the door before sailing.</li>
+      <li>Trash: compact and double-bag it. Drop it at marinas or restaurants (some charge a few dollars a bag). Nothing goes overboard, food scraps included.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="boat-sailing">
+    <header><span class="eyebrow">Christmas winds</span><h2>Sailing</h2>
+      <p class="lede">December trade winds blow E–NE at 15–25 knots, sometimes 25–30 for days, with squalls on top. Plan to reef early and often.</p></header>
+    <div class="card">
+      <h3>When to reef</h3>
+      <dl class="kv cat-only">
+        <dt>1st reef</dt><dd>Around 18–20 kn true, or gusts over 20</dd>
+        <dt>2nd reef</dt><dd>Around 25 kn</dd>
+        <dt>Rule</dt><dd>A cat won't heel to warn you, so watch the wind instrument. If you're wondering whether to reef, reef. Confirm the numbers for your boat at the briefing.</dd>
+      </dl>
+      <dl class="kv mono-only">
+        <dt>1st reef</dt><dd>Heel regularly past ~20°, or gusts over 18–20 kn</dd>
+        <dt>2nd reef</dt><dd>Around 25 kn</dd>
+        <dt>Rule</dt><dd>If you're wondering whether to reef, reef.</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h3>Good habits</h3>
+      <ul>
+        <li><strong>Raise the main head-to-wind</strong> under power. Ease the mainsheet and reef lines first, and watch for battens snagging the lazy jacks. Never force a winch.</li>
+        <li><strong>Jib:</strong> unroll with the furling line under control (a turn on a winch). Roll it in before it gets windy; a partly furled jib is a reef.</li>
+        <li><strong>Upwind:</strong> a cat sails poorly closer than ~50–60° to the wind. Motor-sail or motor the upwind legs and save sailing for reaches and runs.</li>
+        <li><strong>Downwind:</strong> avoid accidental gybes. Control the boom with the mainsheet.</li>
+        <li><strong>Squalls:</strong> you can see them coming (dark cloud, grey rain curtain). Before one hits: reef or furl, close hatches, life jackets on. Expect 15+ knots more wind for 10–20 minutes, then a lull.</li>
+        <li><strong>Ferries</strong> are fast and frequent between Road Town, West End, Jost Van Dyke and Virgin Gorda. Keep clear of them.</li>
+        <li><strong>Red right returning:</strong> the BVI uses the same buoy system as the US (IALA B). Red markers on your right when entering a harbor.</li>
+        <li><strong>Read the water:</strong> brown or dark patches are reef or rock, pale turquoise is shallow sand, deep blue is deep. Best between 10 AM and 2 PM with the sun behind you and polarized sunglasses on.</li>
+        <li>Never leave the helm unattended on autopilot.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="boat-dinghy">
+    <header><span class="eyebrow">Your car for the week</span><h2>Dinghy &amp; outboard</h2></header>
+    <div class="card">
+      <h3>Starting the outboard</h3>
+      <ol class="steps">
+        <li>Fuel tank vent open; fuel line connected; squeeze the primer bulb until firm.</li>
+        <li>Kill cord clipped to the driver.</li>
+        <li>Gear in neutral; choke out if cold.</li>
+        <li>Pull. Push the choke back in once it's running.</li>
+      </ol>
+    </div>
+    <ul>
+      <li><strong>Gasoline only.</strong> Fuel docks with a gas pump can refill the dinghy tank.</li>
+      <li>Kill cord on the driver every time. <strong>Under-16s may not drive the outboard</strong> (Moorings rule).</li>
+      <li>Kids wear life jackets in the dinghy, especially after dark. Carry a flashlight at night (you must be seen), a handheld VHF, paddles and the lock.</li>
+      <li><strong>Lock it</strong> to the dock ashore and to the boat at night. Dinghy theft happens. Cats: raise it on the davits overnight.</li>
+      <li>Towing: shorten the painter when maneuvering so it can't reach the props. On long or rough legs, lift it onto the davits.</li>
+      <li>Idle speed, no wake, in anchorages and near swimmers. Stay outside swim-zone buoys. Watch for snorkelers and dive flags.</li>
+      <li>At The Baths and Devil's Bay, dinghies tie to the dinghy line and you swim in.</li>
+      <li><strong>Engines off, kill cord out</strong> whenever anyone is swimming near the boat or dinghy.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="boat-anchor">
+    <header><span class="eyebrow">Ground tackle</span><h2>Anchor gear</h2></header>
+    <ul>
+      <li>Windlass breaker or switch on at the panel, engine running, then use the remote (UP / DOWN).</li>
+      <li>Keep hands, feet, hair and loose clothing away from the chain and gypsy.</li>
+      <li>Never use the windlass to pull the boat forward. Motor slowly toward the anchor while the bow crew points.</li>
+      <li class="cat-only">Catamaran bridle: once the anchor is set, hook the bridle onto the chain and let out more chain until the bridle takes the load. Remove the bridle before raising.</li>
+      <li class="mono-only">Use a snubber line on the chain so the windlass isn't carrying the load overnight.</li>
+      <li>Ask how the chain is marked (often colored paint or tags every 25–30 ft).</li>
+    </ul>
+    <p><a href="#log-anchor">How to anchor, step by step →</a></p>
+  </section>
+
+  <section class="block" id="boat-rules">
+    <header><span class="eyebrow">The short list</span><h2>Do's &amp; don'ts</h2></header>
+    <div class="dd">
+      <div class="card do"><h3>Do</h3><ul>
+        <li>Be on a mooring or anchored <strong>1 hour before sunset</strong> (sunset is ≈ 5:40–5:50 PM in December).</li>
+        <li>Check the wind and swell forecast every morning.</li>
+        <li>Do the engine check every morning and note engine hours.</li>
+        <li>Keep the VHF on channel 16 when under way.</li>
+        <li>Close hatches whenever you leave the boat (squalls).</li>
+        <li>Turn off the water pump and propane when not in use.</li>
+        <li>Kids in life jackets on deck under way and in the dinghy.</li>
+        <li>Lock the dinghy, and raise it at night.</li>
+        <li>Use reef-safe (mineral) sunscreen. Drink lots of water.</li>
+      </ul></div>
+      <div class="card dont"><h3>Don't</h3><ul>
+        <li>Sail at night (Moorings rule), or sail single-handed.</li>
+        <li>Go to Anegada without The Moorings' OK.</li>
+        <li>Stay overnight on a National Parks day mooring, or past its 90-minute limit.</li>
+        <li>Anchor on coral or seagrass. Drop only in sand.</li>
+        <li>Moor or anchor in White Bay, Jost Van Dyke. It's closed to charter boats.</li>
+        <li>Enter US Virgin Islands waters (St. John is next door) without clearing customs and charter permission.</li>
+        <li>Put the boat in gear with lines in the water.</li>
+        <li>Swim near running engines or across dinghy traffic after dark.</li>
+        <li>Touch coral or turtles, or take shells and sea life.</li>
+        <li>Sit under manchineel trees. The sap and little green "apples" are toxic.</li>
+      </ul></div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= ISLANDS ======================= -->
+<section class="view" id="islands" data-title="Islands & route" hidden>
+  <nav class="subnav" aria-label="Island sections">
+    <a class="chip" href="#islands-map">Chart</a>
+    <a class="chip" href="#islands-plan">7-day plan</a>
+    <a class="chip" href="#islands-legs">Distances</a>
+    <a class="chip" href="#islands-stops">Stops</a>
+    <a class="chip" href="#islands-nav">Which way</a>
+    <a class="chip" href="#islands-avoid">Avoid</a>
+  </nav>
+
+  <section class="block" id="islands-map">
+    <header><span class="eyebrow">Overview chart</span><h2>Where everything is</h2>
+      <p class="lede">Pinch or use + / − to zoom. Tap a dot for details. The magenta line is the suggested loop.</p></header>
+    <div class="card map-card">
+      <div class="map-wrap" id="map-wrap">
+        <svg id="map-svg" role="img" aria-label="Schematic chart of the British Virgin Islands with suggested route"></svg>
+        <div class="map-tools">
+          <button type="button" id="map-in" aria-label="Zoom in">+</button>
+          <button type="button" id="map-out" aria-label="Zoom out">−</button>
+          <button type="button" id="map-reset" aria-label="Show all" style="font-size:.8rem">All</button>
+        </div>
+        <div class="map-scale" id="map-scale"><span id="map-scale-t">5 nm</span><i id="map-scale-bar" style="width:60px"></i></div>
+        <div class="map-nfn">Not for navigation</div>
+      </div>
+      <div class="map-regions" id="map-regions">
+        <button class="chip" type="button" data-region="south">Road Town &amp; south</button>
+        <button class="chip" type="button" data-region="vg">Virgin Gorda</button>
+        <button class="chip" type="button" data-region="anegada">Anegada</button>
+        <button class="chip" type="button" data-region="north">North shore</button>
+        <button class="chip" type="button" data-region="west">JVD &amp; West End</button>
+      </div>
+      <div class="legend"><span><i class="n"></i>Overnight</span><span><i class="d"></i>Day stop</span><span><i class="m"></i>Marina / base</span><span><i class="r"></i>Suggested route</span></div>
+      <div class="map-info" id="map-info"><p class="small">Tap a dot to see what's there.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="islands-plan">
+    <header><span class="eyebrow">East first, then ride the wind back</span><h2>Suggested 7-night plan</h2>
+      <p class="lede">Built for December: upwind legs early in the week while the crew is fresh, downwind days later, and a short last hop to the base. Every day has a bad-weather alternative.</p></header>
+    <div class="stack" id="plan-list"></div>
+  </section>
+
+  <section class="block" id="islands-legs">
+    <header><span class="eyebrow">Planning numbers</span><h2>How far apart</h2>
+      <p class="lede">Approximate routed distances in nautical miles. Time assumes 6 knots average; add time on upwind legs.</p></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>From → to</th><th>nm</th><th>Time</th><th>Wind</th></tr></thead>
+      <tbody id="legs-body"></tbody>
+    </table></div>
+    <p class="small">"Upwind" means into December's E–NE trade wind: expect to motor-sail. Distances measured on the chart with detours around islands; your plotter will be more exact.</p>
+  </section>
+
+  <section class="block" id="islands-stops">
+    <header><span class="eyebrow">The places</span><h2>Stops</h2>
+      <p class="lede">Overnight anchorages, snorkel stops and marinas, roughly west-to-east and south-to-north.</p></header>
+    <div class="stack" id="stops-list"></div>
+  </section>
+
+  <section class="block" id="islands-nav">
+    <header><span class="eyebrow">Strategy</span><h2>Which way to go</h2></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Go east early.</strong> The trade wind blows from the east. Beat (or motor-sail) up to Cooper and Virgin Gorda in the first half of the week, then ride the wind back west to Jost Van Dyke.</li>
+        <li><strong>Start early, stop early.</strong> Leave by 8–9 AM, aim to pick up your mooring by 1–2 PM. In Christmas and New Year's weeks the popular mooring fields fill by early afternoon.</li>
+        <li><strong>Use the channel.</strong> Sir Francis Drake Channel, between Tortola and the southern islands, is sheltered from ocean swell. It's the main highway.</li>
+        <li><strong>Check the north swell daily.</strong> Winter storms off the US send long swells into north-facing bays. When it's up, stay on the south side.</li>
+        <li><strong>Save Anegada for a calm day</strong> with The Moorings' OK. Leave mid-morning so the sun is high for spotting reef.</li>
+        <li><strong>Make the last night short.</strong> Norman or Peter Island are 5–7 miles from the base, an easy morning sail before the 11 AM return.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Passages to know</h3>
+      <dl class="kv">
+        <dt>The Narrows</dt><dd>Between Tortola and St. John (USVI). Current runs here, and the far side is US waters.</dd>
+        <dt>Thatch Island Cut</dt><dd>Between Little Thatch and Frenchman's Cay near West End. Strong current and ferry traffic.</dd>
+        <dt>North Sound entrance</dt><dd>Use the marked channel only. Colquhoun Reef and Cactus Reef flank it.</dd>
+        <dt>Anegada approach</dt><dd>Follow the buoyed channel into Setting Point exactly. Horseshoe Reef has wrecked hundreds of ships.</dd>
+        <dt>Cane Garden Bay</dt><dd>Enter through the buoyed gap in the reef.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="block" id="islands-avoid">
+    <header><span class="eyebrow">Stay out of trouble</span><h2>What to avoid</h2></header>
+    <div class="card">
+      <ul>
+        <li><span class="pill no">Never</span> Sailing after dark. Unlit moorings, reefs and boats.</li>
+        <li><span class="pill no">Never</span> Anegada without permission, in strong wind, big swell or poor light.</li>
+        <li><span class="pill no">Never</span> White Bay (JVD) with the big boat. Charter boats aren't allowed to moor or anchor there; go by taxi or on foot from Great Harbour.</li>
+        <li><span class="pill no">Never</span> Overnight on National Parks moorings (The Indians, The Caves, the Rhone, The Baths, Monkey Point, and other dive and snorkel sites).</li>
+        <li><span class="pill no">Never</span> Anchoring in the Rhone marine park or on any coral.</li>
+        <li><span class="pill caution">Swell</span> North-facing spots in a north swell: Cane Garden Bay, Monkey Point, Diamond Cay and the Bubbly Pool, Sandy Spit, and the Anegada crossing.</li>
+        <li><span class="pill caution">Flag</span> The Baths when the red flag flies. Moorings are closed and swimming is dangerous.</li>
+        <li><span class="pill caution">Crowds</span> The Baths after ~10 AM when cruise ships are in. Go first thing.</li>
+        <li><span class="pill caution">Border</span> US waters around St. John. Crossing requires customs clearance.</li>
+        <li><span class="pill caution">Corners</span> Cutting close around reefs: Cooper's north end, Sandy Spit, Saba Rock shoals, and any dark patch you can't identify.</li>
+      </ul>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= LOGISTICS ======================= -->
+<section class="view" id="logistics" data-title="Island logistics" hidden>
+  <nav class="subnav" aria-label="Logistics sections">
+    <a class="chip" href="#log-mooring">Mooring ball</a>
+    <a class="chip" href="#log-anchor">Anchoring</a>
+    <a class="chip" href="#log-choose">Ball, anchor or marina?</a>
+    <a class="chip" href="#log-fuel">Fuel, water, ice</a>
+    <a class="chip" href="#log-food">Provisioning</a>
+    <a class="chip" href="#log-money">Money &amp; fees</a>
+    <a class="chip" href="#log-rules">Local rules</a>
+  </nav>
+
+  <section class="block" id="log-mooring">
+    <header><span class="eyebrow">Most nights</span><h2>Picking up a mooring ball</h2>
+      <p class="lede">Everyone fumbles the first one. Go slowly, abort early, and try again. Nobody minds.</p></header>
+    <div class="card">
+      <h3>Get ready (before you enter the mooring field)</h3>
+      <ul>
+        <li>Two lines ready at the bow, one from each bow cleat. Long boathook at hand.</li>
+        <li>Agree hand signals: point at the ball, palm down = slow, fist = neutral, thumb back = reverse.</li>
+        <li>Pick a free ball with swinging room. Don't take a <strong>reserved BoatyBall</strong> (orange with blue markings and the BoatyBall logo) unless it's yours.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>The pickup</h3>
+      <ol class="steps">
+        <li><strong>Approach slowly into the wind</strong> (and current), aiming to stop with the ball just off the bow.</li>
+        <li><strong>Bow crew calls distance and direction</strong> with hand signals.<span class="cat-only"> On a cat the helm loses sight of the ball for the last 20 feet.</span></li>
+        <li><strong>Hook the pennant</strong> (the rope loop on top of the ball), not the ball itself, and lift the loop aboard.</li>
+        <li><strong>Line 1:</strong> from the port bow cleat, through the pennant loop, back to the <em>same</em> port cleat.</li>
+        <li><strong>Line 2:</strong> starboard cleat, through the loop, back to the starboard cleat. Make both the same length so the ball sits centered ahead<span class="cat-only">, about 10–15 ft in front of the cross-beam</span>.</li>
+        <li><strong>Neutral, let her fall back.</strong> Check the lines aren't chafing on the anchor or bow roller.</li>
+        <li><strong>Pay.</strong> BoatyBall first-come balls (white, with a sticker and 3-letter ID) are paid in the app. Otherwise a collector comes by around dusk; pay cash and keep the receipt.</li>
+      </ol>
+    </div>
+    <div class="callout bad">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Never</b>run one line through the pennant from one cleat to the other (it saws through the pennant overnight), and never cleat the pennant directly to the boat.</div>
+    </div>
+    <div class="card">
+      <h3>Leaving</h3>
+      <p>Engines on. Slip one line, then the other, and let the boat drift back and away before you go forward. Don't run over the ball or its pennant.</p>
+    </div>
+    <div class="card">
+      <h3>BoatyBall</h3>
+      <ul>
+        <li>App-based mooring reservations at many popular spots, including Cooper Island, Leverick Bay, Saba Rock, Marina Cay, Soper's Hole, Cane Garden Bay and Jost Van Dyke.</li>
+        <li>Same-day reservations open at <strong>7:00 AM</strong>. A reservation runs from noon to noon the next day.</li>
+        <li>Prices (since Dec 2022): about <strong>$55</strong> a night reserved, <strong>$40</strong> first-come. Check the app; 2026 prices may be higher.</li>
+        <li>Set up the app and payment at home on Wi-Fi.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>National Parks day moorings</h3>
+      <p>At dive and snorkel sites (The Indians, The Caves, the Rhone, The Baths, Monkey Point and others): <strong>day use only, 90-minute limit</strong>, no anchoring. Yellow balls are for commercial dive boats. Your National Parks permit is included in the Moorings charter.</p>
+    </div>
+  </section>
+
+  <section class="block" id="log-anchor">
+    <header><span class="eyebrow">Free and quiet</span><h2>Anchoring</h2></header>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Choose sand.</strong> Pale patches, 10–25 ft deep, with room to swing clear of other boats and the mooring field. Never coral; avoid dark seagrass (turtles feed there).</li>
+        <li><strong>Head into the wind</strong> and stop over your spot. Lower the anchor until it touches bottom.</li>
+        <li><strong>Back slowly</strong> while paying out chain.</li>
+        <li><strong>Scope:</strong> 5:1 in normal conditions, 7:1 when it's blowing. Example: 15 ft deep + 5 ft bow height = 20 ft × 5 = 100 ft of chain.</li>
+        <li><strong>Set it:</strong> gentle reverse, then build to ~1,500–2,000 rpm<span class="cat-only"> on both engines</span> for 30 seconds. Line up two objects on shore abeam. If they don't move, you're set.</li>
+        <li class="cat-only"><strong>Bridle on:</strong> hook the bridle to the chain and let out more chain until the bridle takes the load.</li>
+        <li><strong>Check it:</strong> snorkel over the anchor (a great job for a kid with an adult). Set an anchor alarm on the plotter or a phone app.</li>
+        <li><strong>At night:</strong> anchor light on.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Raising it</h3>
+      <p>Engines on, windlass breaker on<span class="cat-only">, bridle off</span>. Motor gently toward the anchor while the bow crew points along the chain and calls "straight up" and "anchor up." Secure it before you speed up.</p>
+    </div>
+    <div class="callout warn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Dragging?</b>Signs: the alarm goes off, shore lights move, a neighbor gets closer. Start engines, raise the anchor and re-anchor with more scope or somewhere else. In doubt at night, pick up a mooring or go to a marina.</div>
+    </div>
+  </section>
+
+  <section class="block" id="log-choose">
+    <header><span class="eyebrow">Decision guide</span><h2>Ball, anchor or marina?</h2></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th></th><th>Mooring ball</th><th>Anchor</th><th>Marina slip</th></tr></thead>
+      <tbody>
+        <tr><td>Cost</td><td>$40–55+ / night</td><td>Free</td><td>Highest: per-foot rate plus power &amp; water</td></tr>
+        <tr><td>Best for</td><td>Popular bays: the Bight, Cooper, North Sound, JVD, Marina Cay, Soper's</td><td>Full mooring fields; quiet bays like Benures, Little Harbour (Peter I.)</td><td>Refills, laundry, showers, a pool for the kids, A/C, or a nasty forecast</td></tr>
+        <tr><td>Skill</td><td>Easy after one try</td><td>Moderate; needs good sand</td><td>Docking a 40-footer in wind is hardest</td></tr>
+        <tr><td>Sleep</td><td>Secure</td><td>Check it at night</td><td>Calm, but hot and buggy</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout ok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5 9-10"/></svg>
+      <div><b class="t">A simple rule</b>Plan a mooring every night, know a backup anchorage for each one, and book one marina night mid-week (Leverick Bay or Spanish Town) to refill water, charge up, do laundry and reset. Book marinas ahead for Christmas and New Year's weeks.</div>
+    </div>
+  </section>
+
+  <section class="block" id="log-fuel">
+    <header><span class="eyebrow">Refills</span><h2>Fuel, water, ice &amp; trash</h2>
+      <p class="lede">Call ahead on VHF 16 or by phone. Fuel docks are busiest late afternoon, so go in the morning. Expect reduced hours on Christmas Day and Boxing Day.</p></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Where</th><th>Diesel</th><th>Water</th><th>Ice</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Moorings base, Road Town</td><td>✓</td><td>✓</td><td>✓</td><td>Start and finish</td></tr>
+        <tr><td>Nanny Cay, Tortola</td><td>✓</td><td>✓</td><td>✓</td><td>Big fuel dock, chandlery</td></tr>
+        <tr><td>Village Cay, Road Town</td><td>✓</td><td>✓</td><td>✓</td><td>In town</td></tr>
+        <tr><td>Soper's Hole, West End</td><td>✓</td><td>✓</td><td>✓</td><td>Port of entry, shops</td></tr>
+        <tr><td>East End (Penn's Landing, Hodges Creek)</td><td>✓</td><td>✓</td><td>·</td><td>Fat Hog's Bay area</td></tr>
+        <tr><td>Leverick Bay, North Sound</td><td>✓</td><td>✓</td><td>✓</td><td>Gas too. Overnight mooring guests have often been offered free water and ice. Ask.</td></tr>
+        <tr><td>Bitter End, North Sound</td><td>✓</td><td>·</td><td>·</td><td>Gas and diesel</td></tr>
+        <tr><td>Virgin Gorda Yacht Harbour, Spanish Town</td><td>✓</td><td>✓</td><td>✓</td><td>Groceries, ATM, laundry</td></tr>
+        <tr><td>Great Harbour, Jost Van Dyke</td><td>✓</td><td>✓</td><td>✓</td><td>North Latitude Marina</td></tr>
+        <tr><td>Anegada, Cooper Island, Norman Island</td><td>✗</td><td>·</td><td>·</td><td>Don't count on fuel here</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">✓ available · · ask · ✗ not available. Services change, so confirm at the chart briefing. Water runs about 15–25¢/gal; ice $4–10 a bag.</p>
+  </section>
+
+  <section class="block" id="log-food">
+    <header><span class="eyebrow">Food &amp; drink</span><h2>Provisioning</h2></header>
+    <div class="card">
+      <ul>
+        <li><strong>Moorings provisioning:</strong> order online at least 5 days before. It's delivered to the boat.</li>
+        <li><strong>Road Town supermarkets</strong> (RiteWay, One Mart, Bobby's) are a short taxi from the base for top-ups and specific brands.</li>
+        <li><strong>Along the way:</strong> small markets at Leverick Bay, Spanish Town, Soper's Hole and Jost Van Dyke. Prices run 1.5–2× US.</li>
+        <li><strong>Plan meals:</strong> breakfast and lunch aboard every day, dinner ashore 3–4 nights. Reserve dinner by VHF or phone by mid-afternoon in holiday weeks. Anegada lobster must be ordered by about 3 PM.</li>
+        <li>Lots of water and drinks (more than you think), snacks for passages, and freezer treats for kids.</li>
+      </ul>
+    </div>
+    <div class="callout warn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Holiday closures</b>Christmas Day (Dec 25) and Boxing Day (Dec 26) are public holidays in the BVI. Many shops close. Provision before Dec 24.</div>
+    </div>
+  </section>
+
+  <section class="block" id="log-money">
+    <header><span class="eyebrow">Budget</span><h2>Money &amp; fees</h2></header>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Item</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Mooring ball</td><td class="n">$40–55+ / night</td></tr>
+        <tr><td>BVI entry levy</td><td class="n">$10 per person</td></tr>
+        <tr><td>Ferry departure tax (leaving BVI)</td><td class="n">$20 per person</td></tr>
+        <tr><td>The Baths (entering by land)</td><td class="n">$3 adult · $2 child</td></tr>
+        <tr><td>Taxis</td><td class="n">$8–16 per person per ride</td></tr>
+        <tr><td>Ice</td><td class="n">$4–10 a bag</td></tr>
+        <tr><td>Water</td><td class="n">15–25¢ / gal</td></tr>
+        <tr><td>Dinner ashore</td><td class="n">$35–60 per adult</td></tr>
+        <tr><td>Cruising permit, National Parks permit</td><td>Included in the Moorings charter</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>Currency is the <strong>US dollar</strong>. Cards work at most restaurants and marinas.</li>
+      <li>Carry <strong>cash in small bills</strong> for mooring collectors, taxis, beach bars, Anegada and tips. ATMs: Road Town, Spanish Town and a few marinas.</li>
+      <li>Check bills for an included service charge (often 10–15%) before tipping.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="log-rules">
+    <header><span class="eyebrow">Know before you go</span><h2>Local rules</h2></header>
+    <div class="card">
+      <h3>Moorings charter rules</h3>
+      <ul>
+        <li>No sailing at night. Be moored or anchored at least 1 hour before sunset.</li>
+        <li>No single-handed sailing. Minimum two people sailing the boat.</li>
+        <li>Under-16s may not operate the outboard.</li>
+        <li>Anegada only with The Moorings' permission.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>BVI rules</h3>
+      <ul>
+        <li>National Parks moorings: day use only, 90 minutes. No anchoring in marine parks.</li>
+        <li>No anchoring on coral or seagrass.</li>
+        <li>No fishing without a BVI fishing license. No spearfishing. Don't take shells, coral or live animals.</li>
+        <li>No holding-tank discharge in anchorages or near reefs.</li>
+        <li>No boats or dinghies inside swim-zone buoys.</li>
+        <li>White Bay, Jost Van Dyke: closed to charter boats.</li>
+        <li>Leaving the BVI by boat (for example to St. John) requires clearing customs at a port of entry and your charter company's OK.</li>
+      </ul>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= MORE ======================= -->
+<section class="view" id="more" data-title="More" hidden>
+  <nav class="subnav" aria-label="More sections">
+    <a class="chip" href="#more-safety">Safety</a>
+    <a class="chip" href="#more-weather">Weather &amp; VHF</a>
+    <a class="chip" href="#more-checklists">Checklists</a>
+    <a class="chip" href="#more-packing">Packing</a>
+    <a class="chip" href="#more-kids">Kids &amp; crew</a>
+    <a class="chip" href="#more-holidays">Holidays</a>
+    <a class="chip" href="#more-glossary">Glossary</a>
+    <a class="chip" href="#more-settings">Settings</a>
+    <a class="chip" href="#more-about">About</a>
+  </nav>
+
+  <section class="block" id="more-safety">
+    <header><span class="eyebrow">Read this before day 1</span><h2>Safety &amp; emergencies</h2>
+      <p class="lede">The red SOS button at the top opens the emergency card from any screen.</p></header>
+    <div class="btn-row"><button class="btn primary" type="button" data-open-sos>Open emergency card</button></div>
+    <details class="acc" id="safety-mob"><summary>Person overboard</summary><div class="acc-body">
+      <ol class="steps">
+        <li><strong>Shout "Man overboard!"</strong> and keep shouting the side.</li>
+        <li><strong>Throw flotation</strong> (Lifesling, horseshoe, cushion) right away.</li>
+        <li><strong>One person points</strong> at them and never looks away.</li>
+        <li><strong>Press MOB</strong> on the chartplotter.</li>
+        <li><strong>Drop sails if needed, check for lines in the water, start engines.</strong></li>
+        <li><strong>Return slowly</strong>, approaching from downwind. Shift to neutral as you come alongside. Props kill.</li>
+        <li><strong>Get them aboard</strong> at the swim ladder or stern steps. If you lose sight of them, call MAYDAY.</li>
+      </ol>
+    </div></details>
+    <details class="acc" id="safety-fire"><summary>Fire</summary><div class="acc-body">
+      <ul>
+        <li>Galley: propane solenoid off, smother with a lid or fire blanket. Never water on a grease fire.</li>
+        <li>Engine: shut the engine down, don't open the hatch wide. Discharge the extinguisher through the access port or a crack.</li>
+        <li>Everyone in life jackets, dinghy ready. If it isn't out within a minute: MAYDAY.</li>
+        <li>Know where every extinguisher is (it's on the check-out list).</li>
+      </ul>
+    </div></details>
+    <details class="acc" id="safety-water"><summary>Taking on water</summary><div class="acc-body">
+      <ul>
+        <li>Turn on the electric bilge pumps and taste the water: salty = a through-hull, hose or stern gland. Fresh = a tank or water line (turn off the water pump).</li>
+        <li>Check seacocks and hoses, the toilet and sink lines, and the engine raw-water hoses.</li>
+        <li>Plug holes with the softwood plugs (ask where they are). Call the base. If water is gaining: PAN-PAN or MAYDAY.</li>
+      </ul>
+    </div></details>
+    <details class="acc" id="safety-ground"><summary>Running aground</summary><div class="acc-body">
+      <ul>
+        <li>Neutral. Check for injuries and leaks.</li>
+        <li>Soft sand: try reversing gently the way you came in. Hard coral or rock: stop, don't grind. Call the base.</li>
+        <li>Check the bilges and props before going on.</li>
+      </ul>
+    </div></details>
+    <details class="acc" id="safety-medical"><summary>Medical &amp; health</summary><div class="acc-body">
+      <dl class="kv">
+        <dt>Seasickness</dt><dd>Meds an hour before, fresh air, eyes on the horizon, crackers and ginger. Helming helps. Ask your doctor about patches and kids' doses.</dd>
+        <dt>Sun</dt><dd>Strongest 10 AM–3 PM. Rash guards and hats beat sunscreen. Re-apply after every swim.</dd>
+        <dt>Dehydration</dt><dd>Headache and grumpiness come first. Everyone drinks a full bottle at every stop.</dd>
+        <dt>Coral cuts</dt><dd>Scrub clean with fresh water, apply antiseptic, and watch for infection.</dd>
+        <dt>Sea urchin</dt><dd>Soak in hot (not scalding) water. Remove only spines you can grab easily.</dd>
+        <dt>Jellyfish</dt><dd>A purple flag on the beach means they're around. Rinse with vinegar or sea water, not fresh water.</dd>
+        <dt>Ears</dt><dd>Swimmer's-ear drops after every snorkel day.</dd>
+        <dt>Manchineel</dt><dd>Toxic beach trees with small green apples. Don't touch, eat, or shelter under them in rain.</dd>
+        <dt>Hospital</dt><dd>Dr. D. Orlando Smith Hospital, Road Town: <a href="tel:+12848527500">+1 284 852 7500</a>. Clinics on Virgin Gorda and Jost Van Dyke.</dd>
+      </dl>
+    </div></details>
+    <details class="acc" id="safety-squall"><summary>Squalls &amp; storms</summary><div class="acc-body">
+      <ul>
+        <li>Watch upwind (east) for dark cloud and a grey rain curtain.</li>
+        <li>Reef or furl before it arrives, close hatches, life jackets on, slow down. Visibility drops in heavy rain.</li>
+        <li>Lightning: stay off the mast and rigging, unplug electronics if you can.</li>
+        <li>On a mooring or at anchor: closed hatches when you leave the boat. A squall can arrive while you're ashore.</li>
+      </ul>
+    </div></details>
+  </section>
+
+  <section class="block" id="more-weather">
+    <header><span class="eyebrow">Every morning</span><h2>Weather &amp; VHF</h2></header>
+    <div class="grid2">
+      <div class="tile"><div class="k">Wind</div><div class="v">E–NE 15–25</div><div class="d">knots; "Christmas winds" to 30</div></div>
+      <div class="tile"><div class="k">Air / water</div><div class="v">78–84° / 80°</div><div class="d">°F in December</div></div>
+      <div class="tile"><div class="k">Sunset</div><div class="v">5:40–5:52</div><div class="d">PM AST, Dec 1–31</div></div>
+      <div class="tile"><div class="k">Rain</div><div class="v">Squalls</div><div class="d">Short bursts, then sun</div></div>
+    </div>
+    <div class="card">
+      <h3>Where to get the forecast</h3>
+      <ul>
+        <li><strong>Radio ZBVI 780 AM</strong> marine forecast: weekdays 8:05 AM, Saturday 7:30 AM, Sunday 9:45 AM.</li>
+        <li><strong>NOAA weather on VHF</strong> WX channels (continuous broadcast).</li>
+        <li><strong>Windy</strong> or <strong>PredictWind</strong> app when you have data. Look at wind <em>and</em> swell height and period.</li>
+        <li><strong>Morning chat at the base</strong> or with your neighbors in the mooring field.</li>
+      </ul>
+      <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">North swell rule of thumb</b>A north swell over ~4–5 ft with a long period (10+ seconds) makes north-facing bays rolly or unsafe: Cane Garden Bay, Monkey Point, Diamond Cay, the Anegada crossing. Head south-side.</div></div>
+    </div>
+    <div class="card">
+      <h3>VHF radio</h3>
+      <dl class="kv">
+        <dt>16</dt><dd>Hailing and distress. Listen whenever you're under way.</dd>
+        <dt>12</dt><dd>The Moorings base</dd>
+        <dt>68, 69, 71, 72</dt><dd>Working channels for boat-to-boat and restaurants</dd>
+      </dl>
+      <p><strong>How to call:</strong> "Cooper Island Beach Club, Cooper Island Beach Club, this is sailing vessel <em>[boat]</em>, over." When they answer they'll name a working channel. Switch and continue. Set the radio to USA mode and keep calls short.</p>
+    </div>
+  </section>
+
+  <section class="block" id="more-checklists">
+    <header><span class="eyebrow">Tick as you go</span><h2>Checklists</h2>
+      <p class="lede">Ticks are saved on this phone. Reset a list each morning.</p></header>
+    <div class="stack" id="checklists"></div>
+  </section>
+
+  <section class="block" id="more-packing">
+    <header><span class="eyebrow">Soft bags only</span><h2>Packing list</h2></header>
+    <div id="packing"></div>
+  </section>
+
+  <section class="block" id="more-kids">
+    <header><span class="eyebrow">Family crew</span><h2>Kids &amp; crew</h2></header>
+    <div class="card">
+      <h3>Give everyone a job</h3>
+      <dl class="kv">
+        <dt>Bow lookout</dt><dd>Spots mooring balls, reef and swimmers; gives the hand signals.</dd>
+        <dt>Fender crew</dt><dd>Fenders out before docking, in after leaving.</dd>
+        <dt>Line handler</dt><dd>Coils lines, keeps them out of the water near the props.</dd>
+        <dt>Navigator</dt><dd>Tracks the route on the chart and calls out the next mark.</dd>
+        <dt>Log keeper</dt><dd>Writes down engine hours, fuel and the day's miles.</dd>
+        <dt>Radio officer</dt><dd>Makes the dinner reservation call on VHF (with a script).</dd>
+        <dt>Snorkel buddy boss</dt><dd>Counts heads in and out of the water.</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h3>Family rules</h3>
+      <ul>
+        <li>Life jackets on deck when sailing, in the dinghy, and for weaker swimmers whenever they're on deck.</li>
+        <li>Swim with a buddy. Trail a floating line off the stern when swimming from the boat (current can be strong).</li>
+        <li>One hand for yourself, one for the boat when moving around under way.</li>
+        <li>Nobody on the foredeck during anchoring or mooring unless it's their job.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Kid favorites</h3>
+      <ul>
+        <li>The Caves at Norman Island, said to have inspired <em>Treasure Island</em>.</li>
+        <li>Climbing through the boulder caves at The Baths.</li>
+        <li>Turtles in the mooring field at Cooper Island and the Bight.</li>
+        <li>Flamingos and rock iguanas on Anegada.</li>
+        <li>Big tarpon under the dock lights in North Sound after dark.</li>
+        <li>Stargazing near the new moon (about Dec 9, 2026).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="more-holidays">
+    <header><span class="eyebrow">December 2026</span><h2>Holidays &amp; crowds</h2></header>
+    <div class="card">
+      <dl class="kv">
+        <dt>~Dec 9</dt><dd>New moon. Darkest nights, best stars.</dd>
+        <dt>~Dec 24</dt><dd>Full moon. Trellis Bay has a famous full-moon party with fireballs (check if it's on).</dd>
+        <dt>Dec 25–26</dt><dd>Christmas Day and Boxing Day are public holidays. Shops and some services close.</dd>
+        <dt>Dec 20 – Jan 2</dt><dd>Peak season. Moorings fill by early afternoon; book BoatyBall at 7 AM and reserve dinners early.</dd>
+        <dt>Dec 31</dt><dd>Old Year's Night. Foxy's on Jost Van Dyke throws one of the Caribbean's biggest New Year's parties. Great Harbour is packed from Dec 30, so plan around it (or skip it with young kids).</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="block" id="more-glossary">
+    <header><span class="eyebrow">Talk like a sailor</span><h2>Glossary</h2></header>
+    <div class="card">
+      <dl class="kv" id="glossary"></dl>
+    </div>
+  </section>
+
+  <section class="block" id="more-settings">
+    <header><span class="eyebrow">Saved on this phone only</span><h2>Settings &amp; trip details</h2>
+      <p class="lede">These fill in the Today screen, the boat numbers and the emergency card.</p></header>
+    <form class="card" id="settings-form" autocomplete="off">
+      <div class="form">
+        <div class="field"><label for="s-start">Charter day 1 (boarding day)</label><input id="s-start" name="start" type="date"></div>
+        <div class="field"><label for="s-nights">Nights on the boat</label><input id="s-nights" name="nights" type="number" inputmode="numeric" min="1" max="21" value="7"></div>
+        <div class="field"><label for="s-boatType">Hull type</label><select id="s-boatType" name="boatType"><option value="cat">Catamaran</option><option value="mono">Monohull</option></select></div>
+        <div class="field"><label for="s-boatName">Boat name</label><input id="s-boatName" name="boatName" type="text" placeholder="e.g. Sea Biscuit"></div>
+        <div class="field"><label for="s-boatModel">Model / description</label><input id="s-boatModel" name="boatModel" type="text" placeholder="e.g. Moorings 4000, white catamaran"></div>
+        <div class="field"><label for="s-crew">People aboard</label><input id="s-crew" name="crew" type="number" inputmode="numeric" min="1" max="12" placeholder="e.g. 6"></div>
+        <div class="field"><label for="s-fuelCap">Fuel tank (gal)</label><input id="s-fuelCap" name="fuelCap" type="number" inputmode="decimal" min="10" max="400"></div>
+        <div class="field"><label for="s-waterCap">Water tanks (gal)</label><input id="s-waterCap" name="waterCap" type="number" inputmode="decimal" min="10" max="600"></div>
+        <div class="field"><label for="s-mooringsPhone">Moorings base phone</label><input id="s-mooringsPhone" name="mooringsPhone" type="tel" placeholder="from your briefing packet"></div>
+        <div class="field"><label for="s-mooringsEmerg">Moorings after-hours / breakdown</label><input id="s-mooringsEmerg" name="mooringsEmerg" type="tel" placeholder="from your briefing packet"></div>
+        <div class="field"><label for="s-ferryOut">Ferry out (STT → Road Town)</label><input id="s-ferryOut" name="ferryOut" type="text" placeholder="e.g. Sat 2:00 PM, Native Son"></div>
+        <div class="field"><label for="s-ferryBack">Ferry back</label><input id="s-ferryBack" name="ferryBack" type="text" placeholder="e.g. Sat 10:00 AM"></div>
+        <div class="field"><label for="s-flightIn">Flight in</label><input id="s-flightIn" name="flightIn" type="text" placeholder="e.g. AA 1234, lands 12:40"></div>
+        <div class="field"><label for="s-flightOut">Flight home</label><input id="s-flightOut" name="flightOut" type="text" placeholder="e.g. AA 5678, departs 4:15"></div>
+        <div class="field wide"><label for="s-notes">Notes</label><textarea id="s-notes" name="notes" placeholder="Confirmation numbers, slip number, Wi-Fi password..."></textarea></div>
+        <div class="field"><label for="s-theme">Appearance</label><select id="s-theme" name="theme"><option value="auto">Match phone</option><option value="light">Light (bright sun)</option><option value="dark">Dark (night)</option></select></div>
+      </div>
+      <div class="btn-row" style="margin-top:14px"><button class="btn primary" type="submit">Save</button><span class="small" id="settings-saved" role="status"></span></div>
+    </form>
+  </section>
+
+  <section class="block" id="more-about">
+    <header><span class="eyebrow">Fine print</span><h2>About this guide</h2></header>
+    <div class="card">
+      <p><span class="status-dot" id="offline-dot"></span><span id="offline-status">Checking offline storage…</span></p>
+      <p>Researched October 2026 for a December 2026 Moorings charter out of Road Town, Tortola. Prices, schedules and what's open change, and some businesses here may have changed by December. <strong>Your Moorings chart briefing and their rules override anything in this guide.</strong> The chart is a schematic: not for navigation.</p>
+      <p>To keep it working offline, open the app from your home screen once a week or so before the trip, and again the day you leave.</p>
+    </div>
+    <details class="acc"><summary>Sources</summary><div class="acc-body">
+      <ul class="small">
+        <li><a href="https://www.moorings.com/destinations/caribbean/british-virgin-islands-yacht-charters/useful-information" target="_blank" rel="noopener">The Moorings: BVI travel information</a> (base times, transfers, fees, rules)</li>
+        <li><a href="https://bviedcard.gov.vg" target="_blank" rel="noopener">BVI online ED card</a></li>
+        <li><a href="https://www.gov.uk/foreign-travel-advice/british-virgin-islands/entry-requirements" target="_blank" rel="noopener">UK FCDO: BVI entry requirements</a> (levy, departure tax)</li>
+        <li><a href="https://boatbookings.com/yachting_content/st_thomas_to_bvi_ferry_schedules.php" target="_blank" rel="noopener">St. Thomas–Tortola ferry fares</a></li>
+        <li><a href="https://visar.org" target="_blank" rel="noopener">VISAR</a> (search and rescue)</li>
+        <li><a href="https://www.yachtwarriors.com/what-is-boatyball" target="_blank" rel="noopener">How BoatyBall works</a>; <a href="https://www.yachtwarriors.com/bvi-weather-and-marine-forecast-resources" target="_blank" rel="noopener">BVI weather resources</a></li>
+        <li><a href="https://www.practical-sailor.com/voyaging/caribbean-bareboat-chartering-basics-2025-updates/" target="_blank" rel="noopener">Practical Sailor: bareboat basics, 2025 updates</a> (White Bay closure, Anegada permission)</li>
+        <li><a href="https://www.bvisail.com/bvi-marinas/" target="_blank" rel="noopener">BVI marinas guide</a></li>
+      </ul>
+      <p class="small">Coastlines: <a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoBoundaries</a> (CC BY 4.0, from Sentinel-2 land cover) and Natural Earth (public domain). Heading font: Barlow Condensed (SIL Open Font License).</p>
+    </div></details>
+    <div class="btn-row"><button class="btn" type="button" id="reset-all">Clear all ticks and notes</button><span class="small" id="reset-msg" role="status"></span></div>
+  </section>
+</section>
+
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <div class="tabbar-row">
+    <a class="tab" href="#today" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</a>
+    <a class="tab" href="#travel" data-tab="travel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16h20M4 16l1.5-5h13L20 16M7 11V7h10v4"/><path d="M3 20c2 0 2-1.5 4.5-1.5S10 20 12 20s2-1.5 4.5-1.5S19 20 21 20"/></svg>Travel</a>
+    <a class="tab" href="#boat" data-tab="boat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v15M12 3l7 12h-7M11 5 5 15h6"/><path d="M3 18h18l-2 3H5z"/></svg>Boat</a>
+    <a class="tab" href="#islands" data-tab="islands"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Islands</a>
+    <a class="tab" href="#logistics" data-tab="logistics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 12H3a9 9 0 0 0 18 0h-2M8 10h8"/></svg>Logistics</a>
+    <a class="tab" href="#more" data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>More</a>
+  </div>
+</nav>
+
+<!-- SOS sheet -->
+<div class="sheet-backdrop" id="sos-backdrop" hidden></div>
+<div class="sheet" id="sos" role="dialog" aria-modal="true" aria-labelledby="sos-title" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="sos-title">Emergency</h2><button class="btn small" type="button" data-close>Close</button></div>
+  <div class="stack">
+    <div class="emerg">
+      <div class="row" style="background:var(--bad-soft);border-color:var(--bad-soft)"><div><b>Life in danger at sea</b><br><small>VHF channel 16: MAYDAY</small></div><span class="n">VHF 16</span></div>
+      <a class="hot" href="tel:767"><div><b>VISAR search &amp; rescue</b><br><small style="color:inherit">From a BVI phone</small></div><span class="n">767</span></a>
+      <a href="tel:+12844990911"><div><b>VISAR from a US phone</b><br><small>24 hours</small></div><span class="n">+1 284 499 0911</span></a>
+      <a href="tel:911"><div><b>Police · fire · ambulance</b><br><small>999 also works</small></div><span class="n">911</span></a>
+      <a href="tel:+12848527500"><div><b>Hospital, Road Town</b><br><small>Dr. D. Orlando Smith</small></div><span class="n">852 7500</span></a>
+      <div class="row"><div><b>The Moorings base</b><br><small>VHF channel 12</small></div><span class="n" id="sos-moorings">Add in Settings</span></div>
+      <div class="row" id="sos-moorings-emerg-row" hidden><div><b>Moorings breakdown line</b></div><span class="n" id="sos-moorings-emerg"></span></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px"><h3 style="flex:1">Our position</h3><button class="btn small" type="button" id="pos-btn">Get GPS position</button></div>
+      <p class="num" id="pos-out" style="font:700 1.25rem/1.3 var(--font-display)">Tap to read your phone's GPS (works with no signal).</p>
+    </div>
+    <div>
+      <h3>MAYDAY script</h3>
+      <p class="small" style="margin:4px 0 8px">Life-threatening only. Channel 16, high power, press to talk, speak slowly.</p>
+      <div class="script" id="mayday-script"></div>
+      <p class="small" style="margin-top:8px">No answer? Repeat. Then call VISAR on 767. For urgent but not life-threatening problems (engine failure near a reef, injured crew) say <strong>"PAN-PAN"</strong> three times instead.</p>
+    </div>
+    <div class="btn-row"><a class="btn" href="#safety-mob" data-close>Person overboard steps</a><a class="btn" href="#safety-medical" data-close>Medical</a></div>
+  </div>
+</div>
+
+<!-- Search sheet -->
+<div class="sheet-backdrop" id="search-backdrop" hidden></div>
+<div class="sheet" id="search" role="dialog" aria-modal="true" aria-labelledby="search-title" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="search-title">Search the guide</h2><button class="btn small" type="button" data-close>Close</button></div>
+  <input class="search-input" id="search-q" type="search" placeholder="e.g. propane, Anegada, mooring, fuel" aria-label="Search">
+  <ul class="results" id="search-results" style="margin-top:12px"></ul>
+</div>
+
+<script>
+/* Coastlines: geoBoundaries VGB ADM0 (CC BY 4.0) + Natural Earth (public domain). Units: nautical miles from 65.06W / 18.78N. */
+const MAP={"w":46.66,"h":30.6,"lon0":-65.06,"lat0":18.78,"cos":0.948324,"bvi":"M25.99,27.39L25.90,27.35L25.93,27.52L25.81,27.58L25.61,27.56L25.54,27.44L25.40,27.56L25.27,27.56L25.11,27.40L24.95,27.36L25.07,27.44L25.05,27.59L25.42,27.67L25.42,27.81L25.31,27.84L25.22,27.98L25.11,28.03L24.96,27.97L24.82,27.79L24.85,28.09L24.80,28.19L24.65,28.22L24.70,28.30L24.82,28.35L24.88,28.29L24.99,28.40L25.02,28.25L25.16,28.24L25.24,28.30L25.28,28.17L25.37,28.15L25.57,28.27L25.66,28.17L25.50,28L25.56,27.87L25.65,27.88L25.74,27.75L25.88,27.80L25.92,27.67L26.11,27.56L26.33,27.62L26.29,27.75L26.51,27.67L26.68,27.79L26.68,27.44L26.49,27.41L26.41,27.47L26.25,27.48ZM24.72,26.79L24.67,26.84L24.77,26.92ZM27.46,25.41L27.35,25.18L27.18,25.11L27.10,25.02L27.22,25.26L27.40,25.36L27.34,25.49L27.13,25.56L26.81,25.56L26.61,25.34L26.14,25.41L26.24,25.49L26.25,25.57L26.10,25.64L25.74,25.60L25.52,25.68L25.83,25.84L25.93,25.96L25.97,25.92L25.95,25.80L26.04,25.75L26.40,25.91L26.46,26.02L26.54,25.84L26.67,25.82L26.73,25.72L26.92,25.77L27.03,25.67L27.22,25.74L27.33,25.66L27.47,25.67L27.71,25.89L27.66,26.11L27.87,26.48L27.70,26.73L27.75,26.87L27.92,26.96L28.19,27L28.09,26.74L28.13,26.35L28.03,26.01L28.03,25.58L28.10,25.53L28.08,25.43L28.03,25.36L27.97,25.51L27.81,25.53L27.68,25.45L27.68,25.33L27.59,25.24L27.52,25.27L27.57,25.39ZM28.35,24.81L28.23,24.77L28.16,24.97L28.40,24.91ZM30.37,24.24L30.33,24.22L30.28,24.33L30.13,24.43L29.95,24.41L29.93,24.49L30.06,24.56L29.97,24.59L29.95,24.65L29.99,24.68L30.04,24.61L30.17,24.57L30.07,24.55L30.08,24.47L30.23,24.48L30.24,24.55L30.18,24.56L30.37,24.70L30.45,24.94L30.55,24.97L30.57,24.74L30.54,24.79L30.46,24.76L30.42,24.56L30.46,24.43L30.60,24.37L30.70,24.25ZM19.79,23.82L19.53,23.85L19.34,23.95L19.79,23.97L19.83,23.93ZM31.22,23.48L31.09,23.42L31.15,23.73L31,23.98L31.11,24.01L31.17,24.15L31.35,24.25L31.33,24.41L31.40,24.63L31.47,24.56L31.58,24.57L31.87,24.78L31.98,24.54L31.88,24.39L31.60,24.40L31.37,24.25L31.44,24.09L31.39,23.97L31.58,23.79L31.45,23.72L31.47,23.75L31.42,23.77L31.38,23.65L31.21,23.61ZM19.05,23.35L18.56,23.48L18.15,23.48L17.61,23.72L17.52,23.82L17.70,23.86L17.85,23.80L18.15,23.79L18.35,23.91L18.45,23.86L18.37,23.72L18.51,23.61L18.43,23.57L18.47,23.51L18.79,23.54L19.01,23.45L19.13,23.46ZM33.55,23.21L33.10,23.26L32.72,23.51L32.48,23.60L32.59,23.62L32.94,23.51L33.08,23.61L33.08,23.76L33.42,23.86L33.49,23.74L33.22,23.60L33.27,23.52L33.20,23.47L33.25,23.40L33.52,23.46L33.62,23.31ZM20.63,22.86L20.50,22.88L20.43,22.97L20.64,22.98L20.68,22.92ZM34.25,22.95L34.36,22.90L34.36,22.84L34.23,22.88L34.20,22.95ZM27.53,21.74L27.48,21.83L27.62,21.78ZM34.64,21.57L34.56,21.70L34.54,21.93L34.73,21.76L34.75,21.59ZM28.52,21.22L28.38,21.09L28.47,21.22L28.45,21.37L28.54,21.44L28.68,21.45L28.71,21.39ZM12.31,20.93L12.27,20.86L12.18,20.94L11.99,20.98L11.96,21.06L12.13,21.14L12.25,21.06ZM20.01,20.60L19.88,20.60L19.88,20.66L20.04,20.65ZM29.67,20.37L29.63,20.41L29.74,20.44ZM29.12,20.02L29.05,19.93L29.10,19.73L28.84,19.73L28.81,19.95L28.88,19.93L28.92,19.99L28.85,20.12L28.92,20.14L29.04,20.02L29.17,20.17L28.96,20.17L28.97,20.21L29.25,20.29L29.34,20.46L29.51,20.49L29.63,20.25L29.74,20.39L30,20.34L30.02,20.40L30.27,20.47L30.51,20.76L30.57,21.14L30.79,20.90L30.91,20.89L30.98,20.80L30.99,20.58L30.88,20.29L30.55,20.03L30.41,20.04L30.36,19.90L30.40,19.89L30.31,19.82L30.23,19.81L30.31,19.92L30.07,20.14L29.84,20.02L29.86,19.83L29.45,20.04L29.42,19.96L29.28,20.05ZM13.31,19.67L13.11,19.79L13.16,19.98L13.28,20.08L13.20,20.14L13.23,20.32L13.17,20.37L13.23,20.42L13.47,20.43L13.67,20.27L13.57,20.03L13.47,19.95L13.42,19.75ZM19.99,19.51L19.94,19.57L20.02,19.67L20.05,19.64ZM17.42,19.31L17.37,19.31L17.37,19.38L17.20,19.43L17.21,19.61L17.02,19.70L16.97,19.83L16.81,19.89L16.52,19.90L16.50,20.10L16.18,20.06L15.94,20.10L15.90,20.16L16,20.30L16.21,20.39L16.57,20.38L16.76,20.14L16.77,20.21L17.15,20.28L17.18,20.45L17.32,20.53L17.43,20.47L17.41,20.22L17.48,20.09L17.61,20.08L17.71,20.13L17.74,20.30L17.87,20.46L18.41,20.69L18.74,20.61L18.71,20.49L18.60,20.39L18.63,20.34L18.89,20.33L19.09,20.54L19.27,20.55L19.30,20.32L19.25,20.15L19.04,20.16L18.87,20L18.87,19.93L19,19.89L18.95,19.73L18.78,19.61L18.87,19.56L18.47,19.42L18.11,19.50L17.90,19.46L17.72,19.34L17.50,19.38ZM27.58,21.45L27.80,21.53L27.76,21.62L27.88,21.60L27.95,21.50L27.97,21.26L28.05,21.21L28.04,21.31L28.09,21.32L28.25,21.15L28.21,20.92L28.12,20.90L28.05,20.96L27.98,20.84L27.97,20.71L28.09,20.51L28.35,20.40L28.61,20.43L28.70,20.51L28.83,20.29L28.73,20.01L28.58,19.83L28.55,19.36L28.44,19.29L28.21,19.24L27.88,19.30L27.83,19.38L27.64,19.41L27.58,19.61L27.50,19.62L27.22,19.83L27.08,19.86L26.89,19.73L26.81,20L26.62,20.07L26.54,19.99L26.42,20.03L26.24,19.97L26.17,19.81L25.99,19.70L26,19.52L25.83,19.81L25.45,19.89L25.30,19.81L25.25,19.87L24.99,19.88L24.87,19.76L24.71,19.84L24.35,19.80L24.27,19.73L24.13,19.74L24.08,19.65L23.71,19.59L23.73,19.72L23.62,19.90L23.36,19.85L23.21,19.89L23.43,19.95L23.49,20.05L23.50,20.23L23.42,20.41L23.22,20.41L22.78,20.17L22.78,20.39L22.55,20.57L22.53,20.84L22.68,21.04L22.78,20.98L22.88,21.01L22.89,21.33L22.78,21.48L22.67,21.50L22.49,21.65L22.21,21.69L22.14,21.75L22.11,21.83L22.16,22.02L22.07,22.28L21.96,22.38L21.76,22.72L21.60,22.85L21.27,22.96L20.77,22.95L20.67,23.15L20.54,23.17L20.46,23.08L20.40,23.20L20.22,23.25L20.14,23.18L20.04,23.29L19.56,23.44L19.77,23.45L20.11,23.57L20.48,23.51L20.52,23.67L20.43,23.66L20.06,23.86L20.09,23.91L20.34,23.95L20.51,23.95L20.83,23.84L20.86,23.75L20.66,23.62L20.59,23.64L20.61,23.58L20.97,23.47L21.20,23.47L21.42,23.38L21.70,23.38L21.84,23.61L22.13,23.84L22.51,23.79L22.60,23.61L22.83,23.56L23.16,23.37L23.20,23.22L23.50,23.28L23.82,23.24L24.19,22.70L24.12,23L24.24,23L24.33,22.86L24.25,22.66L24.25,22.43L24.18,22.38L24.24,22.21L24.39,22.22L24.39,22.34L24.34,22.38L24.38,22.43L24.65,22.38L24.75,22.44L24.99,22.41L25.18,22.45L25.28,22.31L25.30,22.35L25.53,22.01L25.45,21.96L25.41,22.08L25.35,22.08L25.39,22.02L25.25,21.94L25.23,21.80L25.13,21.70L25.41,21.43L25.31,21.35L25.21,21.43L25.10,21.35L25.07,21.30L25.16,21.17L25.33,21.12L25.34,21.25L25.40,21.26L25.34,21.29L25.44,21.29L25.45,21.11L25.52,21.09L25.73,21.34L25.83,21.31L25.81,21.37L25.89,21.43L25.95,21.37L26.04,21.70L26.20,21.75L26.26,21.67L26.23,21.75L26.44,21.96L26.60,21.99L26.68,22.08L26.90,22.03L26.88,21.89L27.01,21.81L27.14,21.86L27.14,22.02L27.21,22.03L27.27,21.91L27.35,21.97L27.44,21.94L27.48,21.87L27.33,21.79L27.31,21.72L27.38,21.65L27.50,21.71ZM19.35,19.24L19.17,19.34L19.18,19.42L18.99,19.42L19.09,19.49L19.05,19.67L19.14,19.64L19.25,19.71L19.32,19.67L19.41,19.74L19.50,19.63L19.62,19.58L19.84,19.60L19.78,19.54L19.35,19.41ZM29.46,19.17L29.43,19.11L29.43,19.16L29.33,19.19L29.39,19.30L29.32,19.33L29.46,19.46L29.53,19.33ZM31.77,18.63L31.82,18.59L31.78,18.52L31.62,18.63L31.13,18.53L30.83,18.75L30.62,18.65L30.56,18.55L30.45,18.72L30.53,18.87L30.73,18.76L31.16,18.86L31.41,18.85ZM34.25,17.75L34.16,17.70L34.12,17.73L34.11,17.93L34.02,17.99L34.04,18.05L34.21,17.92L34.66,17.93L34.65,17.81L34.48,17.86ZM33.38,17.88L33.50,17.84L33.47,17.70L33.42,17.70L33.35,17.84ZM27.46,17.49L27.31,17.40L27.14,17.60L27.39,17.64L27.46,17.93L27.40,18.10L27.23,18.16L27.17,18.29L27.28,18.37L27.47,18.24L27.53,18.27L27.69,18.43L27.74,18.71L27.97,18.95L28.06,18.89L28.23,18.57L28.57,18.42L28.50,18.29L28.51,18.10L28.43,18.03L28.30,18.14L28.05,17.87L27.91,18.04L27.79,18.06L27.60,17.91ZM34.28,17.13L34.12,17.17L34.25,17.23L34.32,17.34L34.46,17.19ZM30.15,17.08L29.97,17.09L29.79,17.24L29.66,17.20L29.66,17.35L29.82,17.60L29.71,17.75L29.65,18L29.93,18.24L29.90,18.34L29.73,18.41L29.76,18.46L29.93,18.45L29.99,18.53L29.81,18.88L29.63,18.86L29.61,18.90L29.68,19.04L29.67,19.24L29.72,19.38L29.83,19.39L29.96,19.27L30,19.09L30.22,19.06L30.37,18.82L30.29,18.62L30.11,18.60L30.08,18.54L30.12,18.21L30.27,17.93L30.35,17.60L30.24,17.62L30.05,17.38L30.02,17.28L30.14,17.20ZM37.71,16.49L37.48,16.62L37.21,16.57L37.08,16.65L36.83,16.65L36.68,16.58L36.70,16.70L36.92,16.76L36.99,16.85L36.93,16.97L36.94,17.12L36.73,17.43L36.81,17.62L36.79,17.82L36.69,17.99L36.84,18.26L36.71,18.46L36.77,18.64L36.69,18.77L36.35,19L36.17,19L36,18.86L35.96,18.97L35.84,19.02L35.87,19.13L35.79,19.20L35.63,19.24L35.53,19.17L35.54,19.08L35.35,19.09L35.27,19.21L35.10,19.30L35.27,19.36L35.44,19.56L35.42,19.81L35.47,19.74L35.52,19.76L35.49,19.87L35.40,19.86L35.25,20.16L35.10,20.23L35.11,20.45L35.03,20.76L35.07,20.85L34.97,21.14L34.92,21.16L34.97,21.22L35.05,21.26L35.25,21.21L35.38,21.02L35.58,20.94L35.98,21.01L36.22,20.88L36.12,20.69L36.01,20.68L35.89,20.40L36.05,19.80L36.07,19.30L36.12,19.23L36.65,19.04L36.91,18.77L37.08,18.68L37.77,18.73L38.07,18.66L38.27,18.73L38.28,18.43L38.21,18.41L38.23,18.50L38.16,18.48L38.09,18.30L38.11,18.17L38.20,18.10L38.16,18.06L38.18,17.90L38.32,17.69L38.70,17.72L38.98,17.94L39.32,17.65L39.43,17.77L39.54,17.78L39.78,17.65L40.03,17.63L40.08,17.39L40.25,17.23L40.43,17.15L40.73,17.10L40.98,17.22L41.40,17L41.62,17.03L41.73,16.92L41.76,16.79L41.90,16.75L42.05,16.61L42.02,16.56L41.69,16.61L41.60,16.76L41.13,16.67L40.87,16.75L40.80,16.89L40.39,17.09L40.33,17.01L40.52,16.79L40.52,16.68L40.45,16.63L40.11,16.67L39.97,16.74L39.99,17.04L39.93,17.08L40.01,17.18L40.16,17.22L40.13,17.29L39.64,17.26L39.57,17.31L39.47,17.28L39.42,17.38L39.31,17.44L39.16,17.36L38.98,17.36L38.67,17.46L38.60,17.40L38.54,17.48L38.52,17.29L38.67,17.10L38.67,17.01L38.51,16.96L38.47,16.87L38.36,16.94L38.07,16.96L37.92,16.79L37.89,16.66L37.72,16.62ZM39.96,16.24L40.07,16.12L39.98,16.09L39.82,16.18L39.86,16.27ZM39.07,16.01L39.01,16.01L39,16.09L39.30,16.39L39.36,16.63L39.42,16.64L39.41,16.58L39.65,16.59L39.77,16.48L39.87,16.52L39.83,16.44L39.46,16.35L39.33,16.03L39.23,16.08ZM38.13,15.90L38.07,15.94L37.94,15.91L37.95,15.97L37.84,16.10L37.56,16.14L37.58,16.23L37.73,16.35L37.99,16.27L38.13,16.02ZM39.97,15.02L39.90,15.04L39.85,15.17L39.79,15.16L39.80,15.31L39.91,15.38L40,15.34L40.10,15.15L40.19,15.12L40.10,15.03ZM41.58,1.93L41.29,1.85L41.09,1.88L40.78,2.16L40.70,2.30L40.62,2.33L40.32,2.28L40.01,2.14L39.41,2.28L39.22,2.22L38.79,1.96L38.21,1.88L37.86,2.09L37.43,2.07L37.25,2.17L36.94,2.03L36.77,2.15L36.63,2.36L37.11,2.76L37.20,2.94L37.38,3.05L37.50,3.29L37.63,3.40L38.22,3.17L38.51,3.27L38.61,3.42L38.73,3.33L39.27,3.27L39.44,3.46L39.81,3.44L40.22,3.66L40.52,3.75L41.06,3.70L41.19,3.77L41.63,3.69L41.77,3.80L41.97,3.82L42.08,3.76L42.15,3.79L42.09,3.80L42.20,3.93L42.40,3.95L42.63,4.25L42.99,4.34L43.61,4.72L43.70,4.83L43.94,4.89L44.21,5.23L44.28,5.23L44.44,5.40L44.63,5.49L44.87,5.36L44.93,5.16L44.83,4.61L43.93,3.39L43.67,3.17L43.50,2.94L43.21,2.88L42.93,2.47L42.69,2.48L42.53,2.37L42.46,2.23Z","usvi":"M10.72,27.92L10.31,28.53L8.51,27.85L7.86,27.45L7.35,26.43L7.11,26.97L6.57,26.60L5.34,26.84L4.46,26.67L3.78,25.92L1.97,26.46L1.05,25.58L2.74,24.68L4.17,24.31L6.26,24.39L7.11,25.00L7.62,24.83L6.70,24.11L6.26,23.60L7.48,23.98L9.59,25.20L11.67,26.39L12.51,27.75L11.87,27.85L11.36,27.68ZM6.40,27.02L6.67,27.23L6.75,27.52L6.51,27.62L6.35,27.60L6.13,27.93L5.74,28.42L5.63,28.26L5.64,28.02L5.77,27.67L6.20,27.17ZM8.47,22.42L8.88,22.72L8.90,23.42L8.68,23.64L8.40,23.26L8.26,22.81L8.04,22.55ZM20.43,26.22L20.02,26.39L20.63,27.21L20.26,28.60L18.42,27.61L15.57,27.89L14.72,27.10L15.57,25.81L16.52,25.40L17.54,25.10L17.30,24.66L17.81,24.38L19.71,24.90L20.63,25.07L21.48,25.44L22.50,25.98L22.74,26.60L21.96,26.73Z","route":[[18.428,-64.6125],[18.405,-64.607],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.3325,-64.6295],[18.345,-64.633],[18.371,-64.61],[18.375,-64.56],[18.373,-64.5375],[18.37,-64.534],[18.373,-64.5375],[18.383,-64.532],[18.387,-64.5135],[18.388,-64.518],[18.396,-64.515],[18.4288,-64.4469],[18.445,-64.452],[18.49,-64.44],[18.515,-64.415],[18.522,-64.383],[18.503,-64.382],[18.501,-64.3605],[18.503,-64.382],[18.522,-64.383],[18.7215,-64.388],[18.48,-64.494],[18.458,-64.497],[18.455,-64.522],[18.461,-64.529],[18.452,-64.535],[18.463,-64.5712],[18.465,-64.6],[18.462,-64.64],[18.445,-64.668],[18.432,-64.671],[18.4255,-64.6615],[18.432,-64.671],[18.44,-64.69],[18.435,-64.7105],[18.43,-64.725],[18.432,-64.75],[18.4415,-64.7505],[18.3865,-64.7175],[18.3866,-64.708],[18.387,-64.702],[18.3866,-64.708],[18.383,-64.708],[18.378,-64.708],[18.372,-64.695],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.335,-64.638],[18.405,-64.607],[18.428,-64.6125]],"ferry":[[18.3365,-64.9315],[18.318,-64.9],[18.317,-64.86],[18.333,-64.835],[18.362,-64.812],[18.373,-64.765],[18.378,-64.722],[18.392,-64.67],[18.41,-64.63],[18.42,-64.615]]};
+</script>
+<script>
+(function () {
+'use strict';
+
+/* ---------------- helpers ---------------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('bvi.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('bvi.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+  del(k) { try { localStorage.removeItem('bvi.' + k); } catch (e) { /* ignore */ } }
+};
+
+/* ---------------- settings ---------------- */
+const BOAT_DEFAULTS = { cat: { fuelCap: 95, waterCap: 206 }, mono: { fuelCap: 53, waterCap: 120 } };
+const DEFAULTS = { start: '', nights: 7, boatType: 'cat', boatName: '', boatModel: '', crew: '', fuelCap: 95, waterCap: 206,
+  mooringsPhone: '', mooringsEmerg: '', ferryOut: '', ferryBack: '', flightIn: '', flightOut: '', notes: '', theme: 'auto' };
+let S = Object.assign({}, DEFAULTS, store.get('settings', {}));
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (S.theme === 'light' || S.theme === 'dark') root.setAttribute('data-theme', S.theme); else root.removeAttribute('data-theme');
+  const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+  const meta = $('#meta-theme'); if (meta && bg) meta.setAttribute('content', bg);
+}
+
+function applyBoat() {
+  document.body.classList.toggle('is-cat', S.boatType === 'cat');
+  document.body.classList.toggle('is-mono', S.boatType === 'mono');
+  $$('[data-boat]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.boat === S.boatType)));
+  $$('[data-bind]').forEach(el => { const v = S[el.dataset.bind]; if (v !== '' && v != null) el.textContent = v; });
+  const eng = $('#fc-eng'); if (eng) { eng.value = S.boatType === 'cat' ? '2' : '1'; eng.disabled = S.boatType === 'mono'; }
+  const tank = $('#fc-tank'); if (tank) tank.value = S.fuelCap;
+  calcFuel();
+}
+
+function setBoatType(t) {
+  const old = BOAT_DEFAULTS[S.boatType];
+  if (Number(S.fuelCap) === old.fuelCap) S.fuelCap = BOAT_DEFAULTS[t].fuelCap;
+  if (Number(S.waterCap) === old.waterCap) S.waterCap = BOAT_DEFAULTS[t].waterCap;
+  S.boatType = t; store.set('settings', S); fillSettingsForm(); applyBoat(); renderToday(); renderMayday();
+}
+
+/* ---------------- dates, sun & moon ---------------- */
+const LAT = 18.427, LON = -64.62, TZ = -4; // Road Town, AST (no daylight saving)
+function parseDate(s) { if (!s) return null; const [y, m, d] = s.split('-').map(Number); return (y && m && d) ? new Date(y, m - 1, d) : null; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function dayDiff(a, b) { return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 864e5); }
+function fmtDate(d, opts) { return d.toLocaleDateString('en-US', opts || { weekday: 'short', month: 'short', day: 'numeric' }); }
+function fmtMin(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; let h = Math.floor(m / 60); const mm = String(m % 60).padStart(2, '0'); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return { t: h + ':' + mm, ap }; }
+/* "Today" in BVI local time regardless of the phone's time zone */
+function bviToday() { const n = new Date(); const u = n.getTime() + n.getTimezoneOffset() * 6e4 + TZ * 36e5; const b = new Date(u); return new Date(b.getFullYear(), b.getMonth(), b.getDate()); }
+
+function sunTimes(date) { // NOAA approximation; returns minutes after local midnight (AST)
+  const start = new Date(date.getFullYear(), 0, 0);
+  const N = Math.round((date - start) / 864e5);
+  const rad = Math.PI / 180;
+  function calc(rise, hr) {
+    const g = 2 * Math.PI / 365 * (N - 1 + (hr - 12) / 24);
+    const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+    const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+    const ha = Math.acos(Math.cos(90.833 * rad) / (Math.cos(LAT * rad) * Math.cos(decl)) - Math.tan(LAT * rad) * Math.tan(decl)) / rad;
+    return 720 - 4 * (LON + (rise ? ha : -ha)) - eqt + TZ * 60;
+  }
+  let r = calc(true, 6), s = calc(false, 18);
+  r = calc(true, r / 60); s = calc(false, s / 60);
+  return { rise: r, set: s };
+}
+function moon(date) {
+  const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
+  const t = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 22); // ~6 PM AST
+  const age = (((t - ref) / 864e5) % syn + syn) % syn;
+  const illum = Math.round((1 - Math.cos(2 * Math.PI * age / syn)) / 2 * 100);
+  const names = ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'];
+  const idx = Math.floor((age / syn) * 8 + 0.5) % 8;
+  return { illum, name: names[idx], age };
+}
+
+/* ---------------- data: stops, legs, plan ---------------- */
+const STOPS = [
+  { id: 'base', name: 'The Moorings base', short: 'Moorings base', area: 'Road Town, Tortola', lat: 18.428, lon: -64.6125, kind: 'marina', lp: 'r',
+    tags: ['Start & finish', 'Fuel', 'Water', 'Ice'],
+    what: 'Wickhams Cay II at the head of Road Harbour. Fuel dock, water, ice, provisioning, restaurant, pool and showers.',
+    moor: 'Your assigned slip. Call the base on VHF 12 about 30 minutes before you return.',
+    caution: 'Road Harbour has ferries and cruise ships. Stay clear of the ferry dock and cruise pier.' },
+  { id: 'nanny', name: 'Nanny Cay', short: 'Nanny Cay', area: 'Tortola, south shore', lat: 18.3985, lon: -64.6365, kind: 'marina', lp: 'l',
+    tags: ['Marina', 'Fuel', 'Restaurants'],
+    what: 'Large full-service marina 3 nm west of the base: fuel, chandlery, restaurants and a pool. A good marina night or last night near the base.',
+    moor: 'Slips (book ahead). Enter via the marked channel.' },
+  { id: 'bight', name: 'The Bight, Norman Island', short: 'The Bight', area: 'Norman Island', lat: 18.318, lon: -64.618, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'Moorings', 'Snorkel', 'Kid favorite'],
+    what: 'Big, well-protected bay. A classic first or last night, 7 nm from the base.',
+    moor: 'Large mooring field; anchoring in sand toward the edges. Fills by mid-afternoon in holiday weeks.',
+    food: 'Pirates Bight beach restaurant. The Willy T floating bar is a party scene, more adult after dark.',
+    todo: 'Dinghy to The Caves for snorkeling. Hike up to Spyglass Hill. Sunset paddleboard.',
+    kids: 'Pirate-treasure legends, and lots of fish and turtles.',
+    caution: 'Busy dinghy traffic at night. Carry a light.' },
+  { id: 'caves', name: 'The Caves', short: 'The Caves', area: 'Treasure Point, Norman Island', lat: 18.3138, lon: -64.626, kind: 'day', lp: 'l',
+    tags: ['Day stop', 'Snorkel', 'NP moorings'],
+    what: 'Sea caves at Treasure Point with huge schools of fish. An easy dinghy ride from the Bight.',
+    moor: 'National Parks day moorings (90 min) or the dinghy line.',
+    caution: 'Surge in big swell. Stay out of the caves when waves push in.' },
+  { id: 'indians', name: 'The Indians', short: 'Indians', area: 'Between Norman and Peter Island', lat: 18.3325, lon: -64.6295, kind: 'day', lp: 'l',
+    tags: ['Day stop', 'Snorkel', 'NP moorings'],
+    what: 'Four rock pinnacles with some of the best snorkeling in the BVI: coral walls, reef fish, sometimes turtles.',
+    moor: 'National Parks day moorings only. No anchoring, 90-minute limit. Go by 8:30 AM.',
+    caution: 'Exposed. Only in moderate conditions. Snorkel up-current first.' },
+  { id: 'benures', name: 'Benures Bay', short: 'Benures', area: 'Norman Island, north side', lat: 18.3233, lon: -64.6064, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'Anchor', 'Quiet'],
+    what: 'Quiet alternative to the Bight. No restaurants and no party.',
+    moor: 'Anchor in sand.',
+    caution: 'Gusts can roll down the hills.' },
+  { id: 'peter', name: 'Peter Island', short: 'Peter I.', area: 'Great Harbour · Little Harbour · Deadman’s Bay', lat: 18.357, lon: -64.582, kind: 'night', lp: 'b',
+    tags: ['Overnight', 'Anchor', 'Quiet'],
+    what: 'Big, quiet bays 5 nm across the channel from Road Town. Deadman’s Bay has a beautiful beach.',
+    moor: 'Little Harbour has good holding in sand. Great Harbour is deep (use lots of scope).',
+    food: 'Limited. The resort has been rebuilding, so check what’s open ashore.',
+    caution: 'Deep anchoring in Great Harbour; let out plenty of chain.' },
+  { id: 'rhone', name: 'Wreck of the RMS Rhone', short: 'Rhone', area: 'Salt Island', lat: 18.37, lon: -64.534, kind: 'day', lp: 'b',
+    tags: ['Day stop', 'Snorkel', 'NP moorings'],
+    what: 'Royal Mail steamship wrecked in an 1867 hurricane, in 20–80 ft. The shallow stern section is good for snorkeling. Marine National Park.',
+    moor: 'National Parks day moorings (90 min). No anchoring anywhere in the park.',
+    caution: 'Current can be strong. Use a float line and swim up-current first. Yellow balls are for dive boats.' },
+  { id: 'cooper', name: 'Cooper Island', short: 'Cooper', area: 'Manchioneel Bay', lat: 18.387, lon: -64.5135, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'BoatyBall', 'Snorkel', 'Kid favorite'],
+    what: 'Laid-back favorite with the Cooper Island Beach Club: restaurant, rum bar, small shops. Turtles in the bay.',
+    moor: 'BoatyBall moorings (reservable). Full by early afternoon.',
+    food: 'Cooper Island Beach Club. Reserve dinner.',
+    todo: 'Snorkel Cistern Point. Watch for turtles among the moorings.',
+    caution: 'The bay’s namesake manchineel trees are toxic. Can be rolly in a north swell.' },
+  { id: 'baths', name: 'The Baths & Devil’s Bay', short: 'The Baths', area: 'Virgin Gorda, southwest', lat: 18.4288, lon: -64.4469, kind: 'day', lp: 'r',
+    tags: ['Day stop', 'NP moorings', 'Swim ashore', 'Kid favorite'],
+    what: 'Giant granite boulders, grottoes and pools. A trail through the boulders (ladders and ropes, 20–30 min) links The Baths to Devil’s Bay.',
+    moor: 'National Parks day moorings only. Dinghies tie to the dinghy line and you swim in; bring a dry bag. A red flag means no mooring and no swimming.',
+    todo: 'Arrive by 8 AM. Water shoes for the trail. Snorkel along the rocks.',
+    caution: 'Crowded late morning when cruise ships are in. Surge can be dangerous in a north swell. Entry by land is $3 adult, $2 child.' },
+  { id: 'vgyh', name: 'Spanish Town (Virgin Gorda Yacht Harbour)', short: 'Spanish Town', area: 'Virgin Gorda', lat: 18.4483, lon: -64.44, kind: 'marina', lp: 'r',
+    tags: ['Marina', 'Fuel', 'Groceries', 'ATM'],
+    what: 'Full-service marina: fuel, water, ice, groceries, laundry, ATMs. A good mid-week marina night or resupply near The Baths.',
+    moor: 'Slips. Enter via the marked channel through the reef.' },
+  { id: 'leverick', name: 'Leverick Bay', short: 'Leverick Bay', area: 'North Sound, Virgin Gorda', lat: 18.4999, lon: -64.391, kind: 'night', lp: 'l',
+    tags: ['Overnight', 'Marina', 'BoatyBall', 'Fuel'],
+    what: 'Resort marina with fuel, water, ice, a small market, pool, beach and restaurant. Live music some nights.',
+    moor: 'BoatyBall moorings and slips. Overnight mooring guests have often been offered free water and ice. Ask.',
+    todo: 'Pool and beach time. A pirate-themed party has been a weekly tradition; check the night.',
+    caution: 'Enter North Sound only by the marked channel.' },
+  { id: 'saba', name: 'Saba Rock & Bitter End', short: 'Saba Rock', area: 'North Sound, Virgin Gorda', lat: 18.501, lon: -64.3605, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'BoatyBall', 'Water sports'],
+    what: 'Both rebuilt after Hurricane Irma (2017). Saba Rock is a tiny islet with a restaurant and bar. Bitter End Yacht Club has a beach, water-sports rentals, coffee and some provisions.',
+    moor: 'BoatyBall moorings at Saba Rock. Bitter End has its own moorings and takes some reservations.',
+    todo: 'Kayak and paddleboard. Beach day at Prickly Pear Island (Vixen Point).',
+    kids: 'Big tarpon cruise under the dock lights after dark.',
+    caution: 'Colquhoun and Cactus reefs flank the entrance. Shoal water near Saba Rock.' },
+  { id: 'anegada', name: 'Anegada', short: 'Setting Point', area: 'Setting Point', lat: 18.7215, lon: -64.388, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'Permission needed', 'Lobster'],
+    what: 'Flat coral island 14 nm north of Virgin Gorda: empty beaches, flamingos, rock iguanas and the famous grilled lobster.',
+    moor: 'Moorings off Setting Point, reached by a buoyed channel through the reef. You need The Moorings’ OK before going.',
+    food: 'Lobster dinners (order by ~3 PM, often cash): Anegada Reef Hotel, Potter’s by the Sea and others.',
+    todo: 'Open-air taxi to Loblolly Bay and Cow Wreck Beach. Flamingos in the salt ponds.',
+    caution: 'Leave North Sound mid-morning for overhead sun. Follow the channel exactly. Don’t go in strong wind, big swell or poor visibility. No reliable fuel.' },
+  { id: 'marina_cay', name: 'Marina Cay', short: 'Marina Cay', area: 'Off Beef Island', lat: 18.461, lon: -64.529, kind: 'night', lp: 'r',
+    tags: ['Overnight', 'BoatyBall', 'Snorkel'],
+    what: 'Tiny island with a reef-protected mooring field off the north side of Beef Island.',
+    moor: 'BoatyBall moorings.',
+    todo: 'Snorkel the reef. Sunset from the hilltop.',
+    food: 'Check what’s open ashore.',
+    caution: 'Reef on the north and east sides. Follow the chart in.' },
+  { id: 'trellis', name: 'Trellis Bay', short: 'Trellis Bay', area: 'Beef Island', lat: 18.4465, lon: -64.533, kind: 'night', lp: 'b',
+    tags: ['Overnight', 'Protected', 'Full moon'],
+    what: 'Very protected bay beside the Beef Island airport. Artists’ studios and casual cafes; a famous full-moon party with fireballs (full moon about Dec 24, 2026; check if it’s on).',
+    moor: 'Moorings and anchoring. Watch the shallows.',
+    kids: 'Planes landing right overhead.' },
+  { id: 'monkey', name: 'Monkey Point', short: 'Monkey Pt', area: 'Guana Island', lat: 18.463, lon: -64.5712, kind: 'day', lp: 't',
+    tags: ['Day stop', 'Snorkel', 'NP moorings'],
+    what: 'Rocky point with big schools of fish and sometimes turtles. A great lunch stop between Marina Cay and Cane Garden Bay.',
+    moor: 'A few National Parks day moorings. Go early.',
+    caution: 'Exposed to north swell. Guana Island ashore is private.' },
+  { id: 'cgb', name: 'Cane Garden Bay', short: 'Cane Garden Bay', area: 'Tortola, north shore', lat: 18.4255, lon: -64.6615, kind: 'night', lp: 'b',
+    tags: ['Overnight', 'Swell-dependent', 'Beach bars'],
+    what: 'Lively beach town with a long sandy beach, bars and restaurants.',
+    moor: 'Moorings inside the bay. Enter through the buoyed gap in the reef.',
+    caution: 'Faces north. In a December north swell it gets rolly and can be unsafe. Have a Plan B (Marina Cay, Trellis Bay, or Little Harbour on Jost Van Dyke).' },
+  { id: 'sandy_cay', name: 'Sandy Cay & Sandy Spit', short: 'Sandy Cay', area: 'Off Jost Van Dyke', lat: 18.435, lon: -64.7105, kind: 'day', lp: 'b',
+    tags: ['Day stop', 'Swim ashore', 'Calm days only'],
+    what: 'Postcard islets of white sand and palms.',
+    moor: 'Anchor in sand off the beach in settled weather and swim in.',
+    caution: 'Exposed, with reef around Sandy Spit. Day stop only.' },
+  { id: 'diamond_cay', name: 'Diamond Cay & Bubbly Pool', short: 'Diamond Cay', area: 'East end, Jost Van Dyke', lat: 18.45, lon: -64.72, kind: 'day', lp: 't',
+    tags: ['Day stop', 'Hike'],
+    what: 'Short hike from Foxy’s Taboo to a natural jacuzzi where waves crash through the rocks.',
+    caution: 'The Bubbly Pool works in a moderate north swell and turns dangerous in a big one. Watch several sets before going in.' },
+  { id: 'jvd_lh', name: 'Little Harbour, Jost Van Dyke', short: 'Little Harbour', area: 'Jost Van Dyke, east', lat: 18.4393, lon: -64.729, kind: 'night', lp: 'b',
+    tags: ['Overnight', 'BoatyBall', 'Quieter'],
+    what: 'Quieter harbor with a few waterfront restaurants (Sidney’s Peace & Love, Harris’ Place).',
+    moor: 'BoatyBall moorings and anchoring.' },
+  { id: 'jvd_gh', name: 'Great Harbour, Jost Van Dyke', short: 'Great Harbour', area: 'Jost Van Dyke', lat: 18.4415, lon: -64.7505, kind: 'night', lp: 't',
+    tags: ['Overnight', 'BoatyBall', 'Foxy’s', 'Fuel'],
+    what: 'Home of Foxy’s, a customs office, small shops and a fuel dock. Your base for White Bay.',
+    moor: 'BoatyBall moorings. Deep anchoring.',
+    todo: 'Taxi or walk over the hill (steep, ~20 min) to White Bay for the Soggy Dollar Bar, birthplace of the Painkiller.',
+    caution: 'Old Year’s Night (Dec 31) is a huge party; the harbor is jammed from Dec 30.' },
+  { id: 'white_bay', name: 'White Bay (by land or dinghy only)', short: 'White Bay', area: 'Jost Van Dyke', lat: 18.441, lon: -64.764, kind: 'day', lp: 'l',
+    tags: ['No charter boats', 'Beach bars'],
+    what: 'Gorgeous beach with the Soggy Dollar Bar and neighbors.',
+    moor: 'Closed to charter boats: no mooring or anchoring. Moor at Great Harbour and take a taxi or walk over.' },
+  { id: 'sopers', name: 'Soper’s Hole', short: 'Soper’s Hole', area: 'West End, Tortola', lat: 18.387, lon: -64.702, kind: 'night', lp: 'b',
+    tags: ['Overnight', 'Marina', 'BoatyBall', 'Fuel'],
+    what: 'Well-protected harbor with a marina, fuel dock, shops, Pusser’s Landing, a ferry dock and customs.',
+    moor: 'BoatyBall moorings and slips. Deep water, so moorings are easier than anchoring.',
+    todo: 'Fuel, water and ice. Shopping. Dinner.',
+    caution: 'Fast ferries come and go. Current in Thatch Island Cut.' }
+];
+const STOP = Object.fromEntries(STOPS.map(s => [s.id, s]));
+
+const LEGS = [
+  ['Moorings base', 'Norman Island (Bight)', 7, 'Reach'],
+  ['Moorings base', 'Peter Island', 5, 'Reach'],
+  ['Moorings base', 'Cooper Island', 8, 'Upwind'],
+  ['Norman (Bight)', 'The Indians', 1, '—'],
+  ['The Indians', 'RMS Rhone', 6, 'Upwind'],
+  ['RMS Rhone', 'Cooper Island', 1.5, '—'],
+  ['Norman (Bight)', 'Cooper Island', 8, 'Upwind'],
+  ['Cooper Island', 'The Baths', 5, 'Upwind'],
+  ['The Baths', 'Spanish Town', 1.5, '—'],
+  ['The Baths', 'North Sound', 9, 'Upwind'],
+  ['North Sound', 'Anegada', 14, 'Reach'],
+  ['North Sound', 'Marina Cay', 10, 'Downwind'],
+  ['Anegada', 'Marina Cay', 18, 'Downwind'],
+  ['Anegada', 'Jost Van Dyke', 27, 'Downwind'],
+  ['Moorings base', 'Marina Cay / Trellis', 10, 'Upwind'],
+  ['Marina Cay', 'Monkey Point', 2.5, '—'],
+  ['Monkey Point', 'Cane Garden Bay', 6, 'Downwind'],
+  ['Marina Cay', 'JVD Great Harbour', 13, 'Downwind'],
+  ['Cane Garden Bay', 'JVD Great Harbour', 5.5, 'Downwind'],
+  ['JVD Great Harbour', 'JVD Little Harbour', 1.5, '—'],
+  ['JVD Little Harbour', 'Sandy Cay', 1, '—'],
+  ['JVD Great Harbour', 'Soper’s Hole', 4.5, 'Reach'],
+  ['Soper’s Hole', 'Norman (Bight)', 6.5, 'Upwind'],
+  ['Soper’s Hole', 'Moorings base', 7, 'Upwind'],
+  ['JVD', 'Norman (Bight)', 11, 'Reach'],
+  ['Norman (Bight)', 'Moorings base', 7, 'Upwind'],
+  ['Nanny Cay', 'Moorings base', 3, 'Upwind']
+];
+
+const PLAN = [
+  { title: 'Shake-down sail to Norman Island', stops: ['base', 'bight'], nm: 7,
+    am: 'Chart and boat briefings, final provisioning, stow everything.',
+    pm: 'Off the dock by 1–2 PM. Practice reefing and twin-engine turns in open water. Pick up a mooring in the Bight.',
+    night: 'The Bight, Norman Island. Snorkel The Caves if there’s light; Pirates Bight or dinner aboard.',
+    alt: 'Late start or rough: Peter Island (5 nm) or a night at Nanny Cay.' },
+  { title: 'Snorkel day: Indians, Rhone, Cooper', stops: ['bight', 'indians', 'rhone', 'cooper'], nm: 8.5,
+    am: 'The Indians at 8–8:30 AM (1 nm), National Parks day mooring, 90 minutes.',
+    pm: 'Motor-sail to the Rhone (6 nm), snorkel the stern. Then 1.5 nm to Cooper Island. Aim to be on a ball by 1–2 PM.',
+    night: 'Cooper Island, Manchioneel Bay. Dinner at the Beach Club.',
+    alt: 'Cooper full: Trellis Bay (~6 nm north) or Peter Island.' },
+  { title: 'The Baths, then North Sound', stops: ['cooper', 'baths', 'saba'], nm: 14,
+    am: 'Leave Cooper by 7:30. The Baths (5 nm, upwind): grab a day mooring, swim in, walk the trail to Devil’s Bay.',
+    pm: 'North along Virgin Gorda to North Sound (9 nm). Enter by the marked channel.',
+    night: 'Saba Rock, Bitter End or Leverick Bay.',
+    alt: 'Red flag at The Baths: Spanish Town marina, then a taxi to The Baths by land.' },
+  { title: 'Anegada (or a North Sound play day)', stops: ['saba', 'anegada'], nm: 14,
+    am: 'Only with The Moorings’ OK, settled weather and good light: leave about 9–10 AM, 14 nm (~2.5 h, beam reach). Follow the buoyed channel into Setting Point.',
+    pm: 'Order lobster by ~3 PM. Taxi to Loblolly Bay or Cow Wreck Beach.',
+    night: 'Anegada, Setting Point.',
+    alt: 'Too windy or swelly: stay in North Sound. Water sports at Bitter End, Prickly Pear beach, Leverick Bay pool. Refill fuel and water at Leverick.' },
+  { title: 'Back west to Marina Cay', stops: ['anegada', 'marina_cay'], nm: 18,
+    am: 'From Anegada: 18 nm downwind (~3 h), leave by 9. From North Sound: 10 nm.',
+    pm: 'Lunch and snorkel at Monkey Point if calm (2.5 nm on). Back to Marina Cay or Trellis Bay for the night.',
+    night: 'Marina Cay (BoatyBall) or Trellis Bay.',
+    alt: 'Cane Garden Bay only if there’s no north swell.' },
+  { title: 'Jost Van Dyke', stops: ['marina_cay', 'monkey', 'sandy_cay', 'jvd_gh'], nm: 14,
+    am: 'Downwind along Tortola’s north shore (~13 nm). Book a BoatyBall at 7 AM.',
+    pm: 'Lunch stop at Sandy Cay or Sandy Spit on calm days. Then Great Harbour or Little Harbour.',
+    night: 'Great Harbour (Foxy’s) or Little Harbour. Taxi or walk to White Bay for the Soggy Dollar.',
+    alt: 'Big north swell: skip Sandy Spit and Diamond Cay. Little Harbour is usually calmer.' },
+  { title: 'Soper’s Hole, then a short last hop', stops: ['jvd_gh', 'sopers', 'bight'], nm: 11,
+    am: 'JVD to Soper’s Hole (4.5 nm): fuel, water, ice, shops, lunch.',
+    pm: 'On to Norman Island (6.5 nm) or Peter Island. Or go straight to the base (7 nm) if you’re returning tonight.',
+    night: 'The Bight or Peter Island, or the Moorings base.',
+    alt: 'Strong wind on the nose: Nanny Cay marina for the last night (3 nm from base).' },
+  { title: 'Return to base', stops: ['bight', 'base'], nm: 7,
+    am: 'Leave by 8:30 AM (7 nm, upwind, ~1.5 h). Pump out offshore. Call The Moorings on VHF 12 about 30 minutes out.',
+    pm: 'Charter ends 11:00 AM. Check out, then taxi to the ferry.',
+    night: 'Home, or a hotel night in Road Town or St. Thomas.',
+    alt: '' }
+];
+
+const GLOSSARY = [
+  ['Port / starboard', 'Left / right when facing the front of the boat. Port has four letters, like "left".'],
+  ['Bow / stern', 'Front / back.'], ['Windward / leeward', 'The side the wind comes from / the side it blows toward.'],
+  ['Helm', 'The steering station.'], ['Cleat', 'Metal fitting you tie lines to.'],
+  ['Pennant', 'The rope loop on top of a mooring ball that you pick up.'], ['Painter', 'The dinghy’s towing and tie-up line.'],
+  ['Bridle', 'A V of lines from both hulls of a catamaran to the anchor chain.'], ['Scope', 'Length of anchor chain out compared with the water depth.'],
+  ['Rode', 'Anchor chain and/or rope.'], ['Windlass', 'Electric winch that raises and lowers the anchor.'],
+  ['Reef (sail)', 'Making a sail smaller for strong wind.'], ['Reef (coral)', 'Shallow coral. Avoid hitting it.'],
+  ['Furl', 'Roll up a sail (the jib rolls around its forestay).'], ['Sheet / halyard', 'Line that trims a sail / line that hoists it.'],
+  ['Tack / gybe', 'Turning the bow / the stern through the wind.'], ['Heel', 'The lean of a monohull under sail.'],
+  ['Knot / nm', 'One nautical mile per hour / nautical mile (1.15 statute miles).'],
+  ['Davits', 'Arms at the stern that lift the dinghy out of the water.'], ['Dinghy / tender', 'The small inflatable boat.'],
+  ['Head', 'Toilet.'], ['Galley', 'Kitchen.'], ['Holding tank', 'Sewage tank under the head.'],
+  ['Y-valve', 'Switches the head between the holding tank and overboard.'], ['Seacock', 'A valve on a hole through the hull.'],
+  ['Raw water', 'Sea water pumped in to cool the engine.'], ['Impeller', 'Rubber pump wheel that moves cooling water. It fails if run dry.'],
+  ['Lazy jacks / stack pack', 'Lines and a zippered bag along the boom that catch the mainsail.'],
+  ['MOB', 'Man (person) overboard. Also the button on the chartplotter.'], ['PFD', 'Personal flotation device: a life jacket.'],
+  ['VHF', 'The marine radio. Channel 16 is for calling and emergencies.'], ['BoatyBall', 'App for booking and paying for mooring balls.'],
+  ['NPT', 'National Parks Trust of the Virgin Islands. Runs the day-use moorings.'],
+  ['Painkiller', 'Rum, pineapple, orange, coconut cream and nutmeg. Invented at the Soggy Dollar.']
+];
+
+const CHECKLISTS = [
+  { id: 'pretrip', title: 'Before you fly', items: [
+    'Passports for everyone (valid well past the trip)', 'BVI ED card done online for each person; QR codes saved', 'Ferry tickets booked (round trip)',
+    'Moorings paperwork, sailing résumé approved, crew list sent', 'Provisioning order in (5 days ahead)', 'Kids’ life jackets requested or packed',
+    'BoatyBall app installed with payment set up', 'Chart app with BVI offline; offline Google Maps', 'Phone travel plan turned on (BVI = roaming)',
+    'Cash in small bills', 'This app opened from the home screen (offline ready)'] },
+  { id: 'checkout', title: 'Boat check-out at the base', items: [
+    'Note fuel and water levels; photo of engine-hour meters', 'Photos/video of existing damage, including the dinghy',
+    'Find: life jackets (count them), throwable/Lifesling, flares, first-aid kit, fire extinguishers', 'Find: seacocks, bilge-pump switches, manual pump handle, softwood plugs',
+    'Learn: engine start/stop, battery switches, battery monitor', 'Learn: propane solenoid, spare tank swap', 'Learn: head operation, Y-valve, holding-tank gauge',
+    'Learn: windlass breaker, remote, chain marks, bridle', 'Learn: reefing system and furler', 'Learn: chartplotter, depth, autopilot, VHF (USA mode)',
+    'Learn: outboard start, kill cord, dinghy lock', 'Ask: Anegada OK? Refuel policy? Return time and place?', 'Save Moorings phone numbers in Settings'] },
+  { id: 'engine', title: 'Morning engine check', items: [
+    'Oil between the marks (each engine)', 'Coolant visible in the overflow tank', 'Raw-water strainer clear, seacock open', 'Belt tight, no fraying',
+    'Bilge dry; no fuel or oil smell', 'Engine hours written down', 'After start: water from the exhaust', 'Battery voltage rising (charging)'] },
+  { id: 'underway', title: 'Before getting under way', items: [
+    'Weather and swell checked; destination and Plan B agreed', 'Hatches and ports closed', 'Galley and cabins stowed; fridge latched',
+    'Dinghy on davits and secured, or painter shortened', 'Instruments and VHF (channel 16) on', 'Kids in life jackets; everyone knows their job',
+    'Engines warm; no lines in the water', 'Windlass breaker on (if anchored); bridle off', 'Mooring lines ready to slip'] },
+  { id: 'mooring', title: 'Mooring pickup prep', items: [
+    'Two lines led from the bow cleats', 'Boathook ready', 'Hand signals agreed', 'Fenders in (they snag the pennant)', 'Approach into the wind, slow',
+    'Reserved-ball check (orange BoatyBall = reserved)'] },
+  { id: 'ashore', title: 'Leaving the boat', items: [
+    'Hatches closed (squalls)', 'Propane solenoid off', 'Water pump off', 'Valuables locked away', 'Flashlight and handheld VHF in the dinghy',
+    'Dinghy lock and key', 'Anchor light on if back after dark', 'Phone and cash in a dry bag'] },
+  { id: 'night', title: 'Bedtime aboard', items: [
+    'Anchor light on', 'Dinghy raised or locked to the boat', 'Mooring lines or bridle checked for chafe', 'Hatches mostly closed if squalls are around',
+    'Propane off', 'Cockpit cushions and towels stowed or tied', 'Battery voltage checked', 'Anchor alarm set (if anchored)'] },
+  { id: 'return', title: 'Return to base', items: [
+    'Fuel per Moorings’ instructions', 'Holding tank pumped out offshore', 'Call Moorings on VHF 12 (~30 min out)', 'Fenders and lines ready both sides',
+    'Pack bags; strip beds if asked', 'List anything broken or not working', 'Snorkel gear, towels and boat items back in place', 'Hand back keys and kill cord'] }
+];
+
+const PACKING = [
+  ['Documents & money', ['Passports', 'ED-card QR codes (screenshots)', 'Moorings confirmation', 'Credit cards', 'Cash in small bills', 'Driver’s license']],
+  ['Sun & water', ['Reef-safe mineral sunscreen (the USVI bans oxybenzone)', 'Rash guards', 'Wide hats with chin straps', 'Polarized sunglasses with straps', 'Swimsuits (two each)', 'Water shoes (for The Baths)', 'Snorkel masks that fit the kids']],
+  ['Clothes', ['Light long sleeves and pants (sun, bugs)', 'Light rain jacket', 'Non-marking sandals or boat shoes', 'One nicer outfit for dinner ashore', 'A warm layer (nights are ~72°F)']],
+  ['Gear', ['Headlamps (red-light mode)', 'Power bank and charging cables', '12 V USB adapters', 'Waterproof phone pouches', 'Dry bag for the dinghy', 'Small Bluetooth speaker', 'Zip bags', 'Clothespins']],
+  ['Health', ['Seasickness medicine (and kids’ doses)', 'Prescriptions in carry-on', 'Pain/fever reliever', 'Antihistamine', 'Aloe and hydrocortisone', 'Swimmer’s-ear drops', 'Bandages and antibiotic ointment', 'Insect repellent (no-see-ums at dusk)']],
+  ['Kids & fun', ['Kids’ life jackets (if not reserved)', 'Card and travel games', 'Fish ID card', 'Downloaded movies and books', 'Journal for the ship’s log']]
+];
+
+/* ---------------- rendering ---------------- */
+function stopKindPill(k) { return k === 'night' ? '<span class="pill night">Overnight</span>' : k === 'marina' ? '<span class="pill marina">Marina</span>' : '<span class="pill day">Day stop</span>'; }
+
+function renderStops() {
+  const order = ['base', 'nanny', 'bight', 'caves', 'indians', 'benures', 'peter', 'rhone', 'cooper', 'baths', 'vgyh', 'leverick', 'saba', 'anegada', 'trellis', 'marina_cay', 'monkey', 'cgb', 'sandy_cay', 'diamond_cay', 'jvd_lh', 'jvd_gh', 'white_bay', 'sopers'];
+  $('#stops-list').innerHTML = order.map(id => {
+    const s = STOP[id];
+    const extra = s.tags.filter(t => !/^(Overnight|Day stop|Marina)$/.test(t)).map(t => {
+      const cls = /Permission|No charter|Swell|Calm days/.test(t) ? 'caution' : '';
+      return '<span class="pill ' + cls + '">' + esc(t) + '</span>';
+    }).join('');
+    const rows = [['What', s.what], ['Mooring', s.moor], ['Food', s.food], ['Do', s.todo], ['Kids', s.kids], ['Watch out', s.caution]]
+      .filter(r => r[1]).map(r => '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>').join('');
+    return '<article class="card stop" id="stop-' + s.id + '"><h3>' + esc(s.name) + ' <span class="area">' + esc(s.area) + '</span></h3>' +
+      '<div class="pills">' + stopKindPill(s.kind) + extra + '</div><dl class="kv">' + rows + '</dl>' +
+      '<p><a href="#islands-map" data-focus="' + s.id + '">Show on chart →</a></p></article>';
+  }).join('');
+}
+
+function fmtHrs(nm) { const m = Math.round(nm / 6 * 60 / 5) * 5; const h = Math.floor(m / 60); return (h ? h + ' h ' : '') + (m % 60 ? (m % 60) + ' m' : (h ? '' : '0 m')); }
+function renderLegs() {
+  $('#legs-body').innerHTML = LEGS.map(l => '<tr><td>' + esc(l[0]) + ' → ' + esc(l[1]) + '</td><td class="n">' + l[2] + '</td><td class="n">' + fmtHrs(l[2]) + '</td><td>' + (l[3] === 'Upwind' ? '<span class="pill caution">Upwind</span>' : esc(l[3])) + '</td></tr>').join('');
+}
+
+function planDate(i) { const st = parseDate(S.start); return st ? addDays(st, i) : null; }
+function dayCard(p, i, isToday) {
+  const d = planDate(i);
+  const route = p.stops.map(id => esc(STOP[id].short)).join(' <span aria-hidden="true">→</span> ');
+  const note = store.get('note.d' + (i + 1), '');
+  return '<article class="card day' + (isToday ? ' today' : '') + '" id="plan-d' + (i + 1) + '">' +
+    '<div class="day-head"><span class="day-no">' + (i + 1) + '</span><div><h3>' + esc(p.title) + '</h3>' +
+    (d ? '<div class="date">' + fmtDate(d) + (isToday ? ' · today' : '') + '</div>' : '') + '</div></div>' +
+    '<div class="legline">' + route + ' <span class="pill">≈ <span class="nm">' + p.nm + '</span> nm</span></div>' +
+    '<dl class="kv"><dt>Morning</dt><dd>' + esc(p.am) + '</dd><dt>Afternoon</dt><dd>' + esc(p.pm) + '</dd><dt>Night</dt><dd>' + esc(p.night) + '</dd>' +
+    (p.alt ? '<dt>Plan B</dt><dd>' + esc(p.alt) + '</dd>' : '') + '</dl>' +
+    '<div class="field"><label for="note-d' + (i + 1) + '">Our notes</label><textarea id="note-d' + (i + 1) + '" data-note="d' + (i + 1) + '" placeholder="Reservations, changes, highlights">' + esc(note) + '</textarea></div>' +
+    '</article>';
+}
+function renderPlan() {
+  const ti = tripIndex();
+  $('#plan-list').innerHTML = PLAN.map((p, i) => dayCard(p, i, ti === i)).join('');
+}
+
+function tripIndex() { const st = parseDate(S.start); if (!st) return null; return dayDiff(st, bviToday()); }
+
+function renderToday() {
+  const st = parseDate(S.start), today = bviToday();
+  const nights = Math.max(1, Number(S.nights) || 7);
+  let focus = today;
+  const eyebrow = $('#hero-eyebrow'), title = $('#hero-title'), text = $('#hero-text'), btn = $('#hero-btn');
+  let planHtml = '<p class="small">Your day-by-day plan appears here during the trip. <a href="#islands-plan">See the 7-night plan →</a></p>';
+  if (!st) {
+    eyebrow.textContent = 'December 2026'; title.textContent = 'Set your charter dates';
+    text.textContent = 'Add your dates in Settings and this screen becomes your daily briefing: the day’s plan, sunset, and when to be on a mooring.';
+    btn.textContent = 'Open settings'; btn.setAttribute('href', '#more-settings'); btn.hidden = false;
+    focus = new Date(2026, 11, 15);
+  } else {
+    const i = dayDiff(st, today);
+    const end = addDays(st, nights);
+    if (i < 0) {
+      const n = -i;
+      eyebrow.textContent = 'Boarding ' + fmtDate(st, { weekday: 'long', month: 'long', day: 'numeric' });
+      title.textContent = n === 1 ? 'Tomorrow!' : n + ' days to go';
+      text.textContent = n <= 3 ? 'Fill in the BVI ED card online now (it opens 72 hours before arrival), and open this app once more on Wi-Fi.' : 'Work through the before-you-fly checklist. Sun and moon times below are for boarding day.';
+      btn.textContent = 'Before-you-fly checklist'; btn.setAttribute('href', '#cl-pretrip'); btn.hidden = false;
+      focus = st;
+    } else if (i <= nights) {
+      const p = PLAN[Math.min(i, PLAN.length - 1)];
+      const last = i === nights;
+      eyebrow.textContent = 'Day ' + (i + 1) + ' of ' + (nights + 1) + ' · ' + fmtDate(today, { weekday: 'long', month: 'short', day: 'numeric' });
+      title.textContent = last ? 'Return to base' : (i < PLAN.length ? p.title : 'Your call today');
+      text.textContent = last ? 'Charter ends 11:00 AM. Call The Moorings on VHF 12 about 30 minutes out.' : 'Check the weather and swell, do the engine check, and be on a mooring by the time below.';
+      btn.textContent = 'Morning engine check'; btn.setAttribute('href', '#cl-engine'); btn.hidden = false;
+      if (i < PLAN.length) planHtml = dayCard(PLAN[last ? PLAN.length - 1 : i], last ? PLAN.length - 1 : i, true).replace('class="card day today"', 'class="day"').replace(/id="plan-d(\d+)"/, 'id="today-d$1"').replace(/id="note-d(\d+)"/, 'id="today-note-d$1"').replace(/for="note-d(\d+)"/, 'for="today-note-d$1"');
+    } else {
+      eyebrow.textContent = 'Back home'; title.textContent = 'Fair winds';
+      text.textContent = 'Hope it was a great trip. Your notes are still saved in the 7-night plan.';
+      btn.hidden = true;
+    }
+    if (i >= 0 && i <= nights) focus = today;
+    if (end < today) focus = today;
+  }
+  $('#today-plan-body').innerHTML = planHtml;
+  const sun = sunTimes(focus), mo = moon(focus);
+  const r = fmtMin(sun.rise), s = fmtMin(sun.set), m = fmtMin(sun.set - 60);
+  $('#t-rise').textContent = r.t + ' ' + r.ap; $('#t-set').textContent = s.t + ' ' + s.ap; $('#t-moor').textContent = m.t + ' ' + m.ap;
+  $('#t-date').textContent = fmtDate(focus) + ' · Road Town';
+  $('#t-moon').textContent = mo.illum + '%'; $('#t-moon-d').textContent = mo.name;
+  $('#view-sub').textContent = st ? (S.boatName ? S.boatName + ' · ' : '') + 'Moorings, Tortola' : 'BVI charter · Moorings, Tortola';
+  renderTripCard();
+}
+
+function renderTripCard() {
+  const st = parseDate(S.start);
+  const rows = [
+    ['Boat', [S.boatName, S.boatModel].filter(Boolean).join(' · ') || (S.boatType === 'cat' ? '40 ft catamaran' : '40 ft monohull')],
+    ['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, Math.max(1, Number(S.nights) || 7))) + ' (' + (Number(S.nights) || 7) + ' nights)' : ''],
+    ['Ferry out', S.ferryOut], ['Ferry back', S.ferryBack], ['Flight in', S.flightIn], ['Flight home', S.flightOut],
+    ['Moorings base', S.mooringsPhone ? '<a href="tel:' + esc(S.mooringsPhone.replace(/[^\d+]/g, '')) + '">' + esc(S.mooringsPhone) + '</a> · VHF 12' : 'VHF 12'],
+    ['Notes', S.notes]
+  ].filter(r => r[1]);
+  $('#trip-kv').innerHTML = rows.map(r => '<dt>' + r[0] + '</dt><dd>' + (r[0] === 'Moorings base' ? r[1] : esc(r[1]).replace(/\n/g, '<br>')) + '</dd>').join('') ||
+    '<dt>Nothing yet</dt><dd>Add your boat, ferries and flights in Settings.</dd>';
+}
+
+function renderMayday() {
+  const name = S.boatName ? esc(S.boatName) : '[boat name]';
+  const desc = S.boatModel ? esc(S.boatModel) : (S.boatType === 'cat' ? '40-foot white catamaran' : '40-foot white sailboat');
+  const crew = S.crew ? esc(S.crew) : '[number]';
+  const pos = lastPos ? esc(lastPos) : '[position, or e.g. “one mile north of Cooper Island”]';
+  $('#mayday-script').innerHTML =
+    '"MAYDAY, MAYDAY, MAYDAY.<br>This is sailing vessel <mark>' + name + '</mark>, <mark>' + name + '</mark>, <mark>' + name + '</mark>.<br>' +
+    'MAYDAY <mark>' + name + '</mark>.<br>Our position is <mark>' + pos + '</mark>.<br>' +
+    'We are <mark>[sinking / on fire / person overboard / medical emergency]</mark>.<br>' +
+    'We need immediate assistance. <mark>' + crew + '</mark> people on board.<br>' +
+    'We are a <mark>' + desc + '</mark>.<br>Over."';
+  const mp = $('#sos-moorings');
+  if (S.mooringsPhone) mp.innerHTML = '<a href="tel:' + esc(S.mooringsPhone.replace(/[^\d+]/g, '')) + '" style="color:inherit">' + esc(S.mooringsPhone) + '</a>'; else mp.textContent = 'Add in Settings';
+  const er = $('#sos-moorings-emerg-row');
+  if (S.mooringsEmerg) { er.hidden = false; $('#sos-moorings-emerg').innerHTML = '<a href="tel:' + esc(S.mooringsEmerg.replace(/[^\d+]/g, '')) + '" style="color:inherit">' + esc(S.mooringsEmerg) + '</a>'; } else er.hidden = true;
+}
+
+/* checklists */
+let checks = store.get('checks', {});
+function listHtml(cl) {
+  const done = cl.items.filter((_, j) => checks[cl.id + '.' + j]).length;
+  return '<details class="acc" id="cl-' + cl.id + '"><summary>' + esc(cl.title) + ' <span class="count" data-count="' + cl.id + '">' + done + '/' + cl.items.length + '</span></summary><div class="acc-body">' +
+    '<ul class="checks">' + cl.items.map((it, j) => '<li><label><input type="checkbox" data-check="' + cl.id + '.' + j + '"' + (checks[cl.id + '.' + j] ? ' checked' : '') + '><span>' + esc(it) + '</span></label></li>').join('') + '</ul>' +
+    '<div class="btn-row"><button class="btn small" type="button" data-reset="' + cl.id + '">Reset list</button></div></div></details>';
+}
+function renderChecklists() {
+  $('#checklists').innerHTML = CHECKLISTS.map(listHtml).join('');
+  let html = '<details class="acc" id="cl-packing" open><summary>Packing list <span class="count" data-count="packing"></span></summary><div class="acc-body"><ul class="checks">';
+  PACKING.forEach((g, gi) => {
+    html += '<li class="cat">' + esc(g[0]) + '</li>';
+    g[1].forEach((it, j) => { const k = 'packing.' + gi + '-' + j; html += '<li><label><input type="checkbox" data-check="' + k + '"' + (checks[k] ? ' checked' : '') + '><span>' + esc(it) + '</span></label></li>'; });
+  });
+  html += '</ul><div class="btn-row"><button class="btn small" type="button" data-reset="packing">Reset list</button></div></div></details>';
+  $('#packing').innerHTML = html;
+  updateCounts();
+}
+function updateCounts() {
+  $$('[data-count]').forEach(el => {
+    const id = el.dataset.count;
+    const boxes = $$('input[data-check^="' + id + '."]');
+    el.textContent = boxes.filter(b => b.checked).length + '/' + boxes.length;
+  });
+}
+
+function renderGlossary() { $('#glossary').innerHTML = GLOSSARY.map(g => '<dt>' + esc(g[0]) + '</dt><dd>' + esc(g[1]) + '</dd>').join(''); }
+
+/* ---------------- fuel calculator ---------------- */
+const BURN = { cat: { idle: 0.2, slow: 0.35, cruise: 0.55, fast: 0.85 }, mono: { idle: 0.25, slow: 0.45, cruise: 0.7, fast: 1.0 } };
+function calcFuel() {
+  if (!$('#fc-hrs')) return;
+  const t = S.boatType, b = BURN[t];
+  const eng = t === 'cat' ? Number($('#fc-eng').value) : 1;
+  const engAll = t === 'cat' ? 2 : 1;
+  const hrs = Math.max(0, Number($('#fc-hrs').value) || 0), chg = Math.max(0, Number($('#fc-chg').value) || 0);
+  const gen = Math.max(0, Number($('#fc-gen').value) || 0), days = Math.max(1, Number($('#fc-days').value) || 1);
+  const tank = Math.max(1, Number($('#fc-tank').value) || 1), startFrac = Number($('#fc-start').value) || 1;
+  const perDay = hrs * eng * b[$('#fc-rpm').value] + chg * engAll * b.idle + gen * 0.5;
+  const trip = perDay * days, startGal = tank * startFrac, left = startGal - trip, pct = Math.max(0, left / tank);
+  $('#fc-day').textContent = perDay.toFixed(1); $('#fc-trip').textContent = trip.toFixed(0);
+  $('#fc-left').textContent = Math.round(pct * 100) + '%';
+  $('#fc-left-d').textContent = left > 0 ? '≈ ' + Math.round(left) + ' gal of ' + tank : 'You’d run dry';
+  const g = $('#fc-gauge'); g.firstElementChild.style.width = Math.round(pct * 100) + '%';
+  g.className = 'gauge' + (pct < 0.15 ? ' empty' : pct < 0.4 ? ' low' : '');
+  $('#fc-advice').textContent = left <= 0 ? 'Plan a mid-week fuel stop (Leverick Bay, Spanish Town or Soper’s Hole), or motor less and sail more.'
+    : pct < 0.4 ? 'Top off mid-week. Leverick Bay (North Sound) is a convenient fuel dock before Anegada.'
+    : 'Plenty of margin. You probably won’t need fuel until the return, but top off if you’re under half before Anegada.';
+}
+
+/* ---------------- map ---------------- */
+const NS = 'http://www.w3.org/2000/svg';
+let mapReady = false, vb = null, svgEl, gMarks;
+function P(lat, lon) { return [(lon - MAP.lon0) * 60 * MAP.cos, (MAP.lat0 - lat) * 60]; }
+const FULL = (function () { const a = P(18.765, -64.80), b = P(18.29, -64.255); return { x: a[0], y: a[1], w: b[0] - a[0], h: b[1] - a[1] }; })();
+const REGIONS = {
+  south: [18.44, -64.66, 18.30, -64.49], vg: [18.53, -64.47, 18.41, -64.33], anegada: [18.77, -64.43, 18.66, -64.26],
+  north: [18.50, -64.70, 18.42, -64.50], west: [18.47, -64.78, 18.37, -64.68]
+};
+function el(name, attrs, parent) { const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function initMap() {
+  if (mapReady || typeof MAP === 'undefined') return;
+  svgEl = $('#map-svg');
+  const g = el('g', {}, svgEl);
+  el('rect', { x: 0, y: 0, width: MAP.w, height: MAP.h, fill: 'var(--water)' }, g);
+  el('path', { d: MAP.usvi, fill: 'var(--land)', stroke: 'var(--land-edge)', 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke', opacity: 0.6 }, g);
+  el('path', { d: MAP.bvi, fill: 'var(--land)', stroke: 'var(--land-edge)', 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }, g);
+  const ferry = MAP.ferry.map(p => P(p[0], p[1]).map(n => n.toFixed(2)).join(',')).join(' ');
+  el('polyline', { points: ferry, fill: 'none', stroke: 'var(--ink-2)', 'stroke-width': 1.5, 'stroke-dasharray': '2 4', 'vector-effect': 'non-scaling-stroke', opacity: 0.7 }, g);
+  const route = MAP.route.map(p => P(p[0], p[1]).map(n => n.toFixed(2)).join(',')).join(' ');
+  el('polyline', { points: route, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2.2, 'stroke-dasharray': '7 5', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }, g);
+  gMarks = el('g', {}, svgEl);
+  vb = Object.assign({}, FULL);
+  bindMap();
+  mapReady = true;
+  drawMarks();
+}
+const LAND_LABELS = [['TORTOLA', 18.418, -64.645, 1], ['VIRGIN GORDA', 18.486, -64.402, 1], ['ANEGADA', 18.722, -64.33, 1], ['JOST VAN DYKE', 18.452, -64.755, 1],
+  ['ST. JOHN (USVI)', 18.334, -64.745, 1], ['ST. THOMAS (USVI)', 18.352, -64.93, 2], ['NORMAN I.', 18.313, -64.598, 2], ['PETER I.', 18.344, -64.586, 2],
+  ['COOPER I.', 18.374, -64.503, 3], ['GUANA I.', 18.481, -64.572, 3]];
+const PRI = { base: 1, bight: 1, cooper: 1, baths: 1, saba: 1, anegada: 1, jvd_gh: 1, sopers: 1, marina_cay: 1,
+  indians: 2, rhone: 2, leverick: 2, cgb: 2, vgyh: 2, trellis: 2, nanny: 2, peter: 2, jvd_lh: 2, monkey: 2,
+  caves: 3, benures: 3, sandy_cay: 3, diamond_cay: 3, white_bay: 3 };
+function drawMarks() {
+  if (!mapReady) return;
+  const w = svgEl.clientWidth || 360, h = svgEl.clientHeight || 400;
+  // expand the requested box to the element's aspect ratio
+  const ar = w / h; let x = vb.x, y = vb.y, vw = vb.w, vh = vb.h;
+  if (vw / vh > ar) { const nh = vw / ar; y -= (nh - vh) / 2; vh = nh; } else { const nw = vh * ar; x -= (nw - vw) / 2; vw = nw; }
+  svgEl.setAttribute('viewBox', [x, y, vw, vh].map(n => n.toFixed(3)).join(' '));
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  const k = w / vw; // screen px per nautical mile
+  const px = n => (n / k).toFixed(3);
+  const toScr = p => [(p[0] - x) * k, (p[1] - y) * k];
+  const level = k >= 24 ? 3 : k >= 15 ? 2 : 1;
+  gMarks.textContent = '';
+  const boxes = [{ x0: w - 58, y0: 0, x1: w, y1: 150 }];
+  const free = b => b.x0 > 2 && b.y0 > 2 && b.x1 < w - 2 && b.y1 < h - 2 && !boxes.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
+  if (k >= 14) {
+    const ch = P(18.392, -64.585);
+    const wt = el('text', { x: ch[0], y: ch[1], 'text-anchor': 'middle', class: 'water-label', 'font-size': px(11), transform: 'rotate(-13 ' + ch[0].toFixed(2) + ' ' + ch[1].toFixed(2) + ')' }, gMarks);
+    wt.textContent = 'Sir Francis Drake Channel';
+  }
+  if (k >= 9) { const fp = P(18.318, -64.88); const ft = el('text', { x: fp[0], y: fp[1], 'text-anchor': 'middle', class: 'water-label', 'font-size': px(10) }, gMarks); ft.textContent = 'ferry from St. Thomas'; }
+  // markers first; they are obstacles for labels
+  const r = Math.max(5, Math.min(9, k * 0.35));
+  const groups = {};
+  STOPS.forEach(s => {
+    const p = P(s.lat, s.lon), sp = toScr(p);
+    const gg = el('g', { class: 'mk', 'data-id': s.id, style: 'cursor:pointer' }, gMarks);
+    el('circle', { cx: p[0], cy: p[1], r: px(r + 8), fill: 'transparent' }, gg);
+    const fill = s.kind === 'night' ? 'var(--accent)' : s.kind === 'marina' ? 'var(--ok)' : 'var(--surface)';
+    const stroke = s.kind === 'day' ? 'var(--accent)' : 'var(--surface)';
+    el('circle', { cx: p[0], cy: p[1], r: px(r), fill: fill, stroke: stroke, 'stroke-width': px(2.2) }, gg);
+    boxes.push({ x0: sp[0] - r - 1, y0: sp[1] - r - 1, x1: sp[0] + r + 1, y1: sp[1] + r + 1 });
+    groups[s.id] = gg;
+  });
+  // labels in priority order, skipping any that would collide
+  const items = [];
+  [1, 2, 3].forEach(pri => {
+    STOPS.forEach(s => { if ((PRI[s.id] || 3) === pri) items.push({ t: 'stop', s }); });
+    LAND_LABELS.forEach(l => { if (l[3] === pri) items.push({ t: 'land', l }); });
+  });
+  const fs = k >= 22 ? 13 : 12;
+  items.forEach(it => {
+    if (it.t === 'stop') {
+      const s = it.s; if ((PRI[s.id] || 3) > level) return;
+      const sp = toScr(P(s.lat, s.lon)), tw = s.short.length * fs * 0.47 + 4, gap = r + 4;
+      const tries = [s.lp, 'r', 'l', 'b', 't'].filter((v, i, a) => a.indexOf(v) === i);
+      for (const pos of tries) {
+        let bx, anchor = 'start', tx = sp[0], ty = sp[1] + fs * 0.35;
+        if (pos === 'r') { tx = sp[0] + gap; bx = { x0: tx, x1: tx + tw }; }
+        else if (pos === 'l') { tx = sp[0] - gap; anchor = 'end'; bx = { x0: tx - tw, x1: tx }; }
+        else { anchor = 'middle'; bx = { x0: sp[0] - tw / 2, x1: sp[0] + tw / 2 }; ty = pos === 't' ? sp[1] - gap - 2 : sp[1] + gap + fs - 2; }
+        bx.y0 = ty - fs * 0.85; bx.y1 = ty + fs * 0.25;
+        if (!free(bx)) continue;
+        boxes.push(bx);
+        const t = el('text', { x: (x + tx / k).toFixed(3), y: (y + ty / k).toFixed(3), 'text-anchor': anchor, class: 'map-label', 'font-size': px(fs), 'stroke-width': px(3) }, groups[s.id]);
+        t.textContent = s.short;
+        break;
+      }
+    } else {
+      const l = it.l; if (l[3] > level) return;
+      const lfs = k > 30 ? 13 : 11, sp = toScr(P(l[1], l[2])), tw = l[0].length * lfs * 0.72;
+      const bx = { x0: sp[0] - tw / 2, x1: sp[0] + tw / 2, y0: sp[1] - lfs * 0.8, y1: sp[1] + lfs * 0.2 };
+      if (!free(bx)) return;
+      boxes.push(bx);
+      const t = el('text', { x: (x + sp[0] / k).toFixed(3), y: (y + sp[1] / k).toFixed(3), 'text-anchor': 'middle', class: 'land-label', 'font-size': px(lfs) }, gMarks);
+      t.textContent = l[0];
+    }
+  });
+  // scale bar
+  const choices = [0.5, 1, 2, 5, 10];
+  let nm = choices[0]; for (const c of choices) if (c * k <= 110) nm = c;
+  $('#map-scale-bar').style.width = Math.round(nm * k) + 'px';
+  $('#map-scale-t').textContent = nm + ' nm';
+}
+function clampVb() {
+  const minW = 3, maxW = MAP.w;
+  if (vb.w < minW) { const s = minW / vb.w; vb.x -= (vb.w * s - vb.w) / 2; vb.y -= (vb.h * s - vb.h) / 2; vb.w *= s; vb.h *= s; }
+  if (vb.w > maxW) { const s = maxW / vb.w; vb.x += (vb.w - vb.w * s) / 2; vb.y += (vb.h - vb.h * s) / 2; vb.w *= s; vb.h *= s; }
+  vb.x = Math.min(Math.max(vb.x, -5), MAP.w - vb.w + 5); vb.y = Math.min(Math.max(vb.y, -5), MAP.h - vb.h + 5);
+}
+function zoomAt(f, cx, cy) { // cx, cy in map units
+  if (cx == null) { cx = vb.x + vb.w / 2; cy = vb.y + vb.h / 2; }
+  vb.x = cx - (cx - vb.x) / f; vb.y = cy - (cy - vb.y) / f; vb.w /= f; vb.h /= f; clampVb(); drawMarks();
+}
+function screenToMap(clientX, clientY) {
+  const rect = svgEl.getBoundingClientRect(); const v = svgEl.viewBox.baseVal;
+  const k = Math.min(rect.width / v.width, rect.height / v.height);
+  const ox = (rect.width - v.width * k) / 2, oy = (rect.height - v.height * k) / 2;
+  return [v.x + (clientX - rect.left - ox) / k, v.y + (clientY - rect.top - oy) / k, k];
+}
+function fitRegion(r) { const a = P(r[0], r[1]), b = P(r[2], r[3]); vb = { x: a[0], y: a[1], w: b[0] - a[0], h: b[1] - a[1] }; drawMarks(); syncVbFromSvg(); }
+function syncVbFromSvg() { const v = svgEl.viewBox.baseVal; vb = { x: v.x, y: v.y, w: v.width, h: v.height }; }
+function focusStop(id) {
+  const s = STOP[id]; if (!s) return;
+  if (!mapReady) initMap();
+  const p = P(s.lat, s.lon); const w = 9, h = 9;
+  vb = { x: p[0] - w / 2, y: p[1] - h / 2, w: w, h: h }; drawMarks(); syncVbFromSvg(); showInfo(id);
+}
+function showInfo(id) {
+  const s = STOP[id];
+  $('#map-info').innerHTML = '<div class="pills">' + stopKindPill(s.kind) + '</div><h3>' + esc(s.name) + '</h3><p class="small">' + esc(s.area) + '</p><p>' + esc(s.what) + '</p>' +
+    (s.caution ? '<p class="small"><strong>Watch out:</strong> ' + esc(s.caution) + '</p>' : '') + '<p><a href="#stop-' + s.id + '">Full details →</a></p>';
+}
+function bindMap() {
+  const pts = new Map(); let pinch = null, moved = false, downAt = null;
+  svgEl.addEventListener('pointerdown', e => { svgEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); moved = false; downAt = [e.clientX, e.clientY];
+    if (pts.size === 2) { const [a, b] = Array.from(pts.values()); pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } });
+  svgEl.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return;
+    const prev = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) moved = true;
+    if (pts.size === 1) {
+      const k = screenToMap(0, 0)[2];
+      vb.x -= (e.clientX - prev[0]) / k; vb.y -= (e.clientY - prev[1]) / k; clampVb(); drawMarks(); syncVbFromSvg();
+    } else if (pts.size === 2 && pinch) {
+      const [a, b] = Array.from(pts.values()); const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      const m = screenToMap((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+      if (d > 0 && pinch.d > 0) { zoomAt(d / pinch.d, m[0], m[1]); syncVbFromSvg(); }
+      pinch.d = d;
+    }
+  });
+  const up = e => {
+    pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
+    if (!moved && e.type === 'pointerup') {
+      const t = document.elementFromPoint(e.clientX, e.clientY); const mk = t && t.closest && t.closest('.mk');
+      if (mk) showInfo(mk.getAttribute('data-id'));
+    }
+  };
+  svgEl.addEventListener('pointerup', up); svgEl.addEventListener('pointercancel', up);
+  svgEl.addEventListener('wheel', e => { e.preventDefault(); const m = screenToMap(e.clientX, e.clientY); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, m[0], m[1]); syncVbFromSvg(); }, { passive: false });
+  $('#map-in').addEventListener('click', () => { zoomAt(1.5); syncVbFromSvg(); });
+  $('#map-out').addEventListener('click', () => { zoomAt(1 / 1.5); syncVbFromSvg(); });
+  $('#map-reset').addEventListener('click', () => { vb = Object.assign({}, FULL); drawMarks(); syncVbFromSvg(); });
+  $$('#map-regions [data-region]').forEach(b => b.addEventListener('click', () => fitRegion(REGIONS[b.dataset.region])));
+  window.addEventListener('resize', () => { if (!$('#islands').hidden) drawMarks(); });
+}
+
+/* ---------------- views & routing ---------------- */
+const VIEWS = ['today', 'travel', 'boat', 'islands', 'logistics', 'more'];
+const scrollMem = {};
+let current = null;
+function show(view, targetId) {
+  if (current && current !== view) scrollMem[current] = window.scrollY;
+  VIEWS.forEach(v => { $('#' + v).hidden = v !== view; });
+  $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === view ? 'page' : 'false'));
+  const sec = $('#' + view);
+  $('#view-title').textContent = sec.dataset.title;
+  if (view !== 'today') $('#view-sub').textContent = { travel: 'STT → ferry → Road Town → base', boat: S.boatName || (S.boatType === 'cat' ? '40 ft catamaran' : '40 ft monohull'), islands: 'Chart, plan, distances, stops', logistics: 'Moorings, anchoring, fuel, money', more: 'Safety, weather, checklists, settings' }[view];
+  else renderToday();
+  if (view === 'islands') { initMap(); requestAnimationFrame(drawMarks); }
+  const changed = current !== view; current = view; store.set('view', view);
+  if (targetId && targetId !== view) {
+    const t = document.getElementById(targetId);
+    if (t) {
+      if (t.tagName === 'DETAILS') t.open = true;
+      const det = t.closest('details'); if (det) det.open = true;
+      requestAnimationFrame(() => t.scrollIntoView({ block: 'start' }));
+    }
+    markChip(view, targetId);
+  } else if (changed) {
+    window.scrollTo(0, scrollMem[view] || 0); markChip(view, null);
+  } else {
+    window.scrollTo(0, 0);
+  }
+}
+function markChip(view, id) {
+  $$('#' + view + ' .subnav .chip').forEach(c => c.classList.toggle('on', !!id && c.getAttribute('href') === '#' + id));
+}
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) { show(store.get('view', 'today')); return; }
+  if (VIEWS.includes(h)) { show(h); return; }
+  const t = document.getElementById(h);
+  if (t) { const v = t.closest('.view'); if (v) { show(v.id, h); return; } }
+  show('today');
+}
+
+/* ---------------- search ---------------- */
+let index = null;
+function buildIndex() {
+  index = [];
+  $$('.view').forEach(v => {
+    $$('section.block[id], article[id], details[id]', v).forEach(s => {
+      const h = s.querySelector('h2, h3, summary'); if (!h) return;
+      const parts = []; const tw = document.createTreeWalker(s, NodeFilter.SHOW_TEXT); while (tw.nextNode()) parts.push(tw.currentNode.nodeValue);
+      index.push({ id: s.id, title: h.textContent.replace(/\d+\/\d+$/, '').trim(), view: v.dataset.title, text: parts.join(' ').replace(/\s+/g, ' ').toLowerCase() });
+    });
+  });
+}
+function doSearch(q) {
+  if (!index) buildIndex();
+  q = q.trim().toLowerCase();
+  const out = $('#search-results');
+  if (q.length < 2) { out.innerHTML = '<li class="small">Type at least two letters.</li>'; return; }
+  const words = q.split(/\s+/);
+  const hits = index.map(e => {
+    let score = 0; for (const w of words) { if (!e.text.includes(w)) return null; score += e.title.toLowerCase().includes(w) ? 10 : 1; }
+    const i = e.text.indexOf(words[0]); const snip = e.text.slice(Math.max(0, i - 40), i + 80);
+    return { e, score, snip };
+  }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 25);
+  out.innerHTML = hits.length ? hits.map(h => '<li><a href="#' + h.e.id + '" data-close><b>' + esc(h.e.title) + '</b><span>' + esc(h.e.view) + ' · …' + esc(h.snip) + '…</span></a></li>').join('')
+    : '<li class="small">No matches. Try a simpler word.</li>';
+}
+
+/* ---------------- sheets ---------------- */
+function openSheet(id) { $('#' + id).hidden = false; $('#' + id + '-backdrop').hidden = false; document.body.style.overflow = 'hidden'; if (id === 'search') setTimeout(() => $('#search-q').focus(), 50); }
+function closeSheets() { ['sos', 'search'].forEach(id => { $('#' + id).hidden = true; $('#' + id + '-backdrop').hidden = true; }); document.body.style.overflow = ''; }
+
+/* ---------------- GPS ---------------- */
+let lastPos = null;
+function dm(v, pos, neg) { const a = Math.abs(v), d = Math.floor(a), m = (a - d) * 60; return d + '° ' + m.toFixed(2) + '′ ' + (v >= 0 ? pos : neg); }
+function getPos() {
+  const out = $('#pos-out');
+  if (!('geolocation' in navigator)) { out.textContent = 'GPS isn’t available here. Read the position off the chartplotter.'; return; }
+  out.textContent = 'Reading GPS…';
+  navigator.geolocation.getCurrentPosition(p => {
+    lastPos = dm(p.coords.latitude, 'N', 'S') + ', ' + dm(p.coords.longitude, 'E', 'W');
+    out.textContent = lastPos + ' (±' + Math.round(p.coords.accuracy) + ' m)'; renderMayday();
+  }, err => { out.textContent = 'Couldn’t get a fix (' + (err.code === 1 ? 'location permission is off' : 'no signal yet') + '). Read the position off the chartplotter.'; },
+  { enableHighAccuracy: true, timeout: 20000, maximumAge: 30000 });
+}
+
+/* ---------------- settings form ---------------- */
+function fillSettingsForm() {
+  const f = $('#settings-form');
+  Object.keys(DEFAULTS).forEach(k => { const i = f.elements[k]; if (i) i.value = S[k] == null ? '' : S[k]; });
+}
+
+/* ---------------- offline ---------------- */
+function setOffline(ok, msg) { $('#offline-dot').classList.toggle('ok', ok); $('#offline-status').textContent = msg; }
+function initOffline() {
+  if (window.BVI_PREVIEW) { setOffline(false, 'This is the online preview. For offline use, open ' + window.BVI_PREVIEW + ' in Safari and add it to your home screen.'); return; }
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const canSW = 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  if (!standalone && canSW) $('#install-card').hidden = false;
+  if (!canSW) { setOffline(false, 'Offline storage isn’t available in this view. Open the app from its web address in Safari and add it to your home screen.'); return; }
+  navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
+    setOffline(true, 'Saved for offline use on this device.');
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  }).catch(() => setOffline(false, 'Couldn’t save for offline use. Reload once on Wi-Fi.'));
+}
+
+/* ---------------- events ---------------- */
+function bind() {
+  window.addEventListener('hashchange', route);
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (a && a.hasAttribute('data-focus')) { e.preventDefault(); if (location.hash !== '#islands-map') location.hash = 'islands-map'; else route(); setTimeout(() => focusStop(a.getAttribute('data-focus')), 60); return; }
+    if (e.target.closest('[data-close]')) { closeSheets(); }
+    if (a) {
+      const id = a.getAttribute('href').slice(1);
+      if (('#' + id) === location.hash) { e.preventDefault(); route(); }
+    }
+    const rb = e.target.closest('[data-reset]');
+    if (rb) { const id = rb.dataset.reset; Object.keys(checks).forEach(k => { if (k.indexOf(id + '.') === 0) delete checks[k]; }); store.set('checks', checks); $$('input[data-check^="' + id + '."]').forEach(i => { i.checked = false; }); updateCounts(); }
+    const bb = e.target.closest('[data-boat]'); if (bb) setBoatType(bb.dataset.boat);
+    if (e.target.closest('[data-open-sos]')) openSheet('sos');
+  });
+  document.addEventListener('change', e => {
+    const c = e.target.closest('input[data-check]');
+    if (c) { if (c.checked) checks[c.dataset.check] = true; else delete checks[c.dataset.check]; store.set('checks', checks); updateCounts(); }
+    if (e.target.closest('#fuel-calc')) calcFuel();
+  });
+  document.addEventListener('input', e => {
+    const n = e.target.closest('textarea[data-note]');
+    if (n) { store.set('note.' + n.dataset.note, n.value); $$('textarea[data-note="' + n.dataset.note + '"]').forEach(o => { if (o !== n) o.value = n.value; }); }
+    if (e.target.closest('#fuel-calc')) calcFuel();
+  });
+  $('#sos-open').addEventListener('click', () => { renderMayday(); openSheet('sos'); });
+  $('#search-open').addEventListener('click', () => openSheet('search'));
+  $('#sos-backdrop').addEventListener('click', closeSheets);
+  $('#search-backdrop').addEventListener('click', closeSheets);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
+  $('#search-q').addEventListener('input', e => doSearch(e.target.value));
+  $('#pos-btn').addEventListener('click', getPos);
+  $('#settings-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target; const prevType = S.boatType;
+    Object.keys(DEFAULTS).forEach(k => { const i = f.elements[k]; if (i) S[k] = i.type === 'number' ? (i.value === '' ? '' : Number(i.value)) : i.value; });
+    if (!S.fuelCap) S.fuelCap = BOAT_DEFAULTS[S.boatType].fuelCap;
+    if (!S.waterCap) S.waterCap = BOAT_DEFAULTS[S.boatType].waterCap;
+    if (prevType !== S.boatType) { const t = S.boatType; S.boatType = prevType; setBoatType(t); }
+    store.set('settings', S); applyTheme(); applyBoat(); renderPlan(); renderToday(); renderMayday();
+    const m = $('#settings-saved'); m.textContent = 'Saved.'; setTimeout(() => { m.textContent = ''; }, 2500);
+  });
+  $('#reset-all').addEventListener('click', () => {
+    const btn = $('#reset-all');
+    if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Tap again to clear everything'; setTimeout(() => { btn.dataset.armed = ''; btn.textContent = 'Clear all ticks and notes'; }, 4000); return; }
+    checks = {}; store.set('checks', checks); PLAN.forEach((_, i) => store.del('note.d' + (i + 1)));
+    renderChecklists(); renderPlan(); renderToday(); btn.dataset.armed = ''; btn.textContent = 'Clear all ticks and notes';
+    $('#reset-msg').textContent = 'Cleared.';
+  });
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { const v = en.target.closest('.view'); if (v && !v.hidden) markChip(v.id, en.target.id); } });
+    }, { rootMargin: '-120px 0px -65% 0px' });
+    $$('.view > section.block[id]').forEach(s => io.observe(s));
+  }
+}
+
+/* ---------------- boot ---------------- */
+applyTheme();
+renderStops(); renderLegs(); renderPlan(); renderChecklists(); renderGlossary();
+fillSettingsForm(); applyBoat(); renderMayday(); renderToday();
+bind(); route(); initOffline();
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "BVI Charter Guide",
+  "short_name": "BVI Charter",
+  "description": "Offline day-to-day guide for a Moorings bareboat charter in the British Virgin Islands.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F3F7FA",
+  "theme_color": "#F3F7FA",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
