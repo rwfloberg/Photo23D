@@ -8,7 +8,14 @@ Works on iPhone, iPad and Android with no signal once installed.
 2. Share → **Add to Home Screen**.
 3. Open it once from the home screen while on Wi-Fi. After that it works offline.
 
-Trip details, checklist ticks and notes are stored only on each phone (Settings tab).
+## Share with the group
+More → Share has a QR code, a **Send the app** button, and install steps.
+
+To give everyone the same trip details (boat name, Moorings phone numbers, ferry times, notes):
+fill in More → Settings, then More → Share → **Send trip details**. Each person installs the app,
+opens it from the home screen, and pastes the message into **Got a trip code?**.
+Flights and appearance stay private to each phone. Trip details are never on the website itself;
+they only travel inside the code. Checklist ticks and day notes stay on each phone.
 
 ## Updating
 Edit `index.html`, then bump `VERSION` in `sw.js` (e.g. `bvi-guide-v2`) so installed copies pick up the change

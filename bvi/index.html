@@ -325,6 +325,10 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .results a span { font-size: .82rem; color: var(--ink-2); }
 
 .install { border: 1px dashed var(--accent); background: var(--accent-soft); }
+.share-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.share-row > .stack { flex: 1; min-width: 180px; gap: 8px; }
+.qr { width: 136px; height: 136px; flex: none; border-radius: 10px; border: 1px solid var(--line); }
+.link-text { font-family: var(--font-mono); font-size: .85rem; word-break: break-all; }
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--warn); margin-right: 6px; vertical-align: 1px; }
 .status-dot.ok { background: var(--ok); }
 footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
@@ -352,6 +356,13 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
 <!-- ======================= TODAY ======================= -->
 <section class="view" id="today" data-title="Today">
+  <div class="card install" id="import-card" hidden>
+    <h3>Load shared trip details?</h3>
+    <p class="small">Someone in your group sent these. Loading them fills in this phone's Settings (your flights and ticks stay as they are).</p>
+    <dl class="kv" id="import-kv"></dl>
+    <div class="btn-row"><button class="btn primary" type="button" id="import-yes">Load them</button><button class="btn" type="button" id="import-no">Not now</button></div>
+    <p class="small" id="import-note"></p>
+  </div>
   <div class="hero" id="today-hero">
     <svg class="compass" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="36"/><path d="M50 4v92M4 50h92M50 14l7 36-7 36-7-36z" /></svg>
     <span class="eyebrow" id="hero-eyebrow">December 2026</span>
@@ -392,6 +403,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <a href="#log-fuel"><b>Fuel, water &amp; ice</b><span>Where to fill up</span></a>
       <a href="#boat-fuel"><b>Fuel calculator</b><span>How much you'll burn</span></a>
       <a href="#more-safety"><b>Emergencies</b><span>MOB, fire, dragging, medical</span></a>
+      <a href="#more-share"><b>Share with the crew</b><span>Send the app and trip details</span></a>
     </div>
   </div>
 
@@ -1132,6 +1144,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 <!-- ======================= MORE ======================= -->
 <section class="view" id="more" data-title="More" hidden>
   <nav class="subnav" aria-label="More sections">
+    <a class="chip" href="#more-share">Share</a>
     <a class="chip" href="#more-safety">Safety</a>
     <a class="chip" href="#more-weather">Weather &amp; VHF</a>
     <a class="chip" href="#more-checklists">Checklists</a>
@@ -1142,6 +1155,45 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <a class="chip" href="#more-settings">Settings</a>
     <a class="chip" href="#more-about">About</a>
   </nav>
+
+  <section class="block" id="more-share">
+    <header><span class="eyebrow">For the whole crew</span><h2>Share with your group</h2>
+      <p class="lede">Everyone installs their own copy from one link. No app store, no account, and it works with no signal once it's on the phone.</p></header>
+    <div class="card">
+      <div class="share-row">
+        <svg class="qr" viewBox="-4 -4 37 37" role="img" aria-label="QR code for the app link" shape-rendering="crispEdges"><rect x="-4" y="-4" width="37" height="37" fill="#fff"/><path fill="#0F2233" d="M0 0h7v1h-7zM9 0h2v1h-2zM14 0h1v1h-1zM16 0h2v1h-2zM22 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM11 1h1v1h-1zM13 1h2v1h-2zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM12 2h1v1h-1zM14 2h3v1h-3zM22 2h1v1h-1zM24 2h3v1h-3zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h2v1h-2zM13 3h1v1h-1zM16 3h2v1h-2zM19 3h2v1h-2zM22 3h1v1h-1zM24 3h3v1h-3zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM10 4h1v1h-1zM15 4h2v1h-2zM18 4h3v1h-3zM22 4h1v1h-1zM24 4h3v1h-3zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM16 5h3v1h-3zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h7v1h-7zM8 7h2v1h-2zM11 7h1v1h-1zM15 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM0 8h1v1h-1zM6 8h1v1h-1zM8 8h11v1h-11zM20 8h3v1h-3zM25 8h3v1h-3zM1 9h2v1h-2zM4 9h2v1h-2zM9 9h2v1h-2zM15 9h5v1h-5zM23 9h2v1h-2zM26 9h2v1h-2zM6 10h2v1h-2zM9 10h3v1h-3zM13 10h3v1h-3zM17 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM0 11h1v1h-1zM3 11h3v1h-3zM8 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM15 11h1v1h-1zM18 11h1v1h-1zM21 11h3v1h-3zM25 11h1v1h-1zM0 12h2v1h-2zM3 12h1v1h-1zM5 12h3v1h-3zM9 12h1v1h-1zM12 12h1v1h-1zM15 12h1v1h-1zM20 12h1v1h-1zM22 12h2v1h-2zM28 12h1v1h-1zM0 13h2v1h-2zM3 13h1v1h-1zM7 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM15 13h1v1h-1zM17 13h4v1h-4zM22 13h3v1h-3zM27 13h2v1h-2zM0 14h3v1h-3zM4 14h1v1h-1zM6 14h1v1h-1zM8 14h5v1h-5zM15 14h2v1h-2zM18 14h1v1h-1zM20 14h2v1h-2zM25 14h2v1h-2zM0 15h1v1h-1zM2 15h2v1h-2zM5 15h1v1h-1zM8 15h4v1h-4zM15 15h1v1h-1zM19 15h1v1h-1zM23 15h2v1h-2zM26 15h1v1h-1zM28 15h1v1h-1zM1 16h4v1h-4zM6 16h3v1h-3zM11 16h1v1h-1zM13 16h1v1h-1zM17 16h1v1h-1zM25 16h2v1h-2zM0 17h1v1h-1zM2 17h4v1h-4zM9 17h5v1h-5zM15 17h6v1h-6zM22 17h3v1h-3zM26 17h3v1h-3zM0 18h3v1h-3zM4 18h1v1h-1zM6 18h2v1h-2zM11 18h1v1h-1zM15 18h2v1h-2zM19 18h2v1h-2zM22 18h1v1h-1zM25 18h1v1h-1zM28 18h1v1h-1zM0 19h1v1h-1zM9 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM19 19h3v1h-3zM23 19h2v1h-2zM0 20h1v1h-1zM3 20h8v1h-8zM15 20h10v1h-10zM26 20h3v1h-3zM8 21h1v1h-1zM10 21h1v1h-1zM12 21h4v1h-4zM17 21h2v1h-2zM20 21h1v1h-1zM24 21h2v1h-2zM0 22h7v1h-7zM9 22h1v1h-1zM13 22h5v1h-5zM19 22h2v1h-2zM22 22h1v1h-1zM24 22h3v1h-3zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h1v1h-1zM12 23h2v1h-2zM15 23h2v1h-2zM20 23h1v1h-1zM24 23h1v1h-1zM27 23h1v1h-1zM0 24h1v1h-1zM2 24h3v1h-3zM6 24h1v1h-1zM11 24h1v1h-1zM13 24h1v1h-1zM16 24h2v1h-2zM19 24h7v1h-7zM27 24h1v1h-1zM0 25h1v1h-1zM2 25h3v1h-3zM6 25h1v1h-1zM9 25h3v1h-3zM13 25h1v1h-1zM15 25h2v1h-2zM19 25h3v1h-3zM23 25h1v1h-1zM25 25h2v1h-2zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h3v1h-3zM6 26h1v1h-1zM10 26h1v1h-1zM12 26h2v1h-2zM15 26h1v1h-1zM18 26h2v1h-2zM22 26h6v1h-6zM0 27h1v1h-1zM6 27h1v1h-1zM11 27h1v1h-1zM14 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM22 27h1v1h-1zM25 27h2v1h-2zM28 27h1v1h-1zM0 28h7v1h-7zM8 28h2v1h-2zM17 28h1v1h-1zM19 28h1v1h-1zM21 28h2v1h-2zM24 28h3v1h-3z"/></svg>
+        <div class="stack">
+          <p><strong>Scan with a phone camera</strong>, or send the link:</p>
+          <p class="link-text" id="app-link">https://rwfloberg.github.io/Photo23D/bvi/</p>
+          <div class="btn-row"><button class="btn primary" type="button" id="share-app">Send the app</button><button class="btn" type="button" id="copy-app">Copy link</button></div>
+          <p class="small" id="share-app-msg" role="status"></p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>How each person installs it</h3>
+      <dl class="kv">
+        <dt>iPhone / iPad</dt><dd>Open the link in <strong>Safari</strong>, tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>. Open it from the home screen once on Wi-Fi.</dd>
+        <dt>Android</dt><dd>Open the link in <strong>Chrome</strong>, tap the <strong>⋮</strong> menu, then <strong>Add to Home screen</strong> (or <strong>Install app</strong>). Open it once on Wi-Fi.</dd>
+        <dt>Before you fly</dt><dd>Open it once more on Wi-Fi to pick up any last updates.</dd>
+      </dl>
+    </div>
+    <div class="card" id="share-trip-card">
+      <h3>Send everyone the trip details</h3>
+      <p>Fill in <a href="#more-settings">Settings</a> once (boat name, Moorings phone numbers, ferry times, notes), then send them as a code. Everyone pastes it into their app. Flights and appearance stay private to each phone.</p>
+      <div class="btn-row"><button class="btn primary" type="button" id="share-trip">Send trip details</button><button class="btn" type="button" id="copy-trip">Copy code</button></div>
+      <p class="small" id="share-trip-msg" role="status"></p>
+      <div class="field" id="trip-code-box" hidden><label for="trip-code-out">Copy this and paste it in your group chat</label><textarea id="trip-code-out" readonly></textarea></div>
+    </div>
+    <div class="card" id="load-trip-card">
+      <h3>Got a trip code?</h3>
+      <p>Install the app first, open it from your home screen, then paste the whole message (or just the code) here.</p>
+      <div class="field"><label for="trip-code-in">Trip code or message</label><textarea id="trip-code-in" placeholder="Paste here. The code starts with BVI1."></textarea></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="load-trip">Load trip details</button></div>
+      <p class="small" id="load-trip-msg" role="status"></p>
+    </div>
+    <p class="small">The guide is public to anyone with the link. Your trip details aren't on the website; they only travel in the code you send. Checklist ticks and day notes stay on each person's phone.</p>
+  </section>
 
   <section class="block" id="more-safety">
     <header><span class="eyebrow">Read this before day 1</span><h2>Safety &amp; emergencies</h2>
@@ -1331,7 +1383,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <div class="field wide"><label for="s-notes">Notes</label><textarea id="s-notes" name="notes" placeholder="Confirmation numbers, slip number, Wi-Fi password..."></textarea></div>
         <div class="field"><label for="s-theme">Appearance</label><select id="s-theme" name="theme"><option value="auto">Match phone</option><option value="light">Light (bright sun)</option><option value="dark">Dark (night)</option></select></div>
       </div>
-      <div class="btn-row" style="margin-top:14px"><button class="btn primary" type="submit">Save</button><span class="small" id="settings-saved" role="status"></span></div>
+      <div class="btn-row" style="margin-top:14px"><button class="btn primary" type="submit">Save</button><a class="btn" href="#more-share">Send to the group</a><span class="small" id="settings-saved" role="status"></span></div>
     </form>
   </section>
 
@@ -2220,6 +2272,72 @@ function initOffline() {
   }).catch(() => setOffline(false, 'Couldn’t save for offline use. Reload once on Wi-Fi.'));
 }
 
+/* ---------------- sharing ---------------- */
+const APP_URL = 'https://rwfloberg.github.io/Photo23D/bvi/';
+const SHARE_KEYS = { s: 'start', n: 'nights', b: 'boatName', m: 'boatModel', c: 'crew', f: 'fuelCap', w: 'waterCap',
+  p: 'mooringsPhone', e: 'mooringsEmerg', o: 'ferryOut', r: 'ferryBack', t: 'notes' };
+function b64urlEncode(str) { let bin = ''; new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function b64urlDecode(str) { str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))); }
+function tripCode() {
+  const o = {};
+  for (const k in SHARE_KEYS) { const v = S[SHARE_KEYS[k]]; if (v !== '' && v != null) o[k] = v; }
+  return 'BVI1.' + b64urlEncode(JSON.stringify(o));
+}
+function parseTrip(text) {
+  const m = String(text || '').match(/BVI1\.([A-Za-z0-9_-]+)/); if (!m) return null;
+  let o; try { o = JSON.parse(b64urlDecode(m[1])); } catch (e) { return null; }
+  if (!o || typeof o !== 'object') return null;
+  const out = {};
+  for (const k in SHARE_KEYS) {
+    if (!(k in o)) continue;
+    const key = SHARE_KEYS[k]; let v = o[k];
+    if (typeof DEFAULTS[key] === 'number') { v = Number(v); if (!isFinite(v) || v <= 0 || v > 1000) continue; }
+    else { v = String(v).slice(0, key === 'notes' ? 2000 : 200); if (key === 'start' && !/^\d{4}-\d{2}-\d{2}$/.test(v)) continue; }
+    out[key] = v;
+  }
+  return Object.keys(out).length ? out : null;
+}
+function tripSummary(t) {
+  const st = parseDate(t.start), n = Number(t.nights) || 7;
+  return [['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, n)) : ''], ['Boat', [t.boatName, t.boatModel].filter(Boolean).join(' · ')],
+    ['Moorings', [t.mooringsPhone, t.mooringsEmerg].filter(Boolean).join(' · ')], ['Ferry out', t.ferryOut], ['Ferry back', t.ferryBack],
+    ['Notes', t.notes ? (t.notes.length > 90 ? t.notes.slice(0, 90) + '…' : t.notes) : '']].filter(r => r[1]);
+}
+function applyTrip(t) {
+  Object.assign(S, t); store.set('settings', S);
+  fillSettingsForm(); applyBoat(); renderPlan(); renderToday(); renderMayday();
+}
+async function copyText(text, msgEl, box) {
+  try { await navigator.clipboard.writeText(text); msgEl.textContent = 'Copied. Paste it into your group chat.'; if (box) box.hidden = true; }
+  catch (e) {
+    if (box) { box.hidden = false; const ta = box.querySelector('textarea'); ta.value = text; ta.focus(); ta.select(); }
+    msgEl.textContent = box ? 'Select the text below and copy it.' : 'Couldn\u2019t copy automatically. Press and hold the link to copy it.';
+  }
+}
+async function shareOrCopy(data, copyFallback, msgEl, box) {
+  if (navigator.share && !window.BVI_PREVIEW) {
+    try { await navigator.share(data); msgEl.textContent = ''; return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  copyText(copyFallback, msgEl, box);
+}
+function tripMessage(code) {
+  return 'Trip details for our BVI Charter Guide app.\n1. Install the app: ' + APP_URL + ' (on iPhone: Safari \u2192 Share \u2192 Add to Home Screen)\n' +
+    '2. Open it from your home screen, go to More \u2192 Share, and paste this whole message.\n\n' + code;
+}
+function checkTripLink() {
+  let code = null;
+  try { code = new URLSearchParams(location.search).get('trip'); } catch (e) { /* ignore */ }
+  const t = code ? parseTrip(code) : null; if (!t) return;
+  $('#import-kv').innerHTML = tripSummary(t).map(r => '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>').join('');
+  const card = $('#import-card'); card.hidden = false;
+  const done = msg => { card.hidden = true; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ } if (msg) $('#view-sub').textContent = msg; };
+  $('#import-yes').onclick = () => { applyTrip(t); done('Trip details loaded'); };
+  $('#import-no').onclick = () => done('');
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (!standalone) $('#import-note').textContent = 'On iPhone, a home-screen app keeps its own storage. If you add it to your home screen after this, paste the code again inside the app (More \u2192 Share).';
+}
+
 /* ---------------- events ---------------- */
 function bind() {
   window.addEventListener('hashchange', route);
@@ -2252,6 +2370,16 @@ function bind() {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
   $('#search-q').addEventListener('input', e => doSearch(e.target.value));
   $('#pos-btn').addEventListener('click', getPos);
+  $('#share-app').addEventListener('click', () => shareOrCopy({ title: 'BVI Charter Guide', text: 'Our BVI trip guide. It works offline once installed (iPhone: open in Safari \u2192 Share \u2192 Add to Home Screen).', url: APP_URL }, APP_URL, $('#share-app-msg')));
+  $('#copy-app').addEventListener('click', () => copyText(APP_URL, $('#share-app-msg')));
+  $('#share-trip').addEventListener('click', () => { const msg = tripMessage(tripCode()); shareOrCopy({ title: 'BVI trip details', text: msg }, msg, $('#share-trip-msg'), $('#trip-code-box')); });
+  $('#copy-trip').addEventListener('click', () => copyText(tripMessage(tripCode()), $('#share-trip-msg'), $('#trip-code-box')));
+  $('#load-trip').addEventListener('click', () => {
+    const t = parseTrip($('#trip-code-in').value), m = $('#load-trip-msg');
+    if (!t) { m.textContent = 'That doesn\u2019t look like a trip code. Paste the whole message; the code starts with BVI1.'; return; }
+    applyTrip(t); $('#trip-code-in').value = '';
+    m.textContent = 'Loaded: ' + tripSummary(t).map(r => r[0]).join(', ') + '.';
+  });
   $('#settings-form').addEventListener('submit', e => {
     e.preventDefault();
     const f = e.target;
@@ -2280,7 +2408,7 @@ function bind() {
 applyTheme();
 renderStops(); renderLegs(); renderPlan(); renderChecklists(); renderGlossary();
 fillSettingsForm(); applyBoat(); renderMayday(); renderToday();
-bind(); route(); initOffline();
+bind(); route(); initOffline(); checkTripLink();
 if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 })();
 </script>
