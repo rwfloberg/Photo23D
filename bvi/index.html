@@ -87,6 +87,7 @@ small, .small { font-size: .85rem; color: var(--ink-2); }
 .appbar {
   position: sticky; top: 0; z-index: 30;
   padding: env(safe-area-inset-top, 0px) 16px 0;
+  background: var(--bg);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid var(--line);
@@ -111,6 +112,7 @@ main { max-width: 760px; margin: 0 auto; padding: 0 16px calc(var(--tab-h) + env
 .subnav {
   position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 1px); z-index: 20;
   margin: -14px -16px 0; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  background: var(--bg);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
 }
@@ -236,10 +238,10 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 
 /* Today hero */
 .hero { background: var(--ink); color: var(--bg); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
-.hero .eyebrow { color: color-mix(in srgb, var(--accent) 55%, var(--bg)); }
+.hero .eyebrow { color: var(--bg); color: color-mix(in srgb, var(--accent) 55%, var(--bg)); }
 .hero h2 { font-size: 2.2rem; }
-.hero p { color: color-mix(in srgb, var(--bg) 78%, var(--ink)); }
-.hero .btn { align-self: flex-start; background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 40%, var(--ink)); }
+.hero p { color: var(--bg); color: color-mix(in srgb, var(--bg) 78%, var(--ink)); }
+.hero .btn { align-self: flex-start; background: transparent; color: var(--bg); border-color: var(--ink-2); border-color: color-mix(in srgb, var(--bg) 40%, var(--ink)); }
 .hero svg.compass { position: absolute; right: -28px; bottom: -28px; width: 150px; height: 150px; opacity: .14; color: var(--bg); pointer-events: none; }
 .quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .quick a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--ink); text-decoration: none; }
@@ -262,13 +264,21 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 
 /* Map */
 .map-card { padding: 0; overflow: hidden; }
-.map-wrap { position: relative; height: clamp(320px, 100vw, 560px); background: var(--water); touch-action: none; user-select: none; -webkit-user-select: none; }
+.map-wrap { position: relative; height: clamp(260px, 78vw, 520px); max-height: 55vh; background: var(--water); touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.map-card.full { position: fixed; z-index: 25; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 1px); bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); margin: 0; border: 0; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; }
+.map-card.full > * + * { margin-top: 0; }
+.map-card.full .map-wrap { flex: 1; height: auto; max-height: none; min-height: 0; touch-action: none; }
+.map-card.full .legend { display: none; }
+.map-card.full .map-info { position: absolute; left: 10px; right: 58px; bottom: 62px; max-height: 45%; overflow: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); padding: 10px 12px; }
+.map-card.full .map-info.empty { display: none; }
+@media (max-height: 500px) { .map-card.full .map-regions { display: none; } .map-card.full .map-info { bottom: 10px; } }
+body.map-open { overflow: hidden; }
 .map-wrap svg { width: 100%; height: 100%; display: block; }
 .map-tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .map-tools button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 700 1.2rem/1 var(--font-body); cursor: pointer; }
 .map-scale { position: absolute; left: 10px; bottom: 10px; font: 600 .72rem/1 var(--font-body); color: var(--ink); display: flex; flex-direction: column; gap: 3px; }
 .map-scale i { display: block; height: 6px; border: 2px solid var(--ink); border-top: 0; }
-.map-nfn { position: absolute; right: 10px; bottom: 10px; font: 700 .68rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); background: color-mix(in srgb, var(--water) 80%, transparent); padding: 3px 6px; border-radius: 6px; }
+.map-nfn { position: absolute; right: 10px; bottom: 10px; font: 700 .68rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); background: var(--water); background: color-mix(in srgb, var(--water) 80%, transparent); padding: 3px 6px; border-radius: 6px; }
 .map-regions { display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px; border-top: 1px solid var(--line); scrollbar-width: none; }
 .map-regions::-webkit-scrollbar { display: none; }
 .map-info { padding: 12px 16px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
@@ -287,6 +297,7 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   padding: 0 4px env(safe-area-inset-bottom, 0px);
+  background: var(--surface);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px);
   border-top: 1px solid var(--line);
@@ -297,7 +308,7 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .tab[aria-current="page"] { color: var(--accent); }
 
 /* Sheets (SOS, search) */
-.sheet-backdrop { position: fixed; inset: 0; background: rgba(5,12,20,.45); z-index: 60; }
+.sheet-backdrop { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(5,12,20,.45); z-index: 60; }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; max-height: 92vh; overflow-y: auto;
   background: var(--bg); border-radius: 20px 20px 0 0; padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
@@ -325,6 +336,11 @@ details.acc .count { font: 600 .8rem/1 var(--font-body); color: var(--ink-2); fo
 .results a span { font-size: .82rem; color: var(--ink-2); }
 
 .install { border: 1px dashed var(--accent); background: var(--accent-soft); }
+.update-bar { position: fixed; z-index: 45; left: 12px; right: 12px; bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 10px); max-width: 736px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--ink); color: var(--bg); box-shadow: 0 6px 24px rgba(0,0,0,.3); font-weight: 600; }
+.log td { padding: 6px; vertical-align: middle; }
+.log td:first-child { white-space: nowrap; font-size: .85rem; padding-left: 10px; }
+.log input { width: 100%; min-width: 58px; font: 16px/1.2 var(--font-body); padding: 8px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
 .share-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 .share-row > .stack { flex: 1; min-width: 180px; gap: 8px; }
 .qr { width: 136px; height: 136px; flex: none; border-radius: 10px; border: 1px solid var(--line); }
@@ -352,6 +368,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
   </div>
 </header>
 
+<div class="update-bar" id="update-bar" role="status" hidden><span>A newer version of the guide is ready.</span><button class="btn small primary" type="button" id="update-btn">Update now</button></div>
+
 <main id="main">
 
 <!-- ======================= TODAY ======================= -->
@@ -371,13 +389,20 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <a class="btn" id="hero-btn" href="#more-settings">Open settings</a>
   </div>
 
+  <div class="card install" id="boat-pick" hidden>
+    <h3>Which boat are you on?</h3>
+    <p class="small">So the emergency card and radio scripts use the right boat name. You can change it later in Settings.</p>
+    <div class="btn-row" id="boat-pick-btns"></div>
+  </div>
+
   <div class="card install" id="install-card" hidden>
     <h3>Install it for offline use</h3>
-    <ol class="steps">
-      <li>Open this page in <strong>Safari</strong> on your iPhone or iPad.</li>
-      <li>Tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</li>
+    <ol class="steps" id="install-steps">
+      <li>Open this page in your phone's browser (Safari on iPhone, Chrome on Android).</li>
+      <li>Open the browser's Share or ⋮ menu and choose <strong>Add to Home Screen</strong>.</li>
       <li>Open it once from the home screen while you still have Wi-Fi. After that it works with no signal.</li>
     </ol>
+    <div class="btn-row" id="install-btn-row" hidden><button class="btn primary" type="button" id="install-btn">Install app</button></div>
   </div>
 
   <div class="grid2" id="sun-tiles">
@@ -402,6 +427,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <a href="#islands-map"><b>Chart &amp; route</b><span>Where everything is, how far</span></a>
       <a href="#log-fuel"><b>Fuel, water &amp; ice</b><span>Where to fill up</span></a>
       <a href="#boat-fuel"><b>Fuel calculator</b><span>How much you'll burn</span></a>
+      <a href="#boat-log"><b>Daily log</b><span>Engine hours, fuel and water</span></a>
       <a href="#more-safety"><b>Emergencies</b><span>MOB, fire, dragging, medical</span></a>
       <a href="#more-share"><b>Share with the crew</b><span>Send the app and trip details</span></a>
     </div>
@@ -428,11 +454,12 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <p class="lede">The BVI is a separate country (a British Overseas Territory). St. Thomas is US soil, so you cross a border on the ferry.</p></header>
     <div class="card">
       <ol class="steps">
-        <li><strong>Plan to arrive Saturday, Dec 12.</strong> Charter day 1 is Sunday, Dec 13, and Sunday ferries are fewer. Ask The Moorings for a sleep-aboard night (boarding 6 PM Saturday) so you start Sunday rested.</li>
+        <li><strong>Arrive the day before: Saturday, Dec 12.</strong> Boarding is at noon on Sunday, Dec 13. Stay the night in Road Town (a late-afternoon ferry lands about 6:30 PM), or ask The Moorings about a sleep-aboard night, which boards from 6 PM.</li>
+        <li><strong>The Moorings' online checklist.</strong> Log in to MyAccount on moorings.com with the lead booker's email and finish the guest list and other tasks. Each adult on the list then gets their own login.</li>
         <li><strong>Passports for everyone, kids included.</strong> Check they're valid well past your return date.</li>
         <li><strong>BVI entry card (ED card) online.</strong> Fill it in at <a href="https://bviedcard.gov.vg" target="_blank" rel="noopener">bviedcard.gov.vg</a> within 72 hours before you arrive (The Moorings suggests 36–72 hours). You get an email with a QR code. Screenshot it for each traveler.</li>
         <li><strong>Book the ferry.</strong> Buy round-trip tickets from Charlotte Amalie to Road Town in advance (it's cheaper and guarantees seats in holiday weeks).</li>
-        <li><strong>Charter paperwork.</strong> Moorings confirmation, approved sailing résumé, crew list, and the credit card used for the security deposit.</li>
+        <li><strong>Charter paperwork.</strong> Moorings confirmation, approved boating résumé, crew list, and the credit card used for the security deposit.</li>
         <li><strong>Provisioning order</strong> (if using Moorings provisioning) is due 5 days before your charter starts.</li>
         <li><strong>Fuel prepayment.</strong> Fuel isn't included on power charters; in the BVI, The Moorings has you prepay. Ask what it covers.</li>
         <li><strong>Request kid-sized life jackets</strong> when you confirm the boat, or bring your own US Coast Guard–approved ones.</li>
@@ -466,8 +493,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <div class="table-wrap"><table>
       <thead><tr><th colspan="2">Ferry: Charlotte Amalie → Road Town</th></tr></thead>
       <tbody>
-        <tr><td>Operators</td><td>Road Town Fast Ferry, Native Son, Smith's Ferry (they alternate days)</td></tr>
-        <tr><td>Typical departures</td><td class="num">≈ 9:00 AM, 2:00 PM, 4:00 PM, 5:30 PM <br><small>Schedules change, so confirm with the operator.</small></td></tr>
+        <tr><td>Operators</td><td>Native Son, Road Town Fast Ferry and Smith's Ferry. They take turns, so each sailing belongs to one company on a given day. <a href="#more-numbers">Phone numbers →</a></td></tr>
+        <tr><td>Typical departures</td><td class="num">≈ 9:00 AM, 2:00 PM, 4:00 PM, 5:30 PM <br><small>Book a specific sailing; your ticket is only good with the company you bought it from.</small></td></tr>
         <tr><td>Fares (2026)</td><td>Adult ≈ $60 one way / $100 round trip; child ≈ $50 / $85–90; plus port fees and taxes</td></tr>
         <tr><td>Door to door</td><td>Allow 2.5–3 hours including immigration</td></tr>
       </tbody>
@@ -534,17 +561,25 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
   <section class="block" id="travel-home">
     <header><span class="eyebrow">The way back</span><h2>Going home</h2>
-      <p class="lede">Sunday, Dec 20. Power charters are due back at 9:00 AM for the exit briefing. Leave a 4–5 hour buffer between the ferry and your flight, and check the Sunday ferry times.</p></header>
+      <p class="lede">Sunday, Dec 20. Power charters are due back at 9:00 AM for the exit briefing and off the boat by 10:00. Sunday ferries are thinner than weekdays, so book a specific sailing ahead.</p></header>
     <div class="card">
       <ol class="steps">
         <li><strong>Be back at the base by 9:00 AM</strong> for the exit briefing; you're off the boat by 10:00. Spend the last night 30 minutes away (Norman or Peter Island) or come back Saturday evening.</li>
         <li><strong>Call The Moorings on VHF 12</strong> about 15–20 minutes out for docking instructions. Fenders and lines ready. They often send a dock hand.</li>
         <li><strong>Pump out the holding tank</strong> offshore (or as instructed) before entering Road Harbour.</li>
         <li><strong>Check out.</strong> Report any damage or breakage, hand back keys and the outboard kill cord.</li>
-        <li><strong>Ferry back to Charlotte Amalie.</strong> Typical departures from Road Town ≈ 7:30 AM, 10:00 AM, 11:30 AM and 3:30 PM, with fewer on Sundays (confirm). Arrive 60–90 minutes early and pay the $20 per person departure tax.</li>
+        <li><strong>Ferry back to Charlotte Amalie.</strong> Timetables list Road Town departures at about 7:30 AM, 10:00 AM, 11:30 AM and 3:15–3:30 PM, with the companies taking turns. After a 10:00 hand-back, the <strong>11:30 AM</strong> is the first you can realistically make; the mid-afternoon boat leaves time for lunch. Arrive 60–90 minutes early and pay the $20 per person departure tax.</li>
         <li><strong>US Customs (CBP) at the Charlotte Amalie terminal.</strong> Passports out.</li>
         <li><strong>Taxi to STT</strong> (≈ $12–15 per person). There is an extra US Customs check at STT before airport security for flights to the mainland. Allow 2–3 hours at the airport.</li>
       </ol>
+    </div>
+    <div class="callout warn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+      <div><b class="t">Book the Sunday ferry by phone</b>As of mid-November none of the three companies publishes a firm Dec 20 timetable online, and Road Town Fast Ferry only runs "select Sundays." Call to confirm which company runs which sailing that day, then book it. <a href="#more-numbers">Ferry phone numbers →</a></div>
+    </div>
+    <div class="callout info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+      <div><b class="t">Flying out the next day?</b>Either cross on Sunday and spend the night in St. Thomas, or stay Sunday night in Road Town and take a Monday-morning ferry. Weekday mornings have more sailings, and a mid-morning boat still leaves hours to spare for a late-afternoon flight.</div>
     </div>
     <p><a href="#cl-return">Open the return-to-base checklist →</a></p>
   </section>
@@ -556,6 +591,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <a class="chip" href="#boat-specs">Your boat</a>
     <a class="chip" href="#boat-driving">Driving</a>
     <a class="chip" href="#boat-fuel">Fuel</a>
+    <a class="chip" href="#boat-log">Log</a>
     <a class="chip" href="#boat-engines">Engines</a>
     <a class="chip" href="#boat-power">Power &amp; A/C</a>
     <a class="chip" href="#boat-water">Water &amp; heads</a>
@@ -567,7 +603,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
   <section class="block" id="boat-specs">
     <header><span class="eyebrow">40 ft power catamaran</span><h2>Moorings 403PC</h2>
-      <p class="lede">Numbers from The Moorings' spec sheet for the 403PC (a Leopard 40 PowerCat built for charter). Confirm the details for your boat at the briefing and correct them in Settings.</p></header>
+      <p class="lede">Both boats are Moorings 403PC "Exclusive" power cats: a Leopard 40 PowerCat built for charter, from the newest part of the fleet. Numbers are from The Moorings' spec sheet. Confirm them at your boat briefing and correct them in Settings.</p></header>
     <div class="card">
       <dl class="kv">
         <dt>Length</dt><dd>40 ft</dd>
@@ -579,7 +615,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <dt>Helms</dt><dd>Two: inside lower helm and flybridge helm. Bow and stern cameras.</dd>
         <dt>Layout</dt><dd>3 cabins, 2 heads; flybridge with wet bar, electric grill and fridge</dd>
         <dt>Deck gear</dt><dd>Electric windlass; davits with an electric winch for the dinghy</dd>
-        <dt>Passengers</dt><dd>The Moorings lists a maximum of 6</dd>
+        <dt>Sleeps</dt><dd>Six in three double cabins; extra guests use the saloon. Your booking sets how many each boat carries.</dd>
+        <dt>Wi-Fi</dt><dd>Included on Exclusive-class boats. Ask for the network name and password at the briefing.</dd>
       </dl>
     </div>
     <div class="callout info">
@@ -687,6 +724,17 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     </ul>
   </section>
 
+  <section class="block" id="boat-log">
+    <header><span class="eyebrow">Skipper's notebook</span><h2>Daily log</h2>
+      <p class="lede">Each morning, write down the engine hours and what the gauges say. It takes a minute, shows your real fuel burn, and gives you a record at check-out.</p></header>
+    <div class="table-wrap"><table class="log">
+      <thead><tr><th>Day</th><th>Engine hrs</th><th>Fuel %</th><th>Water %</th></tr></thead>
+      <tbody id="log-body"></tbody>
+    </table></div>
+    <div class="card"><dl class="kv" id="log-summary"></dl></div>
+    <p class="small">Saved on this phone only, so keep it on the skipper's phone on each boat. If the two engines show different hours, log the higher one.</p>
+  </section>
+
   <section class="block" id="boat-engines">
     <header><span class="eyebrow">Every morning</span><h2>Engines &amp; generator</h2></header>
     <div class="card">
@@ -699,7 +747,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li><strong>Engine rooms and bilges:</strong> dry, no fuel or oil smell, no new drips.</li>
         <li><strong>After starting:</strong> water spitting from each exhaust (and the generator's) within 30 seconds. If not, shut down and check the seacock, strainer and impeller.</li>
       </ol>
-      <p><a href="#cl-engine">Use the tick-box version →</a></p>
+      <p><a href="#cl-engine">Use the tick-box version →</a> · <a href="#boat-log">Log today's hours and fuel →</a></p>
     </div>
     <div class="card">
       <h3>Start and stop</h3>
@@ -864,11 +912,12 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
   <section class="block" id="islands-map">
     <header><span class="eyebrow">Overview chart</span><h2>Where everything is</h2>
-      <p class="lede">Pinch or use + / − to zoom. Tap a dot for details. The magenta line is the suggested loop.</p></header>
-    <div class="card map-card">
+      <p class="lede">Tap a dot for details. Use + and − to zoom, or tap ⤢ for full screen to drag and pinch. The magenta line is the suggested loop.</p></header>
+    <div class="card map-card" id="map-card">
       <div class="map-wrap" id="map-wrap">
         <svg id="map-svg" role="img" aria-label="Schematic chart of the British Virgin Islands with suggested route"></svg>
         <div class="map-tools">
+          <button type="button" id="map-full" aria-label="Full-screen map" aria-pressed="false">⤢</button>
           <button type="button" id="map-in" aria-label="Zoom in">+</button>
           <button type="button" id="map-out" aria-label="Zoom out">−</button>
           <button type="button" id="map-reset" aria-label="Show all" style="font-size:.8rem">All</button>
@@ -884,13 +933,15 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <button class="chip" type="button" data-region="west">JVD &amp; West End</button>
       </div>
       <div class="legend"><span><i class="n"></i>Overnight</span><span><i class="d"></i>Day stop</span><span><i class="m"></i>Marina / base</span><span><i class="r"></i>Suggested route</span></div>
-      <div class="map-info" id="map-info"><p class="small">Tap a dot to see what's there.</p></div>
+      <div class="map-info empty" id="map-info"><p class="small">Tap a dot to see what's there.</p></div>
     </div>
   </section>
 
   <section class="block" id="islands-plan">
-    <header><span class="eyebrow">Sun Dec 13 → Sun Dec 20</span><h2>Suggested 7-night plan</h2>
+    <header><span class="eyebrow">Sun Dec 13 → Sun Dec 20</span><h2>7-night plan</h2>
       <p class="lede">Built for a power cat in December: run into the waves early in the week and early in the day, then follow the seas back west, ending 30 minutes from the base for the 9 AM return. Times are at ~16 knots. Every day has a bad-weather alternative.</p></header>
+    <p class="small">Plans change with the weather. Use <strong>Tonight's stop</strong> on any day to record where you're really going; the Today screen follows it, and the plan travels in the trip code you send the group.</p>
+    <div class="btn-row"><button class="btn small" type="button" id="plan-reset" hidden>Reset to the suggested plan</button></div>
     <div class="stack" id="plan-list"></div>
   </section>
 
@@ -1146,6 +1197,8 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
   <nav class="subnav" aria-label="More sections">
     <a class="chip" href="#more-share">Share</a>
     <a class="chip" href="#more-safety">Safety</a>
+    <a class="chip" href="#more-numbers">Numbers</a>
+    <a class="chip" href="#more-fleet">Two boats</a>
     <a class="chip" href="#more-weather">Weather &amp; VHF</a>
     <a class="chip" href="#more-checklists">Checklists</a>
     <a class="chip" href="#more-packing">Packing</a>
@@ -1180,7 +1233,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     </div>
     <div class="card" id="share-trip-card">
       <h3>Send everyone the trip details</h3>
-      <p>Fill in <a href="#more-settings">Settings</a> once (boat name, Moorings phone numbers, ferry times, notes), then send them as a code. Everyone pastes it into their app. Flights and appearance stay private to each phone.</p>
+      <p>Fill in <a href="#more-settings">Settings</a> once (boat names, Moorings phone numbers, ferry times, notes), then send them as a code. Everyone pastes it into their app. Any changes you made to the plan go too. Flights, which boat a phone is on, and appearance stay private to each phone.</p>
       <div class="btn-row"><button class="btn primary" type="button" id="share-trip">Send trip details</button><button class="btn" type="button" id="copy-trip">Copy code</button></div>
       <p class="small" id="share-trip-msg" role="status"></p>
       <div class="field" id="trip-code-box" hidden><label for="trip-code-out">Copy this and paste it in your group chat</label><textarea id="trip-code-out" readonly></textarea></div>
@@ -1289,7 +1342,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <dt>12</dt><dd>The Moorings base</dd>
         <dt>68, 69, 71, 72</dt><dd>Working channels for boat-to-boat and restaurants</dd>
       </dl>
-      <p><strong>How to call:</strong> "Cooper Island Beach Club, Cooper Island Beach Club, this is sailing vessel <em>[boat]</em>, over." When they answer they'll name a working channel. Switch and continue. Set the radio to USA mode and keep calls short.</p>
+      <p><strong>How to call:</strong> "Cooper Island Beach Club, Cooper Island Beach Club, this is motor vessel <em>[boat]</em>, over." When they answer they'll name a working channel. Switch and continue. Set the radio to USA mode and keep calls short.</p>
     </div>
   </section>
 
@@ -1302,6 +1355,41 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
   <section class="block" id="more-packing">
     <header><span class="eyebrow">Soft bags only</span><h2>Packing list</h2></header>
     <div id="packing"></div>
+  </section>
+
+  <section class="block" id="more-numbers">
+    <header><span class="eyebrow">Tap to call</span><h2>Phone numbers</h2>
+      <p class="lede">From a US phone, BVI numbers are +1 284 and seven digits. Calls made in the BVI are roaming calls on most US plans.</p></header>
+    <div class="table-wrap"><table>
+      <tbody>
+        <tr><td>Rescue at sea (VISAR)</td><td><a href="tel:+12844990911">+1 284 499 0911</a> · 767 · VHF 16</td></tr>
+        <tr><td>Police, fire, ambulance</td><td><a href="tel:911">911</a> or 999</td></tr>
+        <tr><td>Hospital, Road Town</td><td><a href="tel:+12848527500">+1 284 852 7500</a></td></tr>
+        <tr><td>The Moorings base</td><td id="num-moorings">VHF 12 · add the phone number in Settings</td></tr>
+        <tr><td>The Moorings, US office</td><td><a href="tel:+18006698288">800 669 8288</a> <small>(office hours)</small></td></tr>
+        <tr><td>Native Son ferry</td><td><a href="tel:+13407748685">340 774 8685</a> <small>(St. Thomas)</small> · <a href="tel:+12844945674">284 494 5674</a> <small>(Tortola)</small></td></tr>
+        <tr><td>Road Town Fast Ferry</td><td><a href="tel:+13407772800">340 777 2800</a> <small>(St. Thomas)</small> · <a href="tel:+12844942323">284 494 2323</a> <small>(Tortola)</small></td></tr>
+        <tr><td>Smith's Ferry</td><td><a href="tel:+13407757292">340 775 7292</a></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">Restaurants and marinas answer on VHF 16. Their phone numbers change often, so they aren't listed here.</p>
+  </section>
+
+  <section class="block" id="more-fleet">
+    <header><span class="eyebrow">Buddy boating</span><h2>Two boats, one plan</h2>
+      <p class="lede">Two boats travelling together need a few habits a single boat doesn't.</p></header>
+    <div class="card">
+      <ul>
+        <li><strong>One plan, shared.</strong> Agree each evening where you're going tomorrow, the Plan B, and what time you leave. One person changes the plan in this app and sends the trip code so every phone matches.</li>
+        <li><strong>Pick a radio channel.</strong> Agree a boat-to-boat working channel at the base (68, 69, 71 or 72) and save it in Settings. Hail on 16, then switch. Do a radio check before leaving each morning.</li>
+        <li><strong>Each skipper decides for their own boat.</strong> Either one can call "too rough, we're turning back," and the other goes along with it.</li>
+        <li><strong>Stay in sight on passages.</strong> The boat in front sets a pace the other is comfortable with. Don't run side by side at speed; your wakes add up.</li>
+        <li><strong>Two boats need two moorings.</strong> Book both at 7 AM on BoatyBall, one phone per boat, or arrive early. Don't tie two boats to one ball; a mooring is meant for one.</li>
+        <li><strong>If you get separated,</strong> carry on to the planned stop and call on the radio, then by phone or WhatsApp when there's signal.</li>
+        <li><strong>If one boat has a problem,</strong> the other stands by and helps on the radio, but doesn't tow. Call The Moorings on VHF 12.</li>
+        <li><strong>Shore runs:</strong> agree who's ferrying whom before dinner, and bring both dinghies home together after dark.</li>
+      </ul>
+    </div>
   </section>
 
   <section class="block" id="more-kids">
@@ -1326,6 +1414,20 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
         <li>Swim with a buddy. Trail a floating line off the stern when swimming from the boat (current can be strong).</li>
         <li>One hand for yourself, one for the boat when moving around under way.</li>
         <li>Nobody on the foredeck during anchoring or mooring unless it's their job.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Baby &amp; toddler aboard</h3>
+      <ul>
+        <li><strong>Life jackets:</strong> bring a US Coast Guard–approved infant vest (under 30 lb) and child vest (30–50 lb) that you've test-fitted at home. Don't count on the base having the right size.</li>
+        <li><strong>One named adult per small child</strong> whenever the boat is moving, at a dock, or anyone is on the swim steps. Hand over out loud: "You have her."</li>
+        <li><strong>Safety netting</strong> closes the gaps in the rails. It doesn't cover the stern steps, the flybridge stairs or the foredeck, so those stay off limits unless an adult is holding on.</li>
+        <li><strong>Under way,</strong> little ones ride in the cockpit or saloon, seated or held. The flybridge moves the most and has the steepest stairs.</li>
+        <li><strong>Dinghy:</strong> vest on before stepping in, sit low in the middle with an adult's arm around them, and go slowly.</li>
+        <li><strong>Sun and heat:</strong> shade, a hat and long sleeves come first. Ask your pediatrician about sunscreen and fluids for a baby. The A/C only runs with the generator on.</li>
+        <li><strong>Supplies:</strong> bring diapers, wipes, formula or baby food, and medicines for the whole week. Shops outside Road Town are small. Diapers and wipes go in the trash, never the head.</li>
+        <li><strong>The Baths:</strong> the swim in from the dinghy line and the boulder trail (ladders and tight squeezes) don't work with a baby. Take a taxi from Spanish Town to the top entrance, walk down to the beach, and take turns on the trail.</li>
+        <li><strong>Taxis and ferries</strong> have no car seats. On the ferry, sit inside and low.</li>
       </ul>
     </div>
     <div class="card">
@@ -1369,13 +1471,17 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
       <div class="form">
         <div class="field"><label for="s-start">Charter day 1 (boarding day)</label><input id="s-start" name="start" type="date"></div>
         <div class="field"><label for="s-nights">Nights on the boat</label><input id="s-nights" name="nights" type="number" inputmode="numeric" min="1" max="21" value="7"></div>
-        <div class="field"><label for="s-boatName">Boat name</label><input id="s-boatName" name="boatName" type="text" placeholder="e.g. Sea Biscuit"></div>
+        <div class="field"><label for="s-boatName">Boat 1 name</label><input id="s-boatName" name="boatName" type="text" placeholder="on your boarding papers"></div>
+        <div class="field"><label for="s-crew">People aboard boat 1</label><input id="s-crew" name="crew" type="number" inputmode="numeric" min="1" max="14" placeholder="e.g. 6"></div>
+        <div class="field"><label for="s-boat2Name">Boat 2 name (if you have two)</label><input id="s-boat2Name" name="boat2Name" type="text" placeholder="leave blank for one boat"></div>
+        <div class="field"><label for="s-crew2">People aboard boat 2</label><input id="s-crew2" name="crew2" type="number" inputmode="numeric" min="1" max="14" placeholder="e.g. 7"></div>
+        <div class="field"><label for="s-myBoat">This phone is on</label><select id="s-myBoat" name="myBoat"><option value="1">Boat 1</option><option value="2">Boat 2</option></select></div>
+        <div class="field"><label for="s-vhfCh">Boat-to-boat VHF channel</label><input id="s-vhfCh" name="vhfCh" type="text" inputmode="numeric" placeholder="agree one at the base, e.g. 68"></div>
         <div class="field"><label for="s-boatModel">Model / description</label><input id="s-boatModel" name="boatModel" type="text" placeholder="e.g. Moorings 403PC, white power catamaran"></div>
-        <div class="field"><label for="s-crew">People aboard</label><input id="s-crew" name="crew" type="number" inputmode="numeric" min="1" max="12" placeholder="e.g. 6"></div>
         <div class="field"><label for="s-fuelCap">Fuel tank (gal)</label><input id="s-fuelCap" name="fuelCap" type="number" inputmode="decimal" min="10" max="400"></div>
         <div class="field"><label for="s-waterCap">Water tanks (gal)</label><input id="s-waterCap" name="waterCap" type="number" inputmode="decimal" min="10" max="600"></div>
-        <div class="field"><label for="s-mooringsPhone">Moorings base phone</label><input id="s-mooringsPhone" name="mooringsPhone" type="tel" placeholder="from your briefing packet"></div>
-        <div class="field"><label for="s-mooringsEmerg">Moorings after-hours / breakdown</label><input id="s-mooringsEmerg" name="mooringsEmerg" type="tel" placeholder="from your briefing packet"></div>
+        <div class="field"><label for="s-mooringsPhone">Moorings base phone</label><input id="s-mooringsPhone" name="mooringsPhone" type="tel" placeholder="from your Moorings paperwork or briefing"></div>
+        <div class="field"><label for="s-mooringsEmerg">Moorings after-hours / breakdown</label><input id="s-mooringsEmerg" name="mooringsEmerg" type="tel" placeholder="from your Moorings paperwork or briefing"></div>
         <div class="field"><label for="s-ferryOut">Ferry out (STT → Road Town)</label><input id="s-ferryOut" name="ferryOut" type="text" placeholder="e.g. Sat Dec 12, 2:00 PM, Native Son"></div>
         <div class="field"><label for="s-ferryBack">Ferry back</label><input id="s-ferryBack" name="ferryBack" type="text" placeholder="e.g. Sun Dec 20, 11:30 AM"></div>
         <div class="field"><label for="s-flightIn">Flight in</label><input id="s-flightIn" name="flightIn" type="text" placeholder="e.g. AA 1234, lands 12:40"></div>
@@ -1391,15 +1497,16 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
     <header><span class="eyebrow">Fine print</span><h2>About this guide</h2></header>
     <div class="card">
       <p><span class="status-dot" id="offline-dot"></span><span id="offline-status">Checking offline storage…</span></p>
-      <p>Researched October 2026 for a December 2026 Moorings charter out of Road Town, Tortola. Prices, schedules and what's open change, and some businesses here may have changed by December. <strong>Your Moorings chart briefing and their rules override anything in this guide.</strong> The chart is a schematic: not for navigation.</p>
-      <p>To keep it working offline, open the app from your home screen once a week or so before the trip, and again the day you leave.</p>
+      <p>Researched October and November 2026 for a December 2026 Moorings charter out of Road Town, Tortola. Prices, schedules and what's open change, and some businesses here may have changed by December. <strong>Your Moorings chart briefing and their rules override anything in this guide.</strong> The chart is a schematic: not for navigation.</p>
+      <p>To keep it working offline, open the app from your home screen once a week or so before the trip, and again the day you leave. When the guide has changed, a bar offers to update it.</p>
+      <p class="small" id="build-line"></p>
     </div>
     <details class="acc"><summary>Sources</summary><div class="acc-body">
       <ul class="small">
         <li><a href="https://www.moorings.com/destinations/caribbean/british-virgin-islands-yacht-charters/useful-information" target="_blank" rel="noopener">The Moorings: BVI travel information</a> (base times, transfers, fees, rules)</li>
         <li><a href="https://bviedcard.gov.vg" target="_blank" rel="noopener">BVI online ED card</a></li>
         <li><a href="https://www.gov.uk/foreign-travel-advice/british-virgin-islands/entry-requirements" target="_blank" rel="noopener">UK FCDO: BVI entry requirements</a> (levy, departure tax)</li>
-        <li><a href="https://boatbookings.com/yachting_content/st_thomas_to_bvi_ferry_schedules.php" target="_blank" rel="noopener">St. Thomas–Tortola ferry fares</a></li>
+        <li><a href="https://boatbookings.com/yachting_content/st_thomas_to_bvi_ferry_schedules.php" target="_blank" rel="noopener">St. Thomas–Tortola ferry fares</a>; ferry companies: <a href="https://www.nativesonferry.co/" target="_blank" rel="noopener">Native Son</a>, <a href="https://www.roadtownfastferry.com/" target="_blank" rel="noopener">Road Town Fast Ferry</a>; timetables: <a href="https://www.bvitraveller.com/bvi-ferry-schedules/" target="_blank" rel="noopener">BVI Traveller</a>, <a href="https://viferries.com/road-town-to-red-hook-ferry" target="_blank" rel="noopener">VI Ferries</a></li>
         <li><a href="https://visar.org" target="_blank" rel="noopener">VISAR</a> (search and rescue)</li>
         <li><a href="https://www.yachtwarriors.com/what-is-boatyball" target="_blank" rel="noopener">How BoatyBall works</a>; <a href="https://www.yachtwarriors.com/bvi-weather-and-marine-forecast-resources" target="_blank" rel="noopener">BVI weather resources</a></li>
         <li><a href="https://www.practical-sailor.com/voyaging/caribbean-bareboat-chartering-basics-2025-updates/" target="_blank" rel="noopener">Practical Sailor: bareboat basics, 2025 updates</a> (White Bay closure, Anegada permission)</li>
@@ -1464,7 +1571,7 @@ footer.fine { font-size: .78rem; color: var(--ink-2); padding: 6px 2px 0; }
 
 <script>
 /* Coastlines: geoBoundaries VGB ADM0 (CC BY 4.0) + Natural Earth (public domain). Units: nautical miles from 65.06W / 18.78N. */
-const MAP={"w":46.66,"h":30.6,"lon0":-65.06,"lat0":18.78,"cos":0.948324,"bvi":"M25.99,27.39L25.90,27.35L25.93,27.52L25.81,27.58L25.61,27.56L25.54,27.44L25.40,27.56L25.27,27.56L25.11,27.40L24.95,27.36L25.07,27.44L25.05,27.59L25.42,27.67L25.42,27.81L25.31,27.84L25.22,27.98L25.11,28.03L24.96,27.97L24.82,27.79L24.85,28.09L24.80,28.19L24.65,28.22L24.70,28.30L24.82,28.35L24.88,28.29L24.99,28.40L25.02,28.25L25.16,28.24L25.24,28.30L25.28,28.17L25.37,28.15L25.57,28.27L25.66,28.17L25.50,28L25.56,27.87L25.65,27.88L25.74,27.75L25.88,27.80L25.92,27.67L26.11,27.56L26.33,27.62L26.29,27.75L26.51,27.67L26.68,27.79L26.68,27.44L26.49,27.41L26.41,27.47L26.25,27.48ZM24.72,26.79L24.67,26.84L24.77,26.92ZM27.46,25.41L27.35,25.18L27.18,25.11L27.10,25.02L27.22,25.26L27.40,25.36L27.34,25.49L27.13,25.56L26.81,25.56L26.61,25.34L26.14,25.41L26.24,25.49L26.25,25.57L26.10,25.64L25.74,25.60L25.52,25.68L25.83,25.84L25.93,25.96L25.97,25.92L25.95,25.80L26.04,25.75L26.40,25.91L26.46,26.02L26.54,25.84L26.67,25.82L26.73,25.72L26.92,25.77L27.03,25.67L27.22,25.74L27.33,25.66L27.47,25.67L27.71,25.89L27.66,26.11L27.87,26.48L27.70,26.73L27.75,26.87L27.92,26.96L28.19,27L28.09,26.74L28.13,26.35L28.03,26.01L28.03,25.58L28.10,25.53L28.08,25.43L28.03,25.36L27.97,25.51L27.81,25.53L27.68,25.45L27.68,25.33L27.59,25.24L27.52,25.27L27.57,25.39ZM28.35,24.81L28.23,24.77L28.16,24.97L28.40,24.91ZM30.37,24.24L30.33,24.22L30.28,24.33L30.13,24.43L29.95,24.41L29.93,24.49L30.06,24.56L29.97,24.59L29.95,24.65L29.99,24.68L30.04,24.61L30.17,24.57L30.07,24.55L30.08,24.47L30.23,24.48L30.24,24.55L30.18,24.56L30.37,24.70L30.45,24.94L30.55,24.97L30.57,24.74L30.54,24.79L30.46,24.76L30.42,24.56L30.46,24.43L30.60,24.37L30.70,24.25ZM19.79,23.82L19.53,23.85L19.34,23.95L19.79,23.97L19.83,23.93ZM31.22,23.48L31.09,23.42L31.15,23.73L31,23.98L31.11,24.01L31.17,24.15L31.35,24.25L31.33,24.41L31.40,24.63L31.47,24.56L31.58,24.57L31.87,24.78L31.98,24.54L31.88,24.39L31.60,24.40L31.37,24.25L31.44,24.09L31.39,23.97L31.58,23.79L31.45,23.72L31.47,23.75L31.42,23.77L31.38,23.65L31.21,23.61ZM19.05,23.35L18.56,23.48L18.15,23.48L17.61,23.72L17.52,23.82L17.70,23.86L17.85,23.80L18.15,23.79L18.35,23.91L18.45,23.86L18.37,23.72L18.51,23.61L18.43,23.57L18.47,23.51L18.79,23.54L19.01,23.45L19.13,23.46ZM33.55,23.21L33.10,23.26L32.72,23.51L32.48,23.60L32.59,23.62L32.94,23.51L33.08,23.61L33.08,23.76L33.42,23.86L33.49,23.74L33.22,23.60L33.27,23.52L33.20,23.47L33.25,23.40L33.52,23.46L33.62,23.31ZM20.63,22.86L20.50,22.88L20.43,22.97L20.64,22.98L20.68,22.92ZM34.25,22.95L34.36,22.90L34.36,22.84L34.23,22.88L34.20,22.95ZM27.53,21.74L27.48,21.83L27.62,21.78ZM34.64,21.57L34.56,21.70L34.54,21.93L34.73,21.76L34.75,21.59ZM28.52,21.22L28.38,21.09L28.47,21.22L28.45,21.37L28.54,21.44L28.68,21.45L28.71,21.39ZM12.31,20.93L12.27,20.86L12.18,20.94L11.99,20.98L11.96,21.06L12.13,21.14L12.25,21.06ZM20.01,20.60L19.88,20.60L19.88,20.66L20.04,20.65ZM29.67,20.37L29.63,20.41L29.74,20.44ZM29.12,20.02L29.05,19.93L29.10,19.73L28.84,19.73L28.81,19.95L28.88,19.93L28.92,19.99L28.85,20.12L28.92,20.14L29.04,20.02L29.17,20.17L28.96,20.17L28.97,20.21L29.25,20.29L29.34,20.46L29.51,20.49L29.63,20.25L29.74,20.39L30,20.34L30.02,20.40L30.27,20.47L30.51,20.76L30.57,21.14L30.79,20.90L30.91,20.89L30.98,20.80L30.99,20.58L30.88,20.29L30.55,20.03L30.41,20.04L30.36,19.90L30.40,19.89L30.31,19.82L30.23,19.81L30.31,19.92L30.07,20.14L29.84,20.02L29.86,19.83L29.45,20.04L29.42,19.96L29.28,20.05ZM13.31,19.67L13.11,19.79L13.16,19.98L13.28,20.08L13.20,20.14L13.23,20.32L13.17,20.37L13.23,20.42L13.47,20.43L13.67,20.27L13.57,20.03L13.47,19.95L13.42,19.75ZM19.99,19.51L19.94,19.57L20.02,19.67L20.05,19.64ZM17.42,19.31L17.37,19.31L17.37,19.38L17.20,19.43L17.21,19.61L17.02,19.70L16.97,19.83L16.81,19.89L16.52,19.90L16.50,20.10L16.18,20.06L15.94,20.10L15.90,20.16L16,20.30L16.21,20.39L16.57,20.38L16.76,20.14L16.77,20.21L17.15,20.28L17.18,20.45L17.32,20.53L17.43,20.47L17.41,20.22L17.48,20.09L17.61,20.08L17.71,20.13L17.74,20.30L17.87,20.46L18.41,20.69L18.74,20.61L18.71,20.49L18.60,20.39L18.63,20.34L18.89,20.33L19.09,20.54L19.27,20.55L19.30,20.32L19.25,20.15L19.04,20.16L18.87,20L18.87,19.93L19,19.89L18.95,19.73L18.78,19.61L18.87,19.56L18.47,19.42L18.11,19.50L17.90,19.46L17.72,19.34L17.50,19.38ZM27.58,21.45L27.80,21.53L27.76,21.62L27.88,21.60L27.95,21.50L27.97,21.26L28.05,21.21L28.04,21.31L28.09,21.32L28.25,21.15L28.21,20.92L28.12,20.90L28.05,20.96L27.98,20.84L27.97,20.71L28.09,20.51L28.35,20.40L28.61,20.43L28.70,20.51L28.83,20.29L28.73,20.01L28.58,19.83L28.55,19.36L28.44,19.29L28.21,19.24L27.88,19.30L27.83,19.38L27.64,19.41L27.58,19.61L27.50,19.62L27.22,19.83L27.08,19.86L26.89,19.73L26.81,20L26.62,20.07L26.54,19.99L26.42,20.03L26.24,19.97L26.17,19.81L25.99,19.70L26,19.52L25.83,19.81L25.45,19.89L25.30,19.81L25.25,19.87L24.99,19.88L24.87,19.76L24.71,19.84L24.35,19.80L24.27,19.73L24.13,19.74L24.08,19.65L23.71,19.59L23.73,19.72L23.62,19.90L23.36,19.85L23.21,19.89L23.43,19.95L23.49,20.05L23.50,20.23L23.42,20.41L23.22,20.41L22.78,20.17L22.78,20.39L22.55,20.57L22.53,20.84L22.68,21.04L22.78,20.98L22.88,21.01L22.89,21.33L22.78,21.48L22.67,21.50L22.49,21.65L22.21,21.69L22.14,21.75L22.11,21.83L22.16,22.02L22.07,22.28L21.96,22.38L21.76,22.72L21.60,22.85L21.27,22.96L20.77,22.95L20.67,23.15L20.54,23.17L20.46,23.08L20.40,23.20L20.22,23.25L20.14,23.18L20.04,23.29L19.56,23.44L19.77,23.45L20.11,23.57L20.48,23.51L20.52,23.67L20.43,23.66L20.06,23.86L20.09,23.91L20.34,23.95L20.51,23.95L20.83,23.84L20.86,23.75L20.66,23.62L20.59,23.64L20.61,23.58L20.97,23.47L21.20,23.47L21.42,23.38L21.70,23.38L21.84,23.61L22.13,23.84L22.51,23.79L22.60,23.61L22.83,23.56L23.16,23.37L23.20,23.22L23.50,23.28L23.82,23.24L24.19,22.70L24.12,23L24.24,23L24.33,22.86L24.25,22.66L24.25,22.43L24.18,22.38L24.24,22.21L24.39,22.22L24.39,22.34L24.34,22.38L24.38,22.43L24.65,22.38L24.75,22.44L24.99,22.41L25.18,22.45L25.28,22.31L25.30,22.35L25.53,22.01L25.45,21.96L25.41,22.08L25.35,22.08L25.39,22.02L25.25,21.94L25.23,21.80L25.13,21.70L25.41,21.43L25.31,21.35L25.21,21.43L25.10,21.35L25.07,21.30L25.16,21.17L25.33,21.12L25.34,21.25L25.40,21.26L25.34,21.29L25.44,21.29L25.45,21.11L25.52,21.09L25.73,21.34L25.83,21.31L25.81,21.37L25.89,21.43L25.95,21.37L26.04,21.70L26.20,21.75L26.26,21.67L26.23,21.75L26.44,21.96L26.60,21.99L26.68,22.08L26.90,22.03L26.88,21.89L27.01,21.81L27.14,21.86L27.14,22.02L27.21,22.03L27.27,21.91L27.35,21.97L27.44,21.94L27.48,21.87L27.33,21.79L27.31,21.72L27.38,21.65L27.50,21.71ZM19.35,19.24L19.17,19.34L19.18,19.42L18.99,19.42L19.09,19.49L19.05,19.67L19.14,19.64L19.25,19.71L19.32,19.67L19.41,19.74L19.50,19.63L19.62,19.58L19.84,19.60L19.78,19.54L19.35,19.41ZM29.46,19.17L29.43,19.11L29.43,19.16L29.33,19.19L29.39,19.30L29.32,19.33L29.46,19.46L29.53,19.33ZM31.77,18.63L31.82,18.59L31.78,18.52L31.62,18.63L31.13,18.53L30.83,18.75L30.62,18.65L30.56,18.55L30.45,18.72L30.53,18.87L30.73,18.76L31.16,18.86L31.41,18.85ZM34.25,17.75L34.16,17.70L34.12,17.73L34.11,17.93L34.02,17.99L34.04,18.05L34.21,17.92L34.66,17.93L34.65,17.81L34.48,17.86ZM33.38,17.88L33.50,17.84L33.47,17.70L33.42,17.70L33.35,17.84ZM27.46,17.49L27.31,17.40L27.14,17.60L27.39,17.64L27.46,17.93L27.40,18.10L27.23,18.16L27.17,18.29L27.28,18.37L27.47,18.24L27.53,18.27L27.69,18.43L27.74,18.71L27.97,18.95L28.06,18.89L28.23,18.57L28.57,18.42L28.50,18.29L28.51,18.10L28.43,18.03L28.30,18.14L28.05,17.87L27.91,18.04L27.79,18.06L27.60,17.91ZM34.28,17.13L34.12,17.17L34.25,17.23L34.32,17.34L34.46,17.19ZM30.15,17.08L29.97,17.09L29.79,17.24L29.66,17.20L29.66,17.35L29.82,17.60L29.71,17.75L29.65,18L29.93,18.24L29.90,18.34L29.73,18.41L29.76,18.46L29.93,18.45L29.99,18.53L29.81,18.88L29.63,18.86L29.61,18.90L29.68,19.04L29.67,19.24L29.72,19.38L29.83,19.39L29.96,19.27L30,19.09L30.22,19.06L30.37,18.82L30.29,18.62L30.11,18.60L30.08,18.54L30.12,18.21L30.27,17.93L30.35,17.60L30.24,17.62L30.05,17.38L30.02,17.28L30.14,17.20ZM37.71,16.49L37.48,16.62L37.21,16.57L37.08,16.65L36.83,16.65L36.68,16.58L36.70,16.70L36.92,16.76L36.99,16.85L36.93,16.97L36.94,17.12L36.73,17.43L36.81,17.62L36.79,17.82L36.69,17.99L36.84,18.26L36.71,18.46L36.77,18.64L36.69,18.77L36.35,19L36.17,19L36,18.86L35.96,18.97L35.84,19.02L35.87,19.13L35.79,19.20L35.63,19.24L35.53,19.17L35.54,19.08L35.35,19.09L35.27,19.21L35.10,19.30L35.27,19.36L35.44,19.56L35.42,19.81L35.47,19.74L35.52,19.76L35.49,19.87L35.40,19.86L35.25,20.16L35.10,20.23L35.11,20.45L35.03,20.76L35.07,20.85L34.97,21.14L34.92,21.16L34.97,21.22L35.05,21.26L35.25,21.21L35.38,21.02L35.58,20.94L35.98,21.01L36.22,20.88L36.12,20.69L36.01,20.68L35.89,20.40L36.05,19.80L36.07,19.30L36.12,19.23L36.65,19.04L36.91,18.77L37.08,18.68L37.77,18.73L38.07,18.66L38.27,18.73L38.28,18.43L38.21,18.41L38.23,18.50L38.16,18.48L38.09,18.30L38.11,18.17L38.20,18.10L38.16,18.06L38.18,17.90L38.32,17.69L38.70,17.72L38.98,17.94L39.32,17.65L39.43,17.77L39.54,17.78L39.78,17.65L40.03,17.63L40.08,17.39L40.25,17.23L40.43,17.15L40.73,17.10L40.98,17.22L41.40,17L41.62,17.03L41.73,16.92L41.76,16.79L41.90,16.75L42.05,16.61L42.02,16.56L41.69,16.61L41.60,16.76L41.13,16.67L40.87,16.75L40.80,16.89L40.39,17.09L40.33,17.01L40.52,16.79L40.52,16.68L40.45,16.63L40.11,16.67L39.97,16.74L39.99,17.04L39.93,17.08L40.01,17.18L40.16,17.22L40.13,17.29L39.64,17.26L39.57,17.31L39.47,17.28L39.42,17.38L39.31,17.44L39.16,17.36L38.98,17.36L38.67,17.46L38.60,17.40L38.54,17.48L38.52,17.29L38.67,17.10L38.67,17.01L38.51,16.96L38.47,16.87L38.36,16.94L38.07,16.96L37.92,16.79L37.89,16.66L37.72,16.62ZM39.96,16.24L40.07,16.12L39.98,16.09L39.82,16.18L39.86,16.27ZM39.07,16.01L39.01,16.01L39,16.09L39.30,16.39L39.36,16.63L39.42,16.64L39.41,16.58L39.65,16.59L39.77,16.48L39.87,16.52L39.83,16.44L39.46,16.35L39.33,16.03L39.23,16.08ZM38.13,15.90L38.07,15.94L37.94,15.91L37.95,15.97L37.84,16.10L37.56,16.14L37.58,16.23L37.73,16.35L37.99,16.27L38.13,16.02ZM39.97,15.02L39.90,15.04L39.85,15.17L39.79,15.16L39.80,15.31L39.91,15.38L40,15.34L40.10,15.15L40.19,15.12L40.10,15.03ZM41.58,1.93L41.29,1.85L41.09,1.88L40.78,2.16L40.70,2.30L40.62,2.33L40.32,2.28L40.01,2.14L39.41,2.28L39.22,2.22L38.79,1.96L38.21,1.88L37.86,2.09L37.43,2.07L37.25,2.17L36.94,2.03L36.77,2.15L36.63,2.36L37.11,2.76L37.20,2.94L37.38,3.05L37.50,3.29L37.63,3.40L38.22,3.17L38.51,3.27L38.61,3.42L38.73,3.33L39.27,3.27L39.44,3.46L39.81,3.44L40.22,3.66L40.52,3.75L41.06,3.70L41.19,3.77L41.63,3.69L41.77,3.80L41.97,3.82L42.08,3.76L42.15,3.79L42.09,3.80L42.20,3.93L42.40,3.95L42.63,4.25L42.99,4.34L43.61,4.72L43.70,4.83L43.94,4.89L44.21,5.23L44.28,5.23L44.44,5.40L44.63,5.49L44.87,5.36L44.93,5.16L44.83,4.61L43.93,3.39L43.67,3.17L43.50,2.94L43.21,2.88L42.93,2.47L42.69,2.48L42.53,2.37L42.46,2.23Z","usvi":"M10.72,27.92L10.31,28.53L8.51,27.85L7.86,27.45L7.35,26.43L7.11,26.97L6.57,26.60L5.34,26.84L4.46,26.67L3.78,25.92L1.97,26.46L1.05,25.58L2.74,24.68L4.17,24.31L6.26,24.39L7.11,25.00L7.62,24.83L6.70,24.11L6.26,23.60L7.48,23.98L9.59,25.20L11.67,26.39L12.51,27.75L11.87,27.85L11.36,27.68ZM6.40,27.02L6.67,27.23L6.75,27.52L6.51,27.62L6.35,27.60L6.13,27.93L5.74,28.42L5.63,28.26L5.64,28.02L5.77,27.67L6.20,27.17ZM8.47,22.42L8.88,22.72L8.90,23.42L8.68,23.64L8.40,23.26L8.26,22.81L8.04,22.55ZM20.43,26.22L20.02,26.39L20.63,27.21L20.26,28.60L18.42,27.61L15.57,27.89L14.72,27.10L15.57,25.81L16.52,25.40L17.54,25.10L17.30,24.66L17.81,24.38L19.71,24.90L20.63,25.07L21.48,25.44L22.50,25.98L22.74,26.60L21.96,26.73Z","route":[[18.428,-64.6125],[18.405,-64.607],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.3325,-64.6295],[18.345,-64.633],[18.371,-64.61],[18.375,-64.56],[18.373,-64.5375],[18.37,-64.534],[18.373,-64.5375],[18.383,-64.532],[18.387,-64.5135],[18.388,-64.518],[18.396,-64.515],[18.4288,-64.4469],[18.445,-64.452],[18.49,-64.44],[18.515,-64.415],[18.522,-64.383],[18.503,-64.382],[18.501,-64.3605],[18.503,-64.382],[18.522,-64.383],[18.7215,-64.388],[18.48,-64.494],[18.458,-64.497],[18.455,-64.522],[18.461,-64.529],[18.452,-64.535],[18.463,-64.5712],[18.465,-64.6],[18.462,-64.64],[18.445,-64.668],[18.432,-64.671],[18.4255,-64.6615],[18.432,-64.671],[18.44,-64.69],[18.435,-64.7105],[18.43,-64.725],[18.432,-64.75],[18.4415,-64.7505],[18.3865,-64.7175],[18.3866,-64.708],[18.387,-64.702],[18.3866,-64.708],[18.383,-64.708],[18.378,-64.708],[18.372,-64.695],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.335,-64.638],[18.405,-64.607],[18.428,-64.6125]],"ferry":[[18.3365,-64.9315],[18.318,-64.9],[18.317,-64.86],[18.333,-64.835],[18.362,-64.812],[18.373,-64.765],[18.378,-64.722],[18.392,-64.67],[18.41,-64.63],[18.42,-64.615]]};
+const MAP={"w":46.66,"h":30.6,"lon0":-65.06,"lat0":18.78,"cos":0.948324,"bvi":"M25.99,27.39L25.90,27.35L25.93,27.52L25.81,27.58L25.61,27.56L25.54,27.44L25.40,27.56L25.27,27.56L25.11,27.40L24.95,27.36L25.07,27.44L25.05,27.59L25.42,27.67L25.42,27.81L25.31,27.84L25.22,27.98L25.11,28.03L24.96,27.97L24.82,27.79L24.85,28.09L24.80,28.19L24.65,28.22L24.70,28.30L24.82,28.35L24.88,28.29L24.99,28.40L25.02,28.25L25.16,28.24L25.24,28.30L25.28,28.17L25.37,28.15L25.57,28.27L25.66,28.17L25.50,28L25.56,27.87L25.65,27.88L25.74,27.75L25.88,27.80L25.92,27.67L26.11,27.56L26.33,27.62L26.29,27.75L26.51,27.67L26.68,27.79L26.68,27.44L26.49,27.41L26.41,27.47L26.25,27.48ZM24.72,26.79L24.67,26.84L24.77,26.92ZM27.46,25.41L27.35,25.18L27.18,25.11L27.10,25.02L27.22,25.26L27.40,25.36L27.34,25.49L27.13,25.56L26.81,25.56L26.61,25.34L26.14,25.41L26.24,25.49L26.25,25.57L26.10,25.64L25.74,25.60L25.52,25.68L25.83,25.84L25.93,25.96L25.97,25.92L25.95,25.80L26.04,25.75L26.40,25.91L26.46,26.02L26.54,25.84L26.67,25.82L26.73,25.72L26.92,25.77L27.03,25.67L27.22,25.74L27.33,25.66L27.47,25.67L27.71,25.89L27.66,26.11L27.87,26.48L27.70,26.73L27.75,26.87L27.92,26.96L28.19,27L28.09,26.74L28.13,26.35L28.03,26.01L28.03,25.58L28.10,25.53L28.08,25.43L28.03,25.36L27.97,25.51L27.81,25.53L27.68,25.45L27.68,25.33L27.59,25.24L27.52,25.27L27.57,25.39ZM28.35,24.81L28.23,24.77L28.16,24.97L28.40,24.91ZM30.37,24.24L30.33,24.22L30.28,24.33L30.13,24.43L29.95,24.41L29.93,24.49L30.06,24.56L29.97,24.59L29.95,24.65L29.99,24.68L30.04,24.61L30.17,24.57L30.07,24.55L30.08,24.47L30.23,24.48L30.24,24.55L30.18,24.56L30.37,24.70L30.45,24.94L30.55,24.97L30.57,24.74L30.54,24.79L30.46,24.76L30.42,24.56L30.46,24.43L30.60,24.37L30.70,24.25ZM19.79,23.82L19.53,23.85L19.34,23.95L19.79,23.97L19.83,23.93ZM31.22,23.48L31.09,23.42L31.15,23.73L31,23.98L31.11,24.01L31.17,24.15L31.35,24.25L31.33,24.41L31.40,24.63L31.47,24.56L31.58,24.57L31.87,24.78L31.98,24.54L31.88,24.39L31.60,24.40L31.37,24.25L31.44,24.09L31.39,23.97L31.58,23.79L31.45,23.72L31.47,23.75L31.42,23.77L31.38,23.65L31.21,23.61ZM19.05,23.35L18.56,23.48L18.15,23.48L17.61,23.72L17.52,23.82L17.70,23.86L17.85,23.80L18.15,23.79L18.35,23.91L18.45,23.86L18.37,23.72L18.51,23.61L18.43,23.57L18.47,23.51L18.79,23.54L19.01,23.45L19.13,23.46ZM33.55,23.21L33.10,23.26L32.72,23.51L32.48,23.60L32.59,23.62L32.94,23.51L33.08,23.61L33.08,23.76L33.42,23.86L33.49,23.74L33.22,23.60L33.27,23.52L33.20,23.47L33.25,23.40L33.52,23.46L33.62,23.31ZM20.63,22.86L20.50,22.88L20.43,22.97L20.64,22.98L20.68,22.92ZM34.25,22.95L34.36,22.90L34.36,22.84L34.23,22.88L34.20,22.95ZM27.53,21.74L27.48,21.83L27.62,21.78ZM34.64,21.57L34.56,21.70L34.54,21.93L34.73,21.76L34.75,21.59ZM28.52,21.22L28.38,21.09L28.47,21.22L28.45,21.37L28.54,21.44L28.68,21.45L28.71,21.39ZM12.31,20.93L12.27,20.86L12.18,20.94L11.99,20.98L11.96,21.06L12.13,21.14L12.25,21.06ZM20.01,20.60L19.88,20.60L19.88,20.66L20.04,20.65ZM29.67,20.37L29.63,20.41L29.74,20.44ZM29.12,20.02L29.05,19.93L29.10,19.73L28.84,19.73L28.81,19.95L28.88,19.93L28.92,19.99L28.85,20.12L28.92,20.14L29.04,20.02L29.17,20.17L28.96,20.17L28.97,20.21L29.25,20.29L29.34,20.46L29.51,20.49L29.63,20.25L29.74,20.39L30,20.34L30.02,20.40L30.27,20.47L30.51,20.76L30.57,21.14L30.79,20.90L30.91,20.89L30.98,20.80L30.99,20.58L30.88,20.29L30.55,20.03L30.41,20.04L30.36,19.90L30.40,19.89L30.31,19.82L30.23,19.81L30.31,19.92L30.07,20.14L29.84,20.02L29.86,19.83L29.45,20.04L29.42,19.96L29.28,20.05ZM13.31,19.67L13.11,19.79L13.16,19.98L13.28,20.08L13.20,20.14L13.23,20.32L13.17,20.37L13.23,20.42L13.47,20.43L13.67,20.27L13.57,20.03L13.47,19.95L13.42,19.75ZM19.99,19.51L19.94,19.57L20.02,19.67L20.05,19.64ZM17.42,19.31L17.37,19.31L17.37,19.38L17.20,19.43L17.21,19.61L17.02,19.70L16.97,19.83L16.81,19.89L16.52,19.90L16.50,20.10L16.18,20.06L15.94,20.10L15.90,20.16L16,20.30L16.21,20.39L16.57,20.38L16.76,20.14L16.77,20.21L17.15,20.28L17.18,20.45L17.32,20.53L17.43,20.47L17.41,20.22L17.48,20.09L17.61,20.08L17.71,20.13L17.74,20.30L17.87,20.46L18.41,20.69L18.74,20.61L18.71,20.49L18.60,20.39L18.63,20.34L18.89,20.33L19.09,20.54L19.27,20.55L19.30,20.32L19.25,20.15L19.04,20.16L18.87,20L18.87,19.93L19,19.89L18.95,19.73L18.78,19.61L18.87,19.56L18.47,19.42L18.11,19.50L17.90,19.46L17.72,19.34L17.50,19.38ZM27.58,21.45L27.80,21.53L27.76,21.62L27.88,21.60L27.95,21.50L27.97,21.26L28.05,21.21L28.04,21.31L28.09,21.32L28.25,21.15L28.21,20.92L28.12,20.90L28.05,20.96L27.98,20.84L27.97,20.71L28.09,20.51L28.35,20.40L28.61,20.43L28.70,20.51L28.83,20.29L28.73,20.01L28.58,19.83L28.55,19.36L28.44,19.29L28.21,19.24L27.88,19.30L27.83,19.38L27.64,19.41L27.58,19.61L27.50,19.62L27.22,19.83L27.08,19.86L26.89,19.73L26.81,20L26.62,20.07L26.54,19.99L26.42,20.03L26.24,19.97L26.17,19.81L25.99,19.70L26,19.52L25.83,19.81L25.45,19.89L25.30,19.81L25.25,19.87L24.99,19.88L24.87,19.76L24.71,19.84L24.35,19.80L24.27,19.73L24.13,19.74L24.08,19.65L23.71,19.59L23.73,19.72L23.62,19.90L23.36,19.85L23.21,19.89L23.43,19.95L23.49,20.05L23.50,20.23L23.42,20.41L23.22,20.41L22.78,20.17L22.78,20.39L22.55,20.57L22.53,20.84L22.68,21.04L22.78,20.98L22.88,21.01L22.89,21.33L22.78,21.48L22.67,21.50L22.49,21.65L22.21,21.69L22.14,21.75L22.11,21.83L22.16,22.02L22.07,22.28L21.96,22.38L21.76,22.72L21.60,22.85L21.27,22.96L20.77,22.95L20.67,23.15L20.54,23.17L20.46,23.08L20.40,23.20L20.22,23.25L20.14,23.18L20.04,23.29L19.56,23.44L19.77,23.45L20.11,23.57L20.48,23.51L20.52,23.67L20.43,23.66L20.06,23.86L20.09,23.91L20.34,23.95L20.51,23.95L20.83,23.84L20.86,23.75L20.66,23.62L20.59,23.64L20.61,23.58L20.97,23.47L21.20,23.47L21.42,23.38L21.70,23.38L21.84,23.61L22.13,23.84L22.51,23.79L22.60,23.61L22.83,23.56L23.16,23.37L23.20,23.22L23.50,23.28L23.82,23.24L24.19,22.70L24.12,23L24.24,23L24.33,22.86L24.25,22.66L24.25,22.43L24.18,22.38L24.24,22.21L24.39,22.22L24.39,22.34L24.34,22.38L24.38,22.43L24.65,22.38L24.75,22.44L24.99,22.41L25.18,22.45L25.28,22.31L25.30,22.35L25.53,22.01L25.45,21.96L25.41,22.08L25.35,22.08L25.39,22.02L25.25,21.94L25.23,21.80L25.13,21.70L25.41,21.43L25.31,21.35L25.21,21.43L25.10,21.35L25.07,21.30L25.16,21.17L25.33,21.12L25.34,21.25L25.40,21.26L25.34,21.29L25.44,21.29L25.45,21.11L25.52,21.09L25.73,21.34L25.83,21.31L25.81,21.37L25.89,21.43L25.95,21.37L26.04,21.70L26.20,21.75L26.26,21.67L26.23,21.75L26.44,21.96L26.60,21.99L26.68,22.08L26.90,22.03L26.88,21.89L27.01,21.81L27.14,21.86L27.14,22.02L27.21,22.03L27.27,21.91L27.35,21.97L27.44,21.94L27.48,21.87L27.33,21.79L27.31,21.72L27.38,21.65L27.50,21.71ZM19.35,19.24L19.17,19.34L19.18,19.42L18.99,19.42L19.09,19.49L19.05,19.67L19.14,19.64L19.25,19.71L19.32,19.67L19.41,19.74L19.50,19.63L19.62,19.58L19.84,19.60L19.78,19.54L19.35,19.41ZM29.46,19.17L29.43,19.11L29.43,19.16L29.33,19.19L29.39,19.30L29.32,19.33L29.46,19.46L29.53,19.33ZM31.77,18.63L31.82,18.59L31.78,18.52L31.62,18.63L31.13,18.53L30.83,18.75L30.62,18.65L30.56,18.55L30.45,18.72L30.53,18.87L30.73,18.76L31.16,18.86L31.41,18.85ZM34.25,17.75L34.16,17.70L34.12,17.73L34.11,17.93L34.02,17.99L34.04,18.05L34.21,17.92L34.66,17.93L34.65,17.81L34.48,17.86ZM33.38,17.88L33.50,17.84L33.47,17.70L33.42,17.70L33.35,17.84ZM27.46,17.49L27.31,17.40L27.14,17.60L27.39,17.64L27.46,17.93L27.40,18.10L27.23,18.16L27.17,18.29L27.28,18.37L27.47,18.24L27.53,18.27L27.69,18.43L27.74,18.71L27.97,18.95L28.06,18.89L28.23,18.57L28.57,18.42L28.50,18.29L28.51,18.10L28.43,18.03L28.30,18.14L28.05,17.87L27.91,18.04L27.79,18.06L27.60,17.91ZM34.28,17.13L34.12,17.17L34.25,17.23L34.32,17.34L34.46,17.19ZM30.15,17.08L29.97,17.09L29.79,17.24L29.66,17.20L29.66,17.35L29.82,17.60L29.71,17.75L29.65,18L29.93,18.24L29.90,18.34L29.73,18.41L29.76,18.46L29.93,18.45L29.99,18.53L29.81,18.88L29.63,18.86L29.61,18.90L29.68,19.04L29.67,19.24L29.72,19.38L29.83,19.39L29.96,19.27L30,19.09L30.22,19.06L30.37,18.82L30.29,18.62L30.11,18.60L30.08,18.54L30.12,18.21L30.27,17.93L30.35,17.60L30.24,17.62L30.05,17.38L30.02,17.28L30.14,17.20ZM37.71,16.49L37.48,16.62L37.21,16.57L37.08,16.65L36.83,16.65L36.68,16.58L36.70,16.70L36.92,16.76L36.99,16.85L36.93,16.97L36.94,17.12L36.73,17.43L36.81,17.62L36.79,17.82L36.69,17.99L36.84,18.26L36.71,18.46L36.77,18.64L36.69,18.77L36.35,19L36.17,19L36,18.86L35.96,18.97L35.84,19.02L35.87,19.13L35.79,19.20L35.63,19.24L35.53,19.17L35.54,19.08L35.35,19.09L35.27,19.21L35.10,19.30L35.27,19.36L35.44,19.56L35.42,19.81L35.47,19.74L35.52,19.76L35.49,19.87L35.40,19.86L35.25,20.16L35.10,20.23L35.11,20.45L35.03,20.76L35.07,20.85L34.97,21.14L34.92,21.16L34.97,21.22L35.05,21.26L35.25,21.21L35.38,21.02L35.58,20.94L35.98,21.01L36.22,20.88L36.12,20.69L36.01,20.68L35.89,20.40L36.05,19.80L36.07,19.30L36.12,19.23L36.65,19.04L36.91,18.77L37.08,18.68L37.77,18.73L38.07,18.66L38.27,18.73L38.28,18.43L38.21,18.41L38.23,18.50L38.16,18.48L38.09,18.30L38.11,18.17L38.20,18.10L38.16,18.06L38.18,17.90L38.32,17.69L38.70,17.72L38.98,17.94L39.32,17.65L39.43,17.77L39.54,17.78L39.78,17.65L40.03,17.63L40.08,17.39L40.25,17.23L40.43,17.15L40.73,17.10L40.98,17.22L41.40,17L41.62,17.03L41.73,16.92L41.76,16.79L41.90,16.75L42.05,16.61L42.02,16.56L41.69,16.61L41.60,16.76L41.13,16.67L40.87,16.75L40.80,16.89L40.39,17.09L40.33,17.01L40.52,16.79L40.52,16.68L40.45,16.63L40.11,16.67L39.97,16.74L39.99,17.04L39.93,17.08L40.01,17.18L40.16,17.22L40.13,17.29L39.64,17.26L39.57,17.31L39.47,17.28L39.42,17.38L39.31,17.44L39.16,17.36L38.98,17.36L38.67,17.46L38.60,17.40L38.54,17.48L38.52,17.29L38.67,17.10L38.67,17.01L38.51,16.96L38.47,16.87L38.36,16.94L38.07,16.96L37.92,16.79L37.89,16.66L37.72,16.62ZM39.96,16.24L40.07,16.12L39.98,16.09L39.82,16.18L39.86,16.27ZM39.07,16.01L39.01,16.01L39,16.09L39.30,16.39L39.36,16.63L39.42,16.64L39.41,16.58L39.65,16.59L39.77,16.48L39.87,16.52L39.83,16.44L39.46,16.35L39.33,16.03L39.23,16.08ZM38.13,15.90L38.07,15.94L37.94,15.91L37.95,15.97L37.84,16.10L37.56,16.14L37.58,16.23L37.73,16.35L37.99,16.27L38.13,16.02ZM39.97,15.02L39.90,15.04L39.85,15.17L39.79,15.16L39.80,15.31L39.91,15.38L40,15.34L40.10,15.15L40.19,15.12L40.10,15.03ZM41.58,1.93L41.29,1.85L41.09,1.88L40.78,2.16L40.70,2.30L40.62,2.33L40.32,2.28L40.01,2.14L39.41,2.28L39.22,2.22L38.79,1.96L38.21,1.88L37.86,2.09L37.43,2.07L37.25,2.17L36.94,2.03L36.77,2.15L36.63,2.36L37.11,2.76L37.20,2.94L37.38,3.05L37.50,3.29L37.63,3.40L38.22,3.17L38.51,3.27L38.61,3.42L38.73,3.33L39.27,3.27L39.44,3.46L39.81,3.44L40.22,3.66L40.52,3.75L41.06,3.70L41.19,3.77L41.63,3.69L41.77,3.80L41.97,3.82L42.08,3.76L42.15,3.79L42.09,3.80L42.20,3.93L42.40,3.95L42.63,4.25L42.99,4.34L43.61,4.72L43.70,4.83L43.94,4.89L44.21,5.23L44.28,5.23L44.44,5.40L44.63,5.49L44.87,5.36L44.93,5.16L44.83,4.61L43.93,3.39L43.67,3.17L43.50,2.94L43.21,2.88L42.93,2.47L42.69,2.48L42.53,2.37L42.46,2.23Z","usvi":"M10.72,27.92L10.31,28.53L8.51,27.85L7.86,27.45L7.35,26.43L7.11,26.97L6.57,26.60L5.34,26.84L4.46,26.67L3.78,25.92L1.97,26.46L1.05,25.58L2.74,24.68L4.17,24.31L6.26,24.39L7.11,25.00L7.62,24.83L6.70,24.11L6.26,23.60L7.48,23.98L9.59,25.20L11.67,26.39L12.51,27.75L11.87,27.85L11.36,27.68ZM6.40,27.02L6.67,27.23L6.75,27.52L6.51,27.62L6.35,27.60L6.13,27.93L5.74,28.42L5.63,28.26L5.64,28.02L5.77,27.67L6.20,27.17ZM8.47,22.42L8.88,22.72L8.90,23.42L8.68,23.64L8.40,23.26L8.26,22.81L8.04,22.55ZM20.43,26.22L20.02,26.39L20.63,27.21L20.26,28.60L18.42,27.61L15.57,27.89L14.72,27.10L15.57,25.81L16.52,25.40L17.54,25.10L17.30,24.66L17.81,24.38L19.71,24.90L20.63,25.07L21.48,25.44L22.50,25.98L22.74,26.60L21.96,26.73Z","route":[[18.428,-64.6125],[18.405,-64.607],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.3325,-64.6295],[18.345,-64.633],[18.371,-64.61],[18.375,-64.56],[18.373,-64.5375],[18.37,-64.534],[18.373,-64.5375],[18.383,-64.532],[18.387,-64.5135],[18.388,-64.518],[18.396,-64.515],[18.4288,-64.4469],[18.445,-64.452],[18.49,-64.44],[18.515,-64.415],[18.522,-64.383],[18.503,-64.382],[18.501,-64.3605],[18.503,-64.382],[18.522,-64.383],[18.7215,-64.388],[18.51,-64.552],[18.47,-64.553],[18.461,-64.556],[18.463,-64.5712],[18.452,-64.535],[18.461,-64.529],[18.452,-64.535],[18.463,-64.5712],[18.465,-64.6],[18.462,-64.64],[18.445,-64.668],[18.44,-64.69],[18.435,-64.7105],[18.43,-64.725],[18.432,-64.75],[18.4415,-64.7505],[18.3865,-64.7175],[18.3866,-64.708],[18.387,-64.702],[18.3866,-64.708],[18.383,-64.708],[18.378,-64.708],[18.372,-64.695],[18.335,-64.638],[18.322,-64.629],[18.318,-64.618],[18.322,-64.629],[18.335,-64.638],[18.405,-64.607],[18.428,-64.6125]],"ferry":[[18.3365,-64.9315],[18.318,-64.9],[18.317,-64.86],[18.333,-64.835],[18.362,-64.812],[18.373,-64.765],[18.378,-64.722],[18.392,-64.67],[18.41,-64.63],[18.42,-64.615]]};
 </script>
 <script>
 (function () {
@@ -1482,18 +1589,24 @@ const store = {
 
 /* ---------------- settings ---------------- */
 const BOAT_DESC = 'Moorings 403PC power catamaran';
-const DEFAULTS = { v: 2, start: '2026-12-13', nights: 7, boatName: '', boatModel: '', crew: '', fuelCap: 370, waterCap: 170,
-  mooringsPhone: '', mooringsEmerg: '', ferryOut: '', ferryBack: '', flightIn: '', flightOut: '', notes: '', theme: 'auto' };
+const BUILD = '2026-11-11'; // shown under More > About so the group can check they all have the same guide
+const DEFAULTS = { v: 3, start: '2026-12-13', nights: 7, boatName: '', crew: '', boat2Name: '', crew2: '', myBoat: '1', vhfCh: '', boatModel: '',
+  fuelCap: 370, waterCap: 170, mooringsPhone: '', mooringsEmerg: '', ferryOut: '', ferryBack: '', flightIn: '', flightOut: '', notes: '', theme: 'auto' };
 let S = (function () {
   const saved = store.get('settings', {});
-  if (saved.v !== 2) { // first version assumed a sailing cat with no dates
+  if (!(saved.v >= 2)) { // first version assumed a sailing cat with no dates
     if (!saved.start) delete saved.start;
     if (Number(saved.fuelCap) === 95) delete saved.fuelCap;
     if (Number(saved.waterCap) === 206) delete saved.waterCap;
-    delete saved.boatType; saved.v = 2;
+    delete saved.boatType;
   }
+  saved.v = 3;
   return Object.assign({}, DEFAULTS, saved);
 })();
+function onBoat2() { return S.myBoat === '2' && !!S.boat2Name; }
+function myBoatName() { return onBoat2() ? S.boat2Name : S.boatName; }
+function otherBoatName() { return S.boat2Name ? (onBoat2() ? S.boatName : S.boat2Name) : ''; }
+function myCrew() { return onBoat2() ? S.crew2 : S.crew; }
 
 function applyTheme() {
   const root = document.documentElement;
@@ -1600,6 +1713,7 @@ const STOPS = [
     what: 'Giant granite boulders, grottoes and pools. A trail through the boulders (ladders and ropes, 20–30 min) links The Baths to Devil’s Bay.',
     moor: 'National Parks day moorings only. Dinghies tie to the dinghy line and you swim in; bring a dry bag. A red flag means no mooring and no swimming.',
     todo: 'Arrive by 8 AM. Water shoes for the trail. Snorkel along the rocks.',
+    kids: 'With a baby or toddler, go by land instead: taxi from Spanish Town to the top entrance and walk down.',
     caution: 'Crowded late morning when cruise ships are in. Surge can be dangerous in a north swell. Entry by land is $3 adult, $2 child.' },
   { id: 'vgyh', name: 'Spanish Town (Virgin Gorda Yacht Harbour)', short: 'Spanish Town', area: 'Virgin Gorda', lat: 18.4483, lon: -64.44, kind: 'marina', lp: 'r',
     tags: ['Marina', 'Fuel', 'Groceries', 'ATM'],
@@ -1752,6 +1866,10 @@ const PLAN = [
     alt: '' }
 ];
 
+const NIGHT_IDS = STOPS.filter(s => s.kind !== 'day').map(s => s.id);
+const PLAN_TO = ['bight', 'cooper', 'saba', 'anegada', 'marina_cay', 'jvd_gh', 'bight', 'base']; // where each suggested day ends
+let planEdits = store.get('plan', {}); // day index -> stop id, only for days changed from the suggestion
+
 const GLOSSARY = [
   ['Port / starboard', 'Left / right when facing the front of the boat. Port has four letters, like "left".'],
   ['Bow / stern', 'Front / back.'], ['Windward / leeward', 'The side the wind comes from / the side it blows toward.'],
@@ -1781,18 +1899,18 @@ const GLOSSARY = [
 
 const CHECKLISTS = [
   { id: 'pretrip', title: 'Before you fly', items: [
-    'Passports for everyone (valid well past the trip)', 'BVI ED card done online for each person; QR codes saved', 'Ferry tickets booked for Sat Dec 12 (round trip)',
-    'Sleep-aboard night requested for Sat Dec 12', 'Moorings paperwork and crew list sent', 'Fuel prepayment arranged with The Moorings',
+    'Passports for everyone (valid well past the trip)', 'BVI ED card done online for each person; QR codes saved', 'Ferry booked both ways (the Sunday return needs a specific sailing)',
+    'Saturday night sorted: hotel in Road Town or a sleep-aboard', 'Moorings paperwork and crew list sent', 'Fuel prepayment arranged with The Moorings',
     'Provisioning order in (5 days ahead)', 'Kids’ life jackets requested or packed',
     'BoatyBall app installed with payment set up', 'Chart app with BVI offline; offline Google Maps', 'Phone travel plan turned on (BVI = roaming)',
-    'Cash in small bills', 'This app opened from the home screen (offline ready)'] },
+    'Cash in small bills', 'This app opened from the home screen (offline ready)', 'Moorings MyAccount checklist and guest list finished', 'Infant and child life jackets test-fitted'] },
   { id: 'checkout', title: 'Boat check-out at the base', items: [
     'Note fuel (both tanks) and water levels; photo of engine-hour meters', 'Photos/video of existing damage, including the dinghy',
     'Find: life jackets (count them), throwable ring, flares, first-aid kit, fire extinguishers', 'Find: seacocks, bilge-pump switches, CO alarms (test them)',
     'Learn: engine start/stop and the engine display', 'Learn: switching helms (flybridge / inside); bow thruster if fitted', 'Learn: which tank feeds which engine and the generator',
     'Learn: generator, A/C and watermaker', 'Learn: battery switches, inverter, shore power', 'Learn: propane solenoid, spare tank swap',
     'Learn: head operation and holding tank', 'Learn: windlass, chain marks, bridle', 'Learn: chartplotter, depth, VHF (USA mode), cameras',
-    'Learn: davit winch, outboard start, kill cord, dinghy lock', 'Ask: Anegada OK? Recommended cruise rpm? Fuel prepayment terms?', 'Save Moorings phone numbers in Settings'] },
+    'Learn: davit winch, outboard start, kill cord, dinghy lock', 'Ask: Anegada OK? Recommended cruise rpm? Fuel prepayment terms?', 'Save Moorings phone numbers in Settings', 'Child safety netting fitted, if you ordered it', 'Two boats: agree a VHF working channel and do a radio check'] },
   { id: 'engine', title: 'Morning engine & generator check', items: [
     'Oil between the marks (both engines)', 'Coolant visible in the overflow tanks', 'Raw-water strainers clear, seacocks open', 'Belts tight, no fraying',
     'Engine rooms dry; no fuel or oil smell', 'Generator: oil, coolant, strainer', 'Engine hours and fuel gauge written down',
@@ -1851,32 +1969,68 @@ function renderLegs() {
 }
 
 function planDate(i) { const st = parseDate(S.start); return st ? addDays(st, i) : null; }
-function dayCard(p, i, isToday) {
-  const d = planDate(i);
-  const route = p.stops.map(id => esc(STOP[id].short)).join(' <span aria-hidden="true">→</span> ');
-  const note = store.get('note.d' + (i + 1), '');
-  return '<article class="card day' + (isToday ? ' today' : '') + '" id="plan-d' + (i + 1) + '">' +
-    '<div class="day-head"><span class="day-no">' + (i + 1) + '</span><div><h3>' + esc(p.title) + '</h3>' +
+function tripNights() { return Math.min(21, Math.max(1, Number(S.nights) || 7)); }
+function planDays() { // the suggested days, padded or trimmed to the trip length, then the return day
+  const n = tripNights(), days = [];
+  for (let i = 0; i < n; i++) days.push(i < 7 ? Object.assign({ to: PLAN_TO[i] }, PLAN[i])
+    : { title: 'Extra day', stops: [], nm: 0, am: 'No suggestion for this day. Pick tonight’s stop below.', pm: '', night: '', alt: '', to: '' });
+  days.push(Object.assign({ to: 'base', last: true }, PLAN[7]));
+  return days;
+}
+function nightOf(days, i) {
+  if (i < 0 || days[i].last) return 'base';
+  const e = planEdits[i];
+  return (e && STOP[e]) ? e : (days[i].to || nightOf(days, i - 1));
+}
+function estNm(a, b) { if (a === b) return 0; const A = STOP[a], B = STOP[b]; return Math.max(1, Math.round(Math.hypot((A.lon - B.lon) * 60 * 0.948, (A.lat - B.lat) * 60) * 1.25)); }
+const ARROW = ' <span aria-hidden="true">→</span> ';
+function dayCard(days, i, isToday) {
+  const p = days[i], d = planDate(i), n = i + 1;
+  const to = nightOf(days, i), from = nightOf(days, i - 1), T = STOP[to], F = STOP[from];
+  const expectedFrom = p.stops.length ? p.stops[0] : from;
+  const changed = !p.last && to !== p.to, movedStart = from !== expectedFrom;
+  const kv = (k, v) => v ? '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>' : '';
+  let title = p.title, leg, body;
+  if (changed) {
+    title = from === to ? 'Staying at ' + T.short : 'Tonight: ' + T.name;
+    leg = esc(F.short) + (from === to ? '' : ARROW + esc(T.short) + ' <span class="pill">about <span class="nm">' + estNm(from, to) + '</span> nm</span>') + ' <span class="pill caution">Changed</span>';
+    body = kv('Tonight', T.what) + kv('Mooring', T.moor) + kv('Food', T.food) + kv('Watch out', T.caution) + (p.to ? kv('Suggested was', p.title) : '');
+  } else {
+    const stops = movedStart ? [from].concat(p.stops.slice(1)) : p.stops;
+    leg = stops.map(id => esc(STOP[id].short)).join(ARROW) + (movedStart ? ' <span class="pill caution">New start</span>' : ' <span class="pill">≈ <span class="nm">' + p.nm + '</span> nm</span>');
+    body = (movedStart ? kv('Note', 'You’re starting from ' + F.name + ', not ' + STOP[expectedFrom].short + ', so the distances and times below will differ. It’s about ' + estNm(from, to) + ' nm direct to ' + T.short + '.') : '') +
+      kv('Morning', p.am) + kv('Afternoon', p.pm) + kv('Night', p.night) + kv('Plan B', p.alt);
+  }
+  const pick = p.last ? '' : '<div class="field"><label for="plan-to-' + n + '">Tonight’s stop</label><select id="plan-to-' + n + '" data-plan="' + i + '">' +
+    NIGHT_IDS.map(id => '<option value="' + id + '"' + (id === to ? ' selected' : '') + '>' + esc(STOP[id].name) + (id === p.to ? ' (suggested)' : '') + '</option>').join('') + '</select></div>';
+  const note = store.get('note.d' + n, '');
+  return '<article class="card day' + (isToday ? ' today' : '') + '" id="plan-d' + n + '">' +
+    '<div class="day-head"><span class="day-no">' + n + '</span><div><h3>' + esc(title) + '</h3>' +
     (d ? '<div class="date">' + fmtDate(d) + (isToday ? ' · today' : '') + '</div>' : '') + '</div></div>' +
-    '<div class="legline">' + route + ' <span class="pill">≈ <span class="nm">' + p.nm + '</span> nm</span></div>' +
-    '<dl class="kv"><dt>Morning</dt><dd>' + esc(p.am) + '</dd><dt>Afternoon</dt><dd>' + esc(p.pm) + '</dd><dt>Night</dt><dd>' + esc(p.night) + '</dd>' +
-    (p.alt ? '<dt>Plan B</dt><dd>' + esc(p.alt) + '</dd>' : '') + '</dl>' +
-    '<div class="field"><label for="note-d' + (i + 1) + '">Our notes</label><textarea id="note-d' + (i + 1) + '" data-note="d' + (i + 1) + '" placeholder="Reservations, changes, highlights">' + esc(note) + '</textarea></div>' +
+    '<div class="legline">' + leg + '</div><dl class="kv">' + body + '</dl>' + pick +
+    '<div class="field"><label for="note-d' + n + '">Our notes</label><textarea id="note-d' + n + '" data-note="d' + n + '" placeholder="Reservations, changes, highlights">' + esc(note) + '</textarea></div>' +
     '</article>';
 }
 function renderPlan() {
-  const ti = tripIndex();
-  $('#plan-list').innerHTML = PLAN.map((p, i) => dayCard(p, i, ti === i)).join('');
+  const ti = tripIndex(), days = planDays();
+  $('#plan-list').innerHTML = days.map((_, i) => dayCard(days, i, ti === i)).join('');
+  $('#plan-reset').hidden = !Object.keys(planEdits).length;
 }
 
 function tripIndex() { const st = parseDate(S.start); if (!st) return null; return dayDiff(st, bviToday()); }
 
+function renderBoatPick() {
+  const card = $('#boat-pick'), show = !!(S.boatName && S.boat2Name) && !store.get('boatChosen', false);
+  card.hidden = !show;
+  if (show) $('#boat-pick-btns').innerHTML = '<button class="btn primary" type="button" data-pick="1">' + esc(S.boatName) + '</button><button class="btn primary" type="button" data-pick="2">' + esc(S.boat2Name) + '</button>';
+}
+
 function renderToday() {
   const st = parseDate(S.start), today = bviToday();
-  const nights = Math.max(1, Number(S.nights) || 7);
+  const nights = tripNights(), days = planDays();
   let focus = today;
   const eyebrow = $('#hero-eyebrow'), title = $('#hero-title'), text = $('#hero-text'), btn = $('#hero-btn');
-  let planHtml = '<p class="small">Your day-by-day plan appears here during the trip. <a href="#islands-plan">See the 7-night plan →</a></p>';
+  let planHtml = '<p class="small">Your day-by-day plan appears here during the trip. <a href="#islands-plan">See the plan →</a></p>';
   if (!st) {
     eyebrow.textContent = 'December 2026'; title.textContent = 'Set your charter dates';
     text.textContent = 'Add your dates in Settings and this screen becomes your daily briefing: the day’s plan, sunset, and when to be on a mooring.';
@@ -1884,7 +2038,6 @@ function renderToday() {
     focus = new Date(2026, 11, 15);
   } else {
     const i = dayDiff(st, today);
-    const end = addDays(st, nights);
     if (i < 0) {
       const n = -i;
       eyebrow.textContent = 'Boarding ' + fmtDate(st, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -1893,20 +2046,19 @@ function renderToday() {
       btn.textContent = 'Before-you-fly checklist'; btn.setAttribute('href', '#cl-pretrip'); btn.hidden = false;
       focus = st;
     } else if (i <= nights) {
-      const p = PLAN[Math.min(i, PLAN.length - 1)];
-      const last = i === nights;
+      const p = days[i], last = !!p.last, to = nightOf(days, i);
       eyebrow.textContent = 'Day ' + (i + 1) + ' of ' + (nights + 1) + ' · ' + fmtDate(today, { weekday: 'long', month: 'short', day: 'numeric' });
-      title.textContent = last ? 'Return to base' : (i < PLAN.length ? p.title : 'Your call today');
+      title.textContent = last ? 'Return to base' : (to !== p.to ? 'Tonight: ' + STOP[to].short : p.title);
       text.textContent = last ? 'Back at the base by 9:00 AM for the exit briefing, off the boat by 10:00. Call The Moorings on VHF 12 about 15–20 minutes out.' : 'Check the weather and swell, do the engine check, and be on a mooring by the time below.';
       btn.textContent = 'Morning engine check'; btn.setAttribute('href', '#cl-engine'); btn.hidden = false;
-      if (i < PLAN.length) planHtml = dayCard(PLAN[last ? PLAN.length - 1 : i], last ? PLAN.length - 1 : i, true).replace('class="card day today"', 'class="day"').replace(/id="plan-d(\d+)"/, 'id="today-d$1"').replace(/id="note-d(\d+)"/, 'id="today-note-d$1"').replace(/for="note-d(\d+)"/, 'for="today-note-d$1"');
+      planHtml = dayCard(days, i, true).replace('class="card day today"', 'class="day"').replace(/id="plan-d(\d+)"/, 'id="today-d$1"')
+        .replace(/id="note-d(\d+)"/, 'id="today-note-d$1"').replace(/for="note-d(\d+)"/, 'for="today-note-d$1"')
+        .replace(/id="plan-to-(\d+)"/, 'id="today-plan-to-$1"').replace(/for="plan-to-(\d+)"/, 'for="today-plan-to-$1"');
     } else {
       eyebrow.textContent = 'Back home'; title.textContent = 'Fair winds';
-      text.textContent = 'Hope it was a great trip. Your notes are still saved in the 7-night plan.';
+      text.textContent = 'Hope it was a great trip. Your notes are still saved in the plan.';
       btn.hidden = true;
     }
-    if (i >= 0 && i <= nights) focus = today;
-    if (end < today) focus = today;
   }
   $('#today-plan-body').innerHTML = planHtml;
   const sun = sunTimes(focus), mo = moon(focus);
@@ -1914,14 +2066,15 @@ function renderToday() {
   $('#t-rise').textContent = r.t + ' ' + r.ap; $('#t-set').textContent = s.t + ' ' + s.ap; $('#t-moor').textContent = m.t + ' ' + m.ap;
   $('#t-date').textContent = fmtDate(focus) + ' · Road Town';
   $('#t-moon').textContent = mo.illum + '%'; $('#t-moon-d').textContent = mo.name;
-  $('#view-sub').textContent = st ? (S.boatName ? S.boatName + ' · ' : '') + 'Moorings, Tortola' : 'BVI charter · Moorings, Tortola';
-  renderTripCard();
+  $('#view-sub').textContent = st ? (myBoatName() ? myBoatName() + ' · ' : '') + 'Moorings, Tortola' : 'BVI charter · Moorings, Tortola';
+  renderBoatPick(); renderTripCard();
 }
 
 function renderTripCard() {
   const st = parseDate(S.start);
   const rows = [
-    ['Boat', [S.boatName, S.boatModel || BOAT_DESC].filter(Boolean).join(' · ')],
+    ['Our boat', [myBoatName(), S.boatModel || BOAT_DESC].filter(Boolean).join(' · ')],
+    ['Other boat', otherBoatName()], ['Boat-to-boat VHF', S.vhfCh ? 'Channel ' + S.vhfCh : ''],
     ['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, Math.max(1, Number(S.nights) || 7))) + ' (' + (Number(S.nights) || 7) + ' nights)' : ''],
     ['Ferry out', S.ferryOut], ['Ferry back', S.ferryBack], ['Flight in', S.flightIn], ['Flight home', S.flightOut],
     ['Moorings base', S.mooringsPhone ? '<a href="tel:' + esc(S.mooringsPhone.replace(/[^\d+]/g, '')) + '">' + esc(S.mooringsPhone) + '</a> · VHF 12' : 'VHF 12'],
@@ -1932,16 +2085,18 @@ function renderTripCard() {
 }
 
 function renderMayday() {
-  const name = S.boatName ? esc(S.boatName) : '[boat name]';
+  const name = myBoatName() ? esc(myBoatName()) : '[boat name]';
   const desc = S.boatModel ? esc(S.boatModel) : '40-foot white power catamaran';
-  const crew = S.crew ? esc(S.crew) : '[number]';
+  const crew = myCrew() ? esc(myCrew()) : '[number]';
   const pos = lastPos ? esc(lastPos) : '[position, or e.g. “one mile north of Cooper Island”]';
   $('#mayday-script').innerHTML =
-    '"MAYDAY, MAYDAY, MAYDAY.<br>This is sailing vessel <mark>' + name + '</mark>, <mark>' + name + '</mark>, <mark>' + name + '</mark>.<br>' +
+    '"MAYDAY, MAYDAY, MAYDAY.<br>This is motor vessel <mark>' + name + '</mark>, <mark>' + name + '</mark>, <mark>' + name + '</mark>.<br>' +
     'MAYDAY <mark>' + name + '</mark>.<br>Our position is <mark>' + pos + '</mark>.<br>' +
     'We are <mark>[sinking / on fire / person overboard / medical emergency]</mark>.<br>' +
     'We need immediate assistance. <mark>' + crew + '</mark> people on board.<br>' +
     'We are a <mark>' + desc + '</mark>.<br>Over."';
+  const tel = n => '<a href="tel:' + esc(String(n).replace(/[^\d+]/g, '')) + '">' + esc(n) + '</a>';
+  $('#num-moorings').innerHTML = (S.mooringsPhone ? tel(S.mooringsPhone) + ' · ' : '') + (S.mooringsEmerg ? tel(S.mooringsEmerg) + ' <small>(after hours)</small> · ' : '') + 'VHF 12' + (S.mooringsPhone ? '' : ' · add the phone number in Settings');
   const mp = $('#sos-moorings');
   if (S.mooringsPhone) mp.innerHTML = '<a href="tel:' + esc(S.mooringsPhone.replace(/[^\d+]/g, '')) + '" style="color:inherit">' + esc(S.mooringsPhone) + '</a>'; else mp.textContent = 'Add in Settings';
   const er = $('#sos-moorings-emerg-row');
@@ -1979,8 +2134,11 @@ function renderGlossary() { $('#glossary').innerHTML = GLOSSARY.map(g => '<dt>' 
 
 /* ---------------- fuel calculator ---------------- */
 const NM_PER_GAL = { fast: 0.8, slow: 4 }, GEN_GPH = 0.7;
+const FUEL_FIELDS = ['fast', 'slow', 'gen', 'days', 'start', 'price'];
+function restoreFuel() { const f = store.get('fuel', {}); FUEL_FIELDS.forEach(k => { const el = $('#fc-' + k); if (el && f[k] != null && f[k] !== '') el.value = f[k]; }); }
 function calcFuel() {
   if (!$('#fc-fast')) return;
+  const saved = {}; FUEL_FIELDS.forEach(k => { saved[k] = $('#fc-' + k).value; }); store.set('fuel', saved);
   const num = id => Math.max(0, Number($(id).value) || 0);
   const fast = num('#fc-fast'), slow = num('#fc-slow'), gen = num('#fc-gen'), days = Math.max(1, num('#fc-days'));
   const tank = Math.max(1, num('#fc-tank')), startFrac = Number($('#fc-start').value) || 1, price = num('#fc-price');
@@ -1997,9 +2155,32 @@ function calcFuel() {
     : 'Plenty of margin. You probably won’t need a fuel dock, but top off if you drop below half.';
 }
 
+/* ---------------- daily log ---------------- */
+let logData = store.get('log', {});
+function renderLog() {
+  $('#log-body').innerHTML = planDays().map((_, i) => {
+    const d = planDate(i), r = logData[i] || {};
+    const cell = (k, max, label) => '<td><input type="number" inputmode="decimal" min="0" max="' + max + '" step="0.1" data-log="' + i + '.' + k + '" aria-label="' + label + ', day ' + (i + 1) + '" value="' + esc(r[k] == null ? '' : r[k]) + '"></td>';
+    return '<tr><td>' + (d ? fmtDate(d, { weekday: 'short', day: 'numeric' }) : 'Day ' + (i + 1)) + '</td>' + cell('h', 99999, 'Engine hours') + cell('f', 100, 'Fuel percent') + cell('w', 100, 'Water percent') + '</tr>';
+  }).join('');
+  logSummary();
+}
+function logSummary() {
+  const num = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
+  const rows = Object.keys(logData).map(Number).sort((a, b) => a - b).map(i => ({ h: num(logData[i].h), f: num(logData[i].f), w: num(logData[i].w) }));
+  const H = rows.filter(r => r.h != null), F = rows.filter(r => r.f != null), W = rows.filter(r => r.w != null), cap = Number(S.fuelCap) || 370, out = [];
+  let used = 0; for (let i = 1; i < F.length; i++) used += Math.max(0, F[i - 1].f - F[i].f) / 100 * cap; // rises are refuels
+  const hrs = H.length >= 2 ? H[H.length - 1].h - H[0].h : null;
+  if (hrs != null && hrs >= 0) out.push(['Engine hours run', hrs.toFixed(1) + ' h']);
+  if (F.length >= 2) out.push(['Fuel used', '≈ ' + Math.round(used) + ' gal' + (hrs > 0 ? ' · ≈ ' + (used / hrs).toFixed(1) + ' gal per engine hour' : '')]);
+  if (F.length) { const f = F[F.length - 1].f; out.push(['Fuel on board', '≈ ' + Math.round(f / 100 * cap) + ' of ' + cap + ' gal' + (f < 35 ? '. Plan a fuel stop.' : '')]); }
+  if (W.length) { const w = W[W.length - 1].w, wc = Number(S.waterCap) || 170; out.push(['Water on board', '≈ ' + Math.round(w / 100 * wc) + ' of ' + wc + ' gal' + (w < 30 ? '. Top up or run the watermaker.' : '')]); }
+  $('#log-summary').innerHTML = out.length ? out.map(r => '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>').join('') : '<dt>Nothing yet</dt><dd>Fill in two mornings to see your real fuel burn.</dd>';
+}
+
 /* ---------------- map ---------------- */
 const NS = 'http://www.w3.org/2000/svg';
-let mapReady = false, vb = null, svgEl, gMarks;
+let mapReady = false, vb = null, svgEl, gMarks, mapFull = false, mapScrollY = 0;
 function P(lat, lon) { return [(lon - MAP.lon0) * 60 * MAP.cos, (MAP.lat0 - lat) * 60]; }
 const FULL = (function () { const a = P(18.765, -64.80), b = P(18.29, -64.255); return { x: a[0], y: a[1], w: b[0] - a[0], h: b[1] - a[1] }; })();
 const REGIONS = {
@@ -2043,7 +2224,7 @@ function drawMarks() {
   const toScr = p => [(p[0] - x) * k, (p[1] - y) * k];
   const level = k >= 24 ? 3 : k >= 15 ? 2 : 1;
   gMarks.textContent = '';
-  const boxes = [{ x0: w - 58, y0: 0, x1: w, y1: 150 }];
+  const boxes = [{ x0: w - 58, y0: 0, x1: w, y1: 195 }];
   const free = b => b.x0 > 2 && b.y0 > 2 && b.x1 < w - 2 && b.y1 < h - 2 && !boxes.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
   if (k >= 14) {
     const ch = P(18.392, -64.585);
@@ -2128,19 +2309,31 @@ function focusStop(id) {
   const p = P(s.lat, s.lon); const w = 9, h = 9;
   vb = { x: p[0] - w / 2, y: p[1] - h / 2, w: w, h: h }; drawMarks(); syncVbFromSvg(); showInfo(id);
 }
+function setMapFull(on) {
+  if (!mapReady || on === mapFull) return;
+  if (on) mapScrollY = window.scrollY;
+  mapFull = on;
+  $('#map-card').classList.toggle('full', on); document.body.classList.toggle('map-open', on);
+  const b = $('#map-full'); b.textContent = on ? '✕' : '⤢'; b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Close full-screen map' : 'Full-screen map');
+  requestAnimationFrame(() => { if (!on) window.scrollTo(0, mapScrollY); drawMarks(); syncVbFromSvg(); });
+}
+function clearInfo() { const i = $('#map-info'); i.classList.add('empty'); i.innerHTML = '<p class="small">Tap a dot to see what\u2019s there.</p>'; }
 function showInfo(id) {
   const s = STOP[id];
+  $('#map-info').classList.remove('empty');
   $('#map-info').innerHTML = '<div class="pills">' + stopKindPill(s.kind) + '</div><h3>' + esc(s.name) + '</h3><p class="small">' + esc(s.area) + '</p><p>' + esc(s.what) + '</p>' +
     (s.caution ? '<p class="small"><strong>Watch out:</strong> ' + esc(s.caution) + '</p>' : '') + '<p><a href="#stop-' + s.id + '">Full details →</a></p>';
 }
 function bindMap() {
   const pts = new Map(); let pinch = null, moved = false, downAt = null;
-  svgEl.addEventListener('pointerdown', e => { svgEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); moved = false; downAt = [e.clientX, e.clientY];
+  const canDrag = e => mapFull || e.pointerType === 'mouse';
+  svgEl.addEventListener('pointerdown', e => { if (canDrag(e)) svgEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); moved = false; downAt = [e.clientX, e.clientY];
     if (pts.size === 2) { const [a, b] = Array.from(pts.values()); pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } });
   svgEl.addEventListener('pointermove', e => {
     if (!pts.has(e.pointerId)) return;
     const prev = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) moved = true;
+    if (!canDrag(e)) return;
     if (pts.size === 1) {
       const k = screenToMap(0, 0)[2];
       vb.x -= (e.clientX - prev[0]) / k; vb.y -= (e.clientY - prev[1]) / k; clampVb(); drawMarks(); syncVbFromSvg();
@@ -2155,11 +2348,12 @@ function bindMap() {
     pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
     if (!moved && e.type === 'pointerup') {
       const t = document.elementFromPoint(e.clientX, e.clientY); const mk = t && t.closest && t.closest('.mk');
-      if (mk) showInfo(mk.getAttribute('data-id'));
+      if (mk) showInfo(mk.getAttribute('data-id')); else if (mapFull) clearInfo();
     }
   };
   svgEl.addEventListener('pointerup', up); svgEl.addEventListener('pointercancel', up);
-  svgEl.addEventListener('wheel', e => { e.preventDefault(); const m = screenToMap(e.clientX, e.clientY); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, m[0], m[1]); syncVbFromSvg(); }, { passive: false });
+  svgEl.addEventListener('wheel', e => { if (!mapFull && !e.ctrlKey) return; e.preventDefault(); const m = screenToMap(e.clientX, e.clientY); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, m[0], m[1]); syncVbFromSvg(); }, { passive: false });
+  $('#map-full').addEventListener('click', () => setMapFull(!mapFull));
   $('#map-in').addEventListener('click', () => { zoomAt(1.5); syncVbFromSvg(); });
   $('#map-out').addEventListener('click', () => { zoomAt(1 / 1.5); syncVbFromSvg(); });
   $('#map-reset').addEventListener('click', () => { vb = Object.assign({}, FULL); drawMarks(); syncVbFromSvg(); });
@@ -2172,12 +2366,13 @@ const VIEWS = ['today', 'travel', 'boat', 'islands', 'logistics', 'more'];
 const scrollMem = {};
 let current = null;
 function show(view, targetId) {
+  if (mapFull) setMapFull(false);
   if (current && current !== view) scrollMem[current] = window.scrollY;
   VIEWS.forEach(v => { $('#' + v).hidden = v !== view; });
   $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === view ? 'page' : 'false'));
   const sec = $('#' + view);
   $('#view-title').textContent = sec.dataset.title;
-  if (view !== 'today') $('#view-sub').textContent = { travel: 'STT → ferry → Road Town → base', boat: S.boatName ? S.boatName + ' · Moorings 403PC' : 'Moorings 403PC power catamaran', islands: 'Chart, plan, distances, stops', logistics: 'Moorings, anchoring, fuel, money', more: 'Safety, weather, checklists, settings' }[view];
+  if (view !== 'today') $('#view-sub').textContent = { travel: 'STT → ferry → Road Town → base', boat: myBoatName() ? myBoatName() + ' · Moorings 403PC' : 'Moorings 403PC power catamaran', islands: 'Chart, plan, distances, stops', logistics: 'Moorings, anchoring, fuel, money', more: 'Safety, weather, checklists, settings' }[view];
   else renderToday();
   if (view === 'islands') { initMap(); requestAnimationFrame(drawMarks); }
   const changed = current !== view; current = view; store.set('view', view);
@@ -2261,26 +2456,44 @@ function fillSettingsForm() {
 /* ---------------- offline ---------------- */
 function setOffline(ok, msg) { $('#offline-dot').classList.toggle('ok', ok); $('#offline-status').textContent = msg; }
 function initOffline() {
-  if (window.BVI_PREVIEW) { setOffline(false, 'This is the online preview. For offline use, open ' + window.BVI_PREVIEW + ' in Safari and add it to your home screen.'); return; }
+  if (window.BVI_PREVIEW) { setOffline(false, 'This is the online preview. For offline use, open ' + window.BVI_PREVIEW + ' in your phone\u2019s browser and add it to your home screen.'); return; }
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const canSW = 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-  if (!standalone && canSW) $('#install-card').hidden = false;
-  if (!canSW) { setOffline(false, 'Offline storage isn’t available in this view. Open the app from its web address in Safari and add it to your home screen.'); return; }
+  if (!standalone && canSW) {
+    const ua = navigator.userAgent || '';
+    const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const last = '<li>Open it once from the home screen while you still have Wi-Fi. After that it works with no signal.</li>';
+    if (ios) $('#install-steps').innerHTML = '<li>Tap the <strong>Share</strong> button (the square with an arrow).</li><li>Choose <strong>Add to Home Screen</strong>. If it isn\u2019t listed, open this page in <strong>Safari</strong> first.</li>' + last;
+    else if (/Android/i.test(ua)) $('#install-steps').innerHTML = '<li>Tap the <strong>\u22EE</strong> menu in Chrome.</li><li>Choose <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>' + last;
+    $('#install-card').hidden = false;
+  }
+  if (!canSW) { setOffline(false, 'Offline storage isn’t available in this view. Open the app from its web address in your phone\u2019s browser and add it to your home screen.'); return; }
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'update-ready') $('#update-bar').hidden = false; });
+  let lastCheck = Date.now();
+  document.addEventListener('visibilitychange', () => { // installed apps are resumed, not reloaded, so re-check when they come back
+    const c = navigator.serviceWorker.controller;
+    if (!document.hidden && c && navigator.onLine !== false && Date.now() - lastCheck > 5 * 60 * 1000) { lastCheck = Date.now(); c.postMessage('check'); }
+  });
   navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
     setOffline(true, 'Saved for offline use on this device.');
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   }).catch(() => setOffline(false, 'Couldn’t save for offline use. Reload once on Wi-Fi.'));
 }
 
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; const r = $('#install-btn-row'); if (r) r.hidden = false; });
+window.addEventListener('appinstalled', () => { const c = $('#install-card'); if (c) c.hidden = true; });
+
 /* ---------------- sharing ---------------- */
 const APP_URL = 'https://rwfloberg.github.io/Photo23D/bvi/';
-const SHARE_KEYS = { s: 'start', n: 'nights', b: 'boatName', m: 'boatModel', c: 'crew', f: 'fuelCap', w: 'waterCap',
+const SHARE_KEYS = { s: 'start', n: 'nights', b: 'boatName', c: 'crew', b2: 'boat2Name', c2: 'crew2', v: 'vhfCh', m: 'boatModel', f: 'fuelCap', w: 'waterCap',
   p: 'mooringsPhone', e: 'mooringsEmerg', o: 'ferryOut', r: 'ferryBack', t: 'notes' };
 function b64urlEncode(str) { let bin = ''; new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function b64urlDecode(str) { str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))); }
 function tripCode() {
   const o = {};
   for (const k in SHARE_KEYS) { const v = S[SHARE_KEYS[k]]; if (v !== '' && v != null) o[k] = v; }
+  o.x = planEdits; // the organizer's plan changes (empty means the suggested plan)
   return 'BVI1.' + b64urlEncode(JSON.stringify(o));
 }
 function parseTrip(text) {
@@ -2295,17 +2508,25 @@ function parseTrip(text) {
     else { v = String(v).slice(0, key === 'notes' ? 2000 : 200); if (key === 'start' && !/^\d{4}-\d{2}-\d{2}$/.test(v)) continue; }
     out[key] = v;
   }
+  if (o.x && typeof o.x === 'object') {
+    const pe = {}; Object.keys(o.x).forEach(k => { if (/^\d{1,2}$/.test(k) && NIGHT_IDS.indexOf(o.x[k]) >= 0) pe[k] = o.x[k]; });
+    out._plan = pe;
+  }
   return Object.keys(out).length ? out : null;
 }
 function tripSummary(t) {
   const st = parseDate(t.start), n = Number(t.nights) || 7;
-  return [['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, n)) : ''], ['Boat', [t.boatName, t.boatModel].filter(Boolean).join(' · ')],
+  const pn = t._plan ? Object.keys(t._plan).length : 0;
+  return [['Dates', st ? fmtDate(st) + ' → ' + fmtDate(addDays(st, n)) : ''], ['Boats', [t.boatName, t.boat2Name].filter(Boolean).join(' & ')],
+    ['Plan', t._plan ? (pn ? pn + (pn === 1 ? ' day' : ' days') + ' changed from the suggestion' : 'The suggested plan') : ''],
     ['Moorings', [t.mooringsPhone, t.mooringsEmerg].filter(Boolean).join(' · ')], ['Ferry out', t.ferryOut], ['Ferry back', t.ferryBack],
     ['Notes', t.notes ? (t.notes.length > 90 ? t.notes.slice(0, 90) + '…' : t.notes) : '']].filter(r => r[1]);
 }
 function applyTrip(t) {
-  Object.assign(S, t); store.set('settings', S);
-  fillSettingsForm(); applyBoat(); renderPlan(); renderToday(); renderMayday();
+  if (t._plan) { planEdits = t._plan; store.set('plan', planEdits); }
+  Object.keys(t).forEach(k => { if (k !== '_plan') S[k] = t[k]; });
+  store.set('settings', S);
+  fillSettingsForm(); applyBoat(); renderPlan(); renderLog(); renderToday(); renderMayday();
 }
 async function copyText(text, msgEl, box) {
   try { await navigator.clipboard.writeText(text); msgEl.textContent = 'Copied. Paste it into your group chat.'; if (box) box.hidden = true; }
@@ -2352,13 +2573,19 @@ function bind() {
     const rb = e.target.closest('[data-reset]');
     if (rb) { const id = rb.dataset.reset; Object.keys(checks).forEach(k => { if (k.indexOf(id + '.') === 0) delete checks[k]; }); store.set('checks', checks); $$('input[data-check^="' + id + '."]').forEach(i => { i.checked = false; }); updateCounts(); }
     if (e.target.closest('[data-open-sos]')) openSheet('sos');
+    const pk = e.target.closest('[data-pick]');
+    if (pk) { S.myBoat = pk.dataset.pick; store.set('settings', S); store.set('boatChosen', true); fillSettingsForm(); renderToday(); renderMayday(); }
   });
   document.addEventListener('change', e => {
     const c = e.target.closest('input[data-check]');
     if (c) { if (c.checked) checks[c.dataset.check] = true; else delete checks[c.dataset.check]; store.set('checks', checks); updateCounts(); }
     if (e.target.closest('#fuel-calc')) calcFuel();
+    const ps = e.target.closest('select[data-plan]');
+    if (ps) { const i = ps.dataset.plan; if (ps.value === planDays()[i].to) delete planEdits[i]; else planEdits[i] = ps.value; store.set('plan', planEdits); renderPlan(); renderToday(); }
   });
   document.addEventListener('input', e => {
+    const lg = e.target.closest('input[data-log]');
+    if (lg) { const k = lg.dataset.log.split('.'); (logData[k[0]] = logData[k[0]] || {})[k[1]] = lg.value; store.set('log', logData); logSummary(); }
     const n = e.target.closest('textarea[data-note]');
     if (n) { store.set('note.' + n.dataset.note, n.value); $$('textarea[data-note="' + n.dataset.note + '"]').forEach(o => { if (o !== n) o.value = n.value; }); }
     if (e.target.closest('#fuel-calc')) calcFuel();
@@ -2367,9 +2594,12 @@ function bind() {
   $('#search-open').addEventListener('click', () => openSheet('search'));
   $('#sos-backdrop').addEventListener('click', closeSheets);
   $('#search-backdrop').addEventListener('click', closeSheets);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheets(); setMapFull(false); } });
   $('#search-q').addEventListener('input', e => doSearch(e.target.value));
   $('#pos-btn').addEventListener('click', getPos);
+  $('#update-btn').addEventListener('click', () => location.reload());
+  $('#plan-reset').addEventListener('click', () => { planEdits = {}; store.set('plan', planEdits); renderPlan(); renderToday(); });
+  $('#install-btn').addEventListener('click', () => { if (!installEvt) return; installEvt.prompt(); installEvt.userChoice.then(() => { installEvt = null; $('#install-btn-row').hidden = true; }, () => {}); });
   $('#share-app').addEventListener('click', () => shareOrCopy({ title: 'BVI Charter Guide', text: 'Our BVI trip guide. It works offline once installed (iPhone: open in Safari \u2192 Share \u2192 Add to Home Screen).', url: APP_URL }, APP_URL, $('#share-app-msg')));
   $('#copy-app').addEventListener('click', () => copyText(APP_URL, $('#share-app-msg')));
   $('#share-trip').addEventListener('click', () => { const msg = tripMessage(tripCode()); shareOrCopy({ title: 'BVI trip details', text: msg }, msg, $('#share-trip-msg'), $('#trip-code-box')); });
@@ -2386,13 +2616,14 @@ function bind() {
     Object.keys(DEFAULTS).forEach(k => { const i = f.elements[k]; if (i) S[k] = i.type === 'number' ? (i.value === '' ? '' : Number(i.value)) : i.value; });
     if (!S.fuelCap) S.fuelCap = DEFAULTS.fuelCap;
     if (!S.waterCap) S.waterCap = DEFAULTS.waterCap;
-    store.set('settings', S); applyTheme(); applyBoat(); renderPlan(); renderToday(); renderMayday();
+    store.set('settings', S); if (S.boat2Name) store.set('boatChosen', true);
+    applyTheme(); applyBoat(); renderPlan(); renderLog(); renderToday(); renderMayday();
     const m = $('#settings-saved'); m.textContent = 'Saved.'; setTimeout(() => { m.textContent = ''; }, 2500);
   });
   $('#reset-all').addEventListener('click', () => {
     const btn = $('#reset-all');
     if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Tap again to clear everything'; setTimeout(() => { btn.dataset.armed = ''; btn.textContent = 'Clear all ticks and notes'; }, 4000); return; }
-    checks = {}; store.set('checks', checks); PLAN.forEach((_, i) => store.del('note.d' + (i + 1)));
+    checks = {}; store.set('checks', checks); for (let i = 1; i <= 22; i++) store.del('note.d' + i);
     renderChecklists(); renderPlan(); renderToday(); btn.dataset.armed = ''; btn.textContent = 'Clear all ticks and notes';
     $('#reset-msg').textContent = 'Cleared.';
   });
@@ -2406,8 +2637,9 @@ function bind() {
 
 /* ---------------- boot ---------------- */
 applyTheme();
-renderStops(); renderLegs(); renderPlan(); renderChecklists(); renderGlossary();
-fillSettingsForm(); applyBoat(); renderMayday(); renderToday();
+renderStops(); renderLegs(); renderPlan(); renderLog(); renderChecklists(); renderGlossary();
+$('#build-line').textContent = 'Guide version: ' + fmtDate(parseDate(BUILD), { month: 'short', day: 'numeric', year: 'numeric' }) + '. Everyone in the group should see the same date here.';
+fillSettingsForm(); restoreFuel(); applyBoat(); renderMayday(); renderToday();
 bind(); route(); initOffline(); checkTripLink();
 if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 })();
